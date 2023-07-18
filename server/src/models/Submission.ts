@@ -27,6 +27,14 @@ import ServerFlagReason from "../enum/ServerFlagReason";
 import QuestionAnswer from "./QuestionAnswer";
 import ReviewOfReview from "./ReviewOfReview";
 
+interface SubmissionInterface {
+  user: User;
+  group: Group;
+  assignmentVersion: AssignmentVersion;
+  file: File;
+  final: boolean;
+}
+
 @Entity()
 export default class Submission extends BaseModel {
   @PrimaryGeneratedColumn()
@@ -109,25 +117,21 @@ export default class Submission extends BaseModel {
   @IsEnum(ServerFlagReason)
   commentByServer: ServerFlagReason | null;
 
-  constructor(
-    user: User,
-    group: Group,
-    assignmentVersion: AssignmentVersion,
-    file: File,
-    final: boolean
-  ) {
-    super();
-    this.user = user;
-    this.group = group;
-    this.assignmentVersion = assignmentVersion;
-    this.file = file;
-    this.final = final;
-    // set default on null
-    this.approvalByTA = null;
-    this.commentByTA = null;
-    this.approvingTA = null;
-    this.flaggedByServer = null;
-    this.commentByServer = null;
+  constructor(init?: SubmissionInterface) {
+    if (init !== undefined) {
+      super();
+      this.user = init.user;
+      this.group = init.group;
+      this.assignmentVersion = init.assignmentVersion;
+      this.file = init.file;
+      this.final = init.final;
+      // set default on null
+      this.approvalByTA = null;
+      this.commentByTA = null;
+      this.approvingTA = null;
+      this.flaggedByServer = null;
+      this.commentByServer = null;
+    }
   }
 
   // validation: check whether the group is in the assingment and the user in the group

@@ -157,13 +157,13 @@ describe("Review distribution", () => {
 
       expectedResult.push(`pdfs/${student.netid + "_" + j}.pdf`);
 
-      const submission = new Submission(
-        student,
-        group,
-        assignmentVersion,
-        file,
-        true
-      );
+      const submission = new Submission({
+        user: student,
+        group: group,
+        assignmentVersion: assignmentVersion,
+        file: file,
+        final: true,
+      });
       await submission.save();
       submissions.push(submission);
     }
@@ -332,13 +332,13 @@ describe("Review distribution", () => {
       });
       await file.save();
 
-      const submission = new Submission(
-        student,
-        group,
-        assignmentVersion,
-        file,
-        true
-      );
+      const submission = new Submission({
+        user: student,
+        group: group,
+        assignmentVersion: assignmentVersion,
+        file: file,
+        final: true,
+      });
       await submission.save();
       submissions.push(submission);
     }
@@ -469,13 +469,13 @@ describe("Review distribution", () => {
     const file1 = new File({ name: "filename", extension: ".pdf", hash: null });
     await file1.save();
 
-    const submission1 = new Submission(
-      student1,
-      group1,
-      assignmentVersion,
-      file1,
-      true
-    );
+    const submission1 = new Submission({
+      user: student1,
+      group: group1,
+      assignmentVersion: assignmentVersion,
+      file: file1,
+      final: true,
+    });
     await submission1.save();
     submissions.push(submission1);
 
@@ -491,13 +491,13 @@ describe("Review distribution", () => {
     const file2 = new File({ name: "filename", extension: ".pdf", hash: null });
     await file1.save();
 
-    const submission2 = new Submission(
-      student2,
-      group2,
-      assignmentVersion,
-      file2,
-      true
-    );
+    const submission2 = new Submission({
+      user: student2,
+      group: group2,
+      assignmentVersion: assignmentVersion,
+      file: file2,
+      final: true,
+    });
     await submission2.save();
     submissions.push(submission2);
 

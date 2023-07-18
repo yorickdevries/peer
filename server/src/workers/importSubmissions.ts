@@ -200,13 +200,13 @@ const importWebLabSubmissions = async function (
 
         // make the submission
         // the submission cannot be validated, because the group has not been saved
-        const submission = new Submission(
-          user,
-          group,
-          assignmentVersion,
-          file,
-          true
-        );
+        const submission = new Submission({
+          user: user,
+          group: group,
+          assignmentVersion: assignmentVersion,
+          file: file,
+          final: true,
+        });
         await transactionalEntityManager.save(submission);
 
         // write the file (so if this fails everything above fails)

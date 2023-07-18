@@ -19,7 +19,13 @@ define(Submission, () => {
   const file = Object.create(File);
   const final = true;
 
-  return new Submission(user, group, assignmentVersion, file, final);
+  return new Submission({
+    user: user,
+    group: group,
+    assignmentVersion: assignmentVersion,
+    file: file,
+    final: final,
+  });
 });
 
 export { createSubmission };

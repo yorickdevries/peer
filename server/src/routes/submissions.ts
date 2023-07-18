@@ -361,13 +361,13 @@ router.post(
     });
 
     // create submission
-    const submission = new Submission(
-      user,
-      group,
-      assignmentVersion,
-      file,
-      true
-    );
+    const submission = new Submission({
+      user: user,
+      group: group,
+      assignmentVersion: assignmentVersion,
+      file: file,
+      final: true,
+    });
     // this checks for the right extension in the validate function
     await submission.validateOrReject();
     await getManager().transaction(
