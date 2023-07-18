@@ -6,6 +6,15 @@ import File from "./File";
 import ReviewOfSubmission from "./ReviewOfSubmission";
 import CommentingPDFAnnotation from "./CommentingPDFAnnotation";
 
+interface ReplyingPDFAnnotationInterface {
+  id: string;
+  bodyValue: string;
+  user: User;
+  file: File;
+  review: ReviewOfSubmission;
+  commentingPDFAnnotation: CommentingPDFAnnotation;
+}
+
 @ChildEntity(PDFAnnotationMotivation.REPLYING)
 export default class ReplyingPDFAnnotation extends PDFAnnotation {
   @RelationId(
@@ -21,16 +30,11 @@ export default class ReplyingPDFAnnotation extends PDFAnnotation {
   // can be null as it is in the same table as commentingPDFAnnotation
   commentingPDFAnnotation?: CommentingPDFAnnotation;
 
-  constructor(
-    id: string,
-    bodyValue: string,
-    user: User,
-    file: File,
-    review: ReviewOfSubmission,
-    commentingPDFAnnotation: CommentingPDFAnnotation
-  ) {
-    super(id, bodyValue, user, file, review);
-    this.commentingPDFAnnotation = commentingPDFAnnotation;
+  constructor(init?: ReplyingPDFAnnotationInterface) {
+    if (init !== undefined) {
+      super(init.id, init.bodyValue, init.user, init.file, init.review);
+      this.commentingPDFAnnotation = init.commentingPDFAnnotation;
+    }
   }
 
   // custom validation which is run before saving

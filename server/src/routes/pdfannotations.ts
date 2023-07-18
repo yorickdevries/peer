@@ -213,14 +213,14 @@ router.post("/", validateBody(annotationSchema), async (req, res) => {
         .send("CommentingPDFAnnotation is not found");
       return;
     }
-    const replyingPDFAnnotation = new ReplyingPDFAnnotation(
-      annotation.id,
-      annotation.bodyValue,
-      user,
-      file,
-      review,
-      commentingPDFAnnotation
-    );
+    const replyingPDFAnnotation = new ReplyingPDFAnnotation({
+      id: annotation.id,
+      bodyValue: annotation.bodyValue,
+      user: user,
+      file: file,
+      review: review,
+      commentingPDFAnnotation: commentingPDFAnnotation,
+    });
     await replyingPDFAnnotation.save();
     res.send(replyingPDFAnnotation);
   } else {
