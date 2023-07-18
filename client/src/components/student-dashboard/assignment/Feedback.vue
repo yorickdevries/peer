@@ -130,7 +130,6 @@
                                                 <h6>Average Rating:</h6>
                                                 <!-- RANGE QUESTION -->
                                                 <StarRating
-                                                    v-if="question.type === 'range'"
                                                     :rating="aggregateRange(question)"
                                                     class="align-middle"
                                                     :border-color="'#007bff'"
