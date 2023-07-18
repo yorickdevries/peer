@@ -37,6 +37,16 @@ interface AnonymousReviewWithReviewer extends AnonymousReview {
   reviewerNetid: string;
 }
 
+interface ReviewInterface {
+  questionnaire: Questionnaire;
+  reviewer: User;
+  flaggedByReviewer: boolean;
+  submitted: boolean;
+  startedAt: Date | null;
+  downloadedAt: Date | null;
+  submittedAt: Date | null;
+}
+
 // formely called rubric
 @Entity()
 @TableInheritance({ column: { type: "varchar", name: "type" } })
@@ -136,27 +146,21 @@ export default abstract class Review extends BaseModel {
 
   abstract isReviewed(user: User): Promise<boolean>;
 
-  constructor(
-    questionnaire: Questionnaire,
-    reviewer: User,
-    flaggedByReviewer: boolean,
-    submitted: boolean,
-    startedAt: Date | null,
-    downloadedAt: Date | null,
-    submittedAt: Date | null
-  ) {
-    super();
-    this.questionnaire = questionnaire;
-    this.reviewer = reviewer;
-    this.flaggedByReviewer = flaggedByReviewer;
-    this.submitted = submitted;
-    this.startedAt = startedAt;
-    this.downloadedAt = downloadedAt;
-    this.submittedAt = submittedAt;
-    // set default on null
-    this.approvalByTA = null;
-    this.commentByTA = null;
-    this.approvingTA = null;
+  constructor(init?: ReviewInterface) {
+    if (init !== undefined) {
+      super();
+      this.questionnaire = init.questionnaire;
+      this.reviewer = init.reviewer;
+      this.flaggedByReviewer = init.flaggedByReviewer;
+      this.submitted = init.submitted;
+      this.startedAt = init.startedAt;
+      this.downloadedAt = init.downloadedAt;
+      this.submittedAt = init.submittedAt;
+      // set default on null
+      this.approvalByTA = null;
+      this.commentByTA = null;
+      this.approvingTA = null;
+    }
   }
 
   // custom validation which is run before saving
