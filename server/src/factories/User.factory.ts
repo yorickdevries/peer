@@ -19,18 +19,18 @@ define(User, (faker: typeof Faker) => {
   })}`;
   const email = faker.internet.email(firstName, lastName, "tudelft.nl");
 
-  return new User(
-    parseNetID(netId),
-    undefined,
-    undefined,
-    undefined,
-    studentNumber,
-    firstName,
-    null,
-    lastName,
-    email,
-    displayName
-  );
+  return new User({
+    netid: parseNetID(netId),
+    affiliation: undefined,
+    study: undefined,
+    organisationUnit: undefined,
+    studentNumber: studentNumber,
+    firstName: firstName,
+    prefix: null,
+    lastName: lastName,
+    email: email,
+    displayName: displayName,
+  });
 });
 
 export { createUser };

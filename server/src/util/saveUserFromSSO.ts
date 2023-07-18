@@ -21,18 +21,18 @@ const saveUserFromSSO = async function (
 ): Promise<string | undefined> {
   try {
     // Try to save the user to database
-    const user = new User(
-      parseNetID(netid),
-      await parseAndSaveAffiliation(affiliation),
-      await parseAndSaveStudy(study),
-      await parseAndSaveOrganisationUnit(organisationUnit),
-      studentNumber ? parseInt(studentNumber) : null,
-      firstName ? firstName : null,
-      prefix ? prefix : null,
-      lastName ? lastName : null,
-      email ? email : null,
-      displayName ? displayName : null
-    );
+    const user = new User({
+      netid: parseNetID(netid),
+      affiliation: await parseAndSaveAffiliation(affiliation),
+      study: await parseAndSaveStudy(study),
+      organisationUnit: await parseAndSaveOrganisationUnit(organisationUnit),
+      studentNumber: studentNumber ? parseInt(studentNumber) : null,
+      firstName: firstName ? firstName : null,
+      prefix: prefix ? prefix : null,
+      lastName: lastName ? lastName : null,
+      email: email ? email : null,
+      displayName: displayName ? displayName : null,
+    });
     // Overwrites existing entry with the same NetID if present
     // might throw an error if the object is not valid
     await user.save();
@@ -43,7 +43,7 @@ const saveUserFromSSO = async function (
     try {
       const parsedNetid = parseNetID(netid);
       // save the user to the database with only the netid
-      const user = await new User(parsedNetid).save();
+      const user = await new User({ netid: parsedNetid }).save();
       console.error(`Saved with only NetID: ${user}`);
       return user.netid;
     } catch (error2) {

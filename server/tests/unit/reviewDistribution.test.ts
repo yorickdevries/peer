@@ -107,7 +107,7 @@ describe("Review distribution", () => {
     const students = [];
     const expectedResult: any[] = ["pdfs/"];
     for (let i = 0; i < numStudents; i++) {
-      const student = new User(`student${i}`);
+      const student = new User({ netid: `student${i}` });
       await student.save();
       const enrollment = new Enrollment({
         user: student,
@@ -293,7 +293,7 @@ describe("Review distribution", () => {
 
     const students = [];
     for (let i = 0; i < numStudents; i++) {
-      const student = new User(`student${i}`);
+      const student = new User({ netid: `student${i}` });
       await student.save();
       const enrollment = new Enrollment({
         user: student,
@@ -430,7 +430,7 @@ describe("Review distribution", () => {
     assignmentVersion.versionsToReview = [assignmentVersion];
     await assignmentVersion.save();
 
-    const student1 = new User(`student1`);
+    const student1 = new User({ netid: `student1` });
     await student1.save();
     const enrollment1 = new Enrollment({
       user: student1,
@@ -438,7 +438,7 @@ describe("Review distribution", () => {
       role: UserRole.STUDENT,
     });
     await enrollment1.save();
-    const student2 = new User(`student2`);
+    const student2 = new User({ netid: `student2` });
     await student2.save();
     const enrollment2 = new Enrollment({
       user: student2,
@@ -446,7 +446,7 @@ describe("Review distribution", () => {
       role: UserRole.STUDENT,
     });
     await enrollment2.save();
-    const student3 = new User(`student3`);
+    const student3 = new User({ netid: `student3` });
     await student3.save();
     const enrollment3 = new Enrollment({
       user: student3,

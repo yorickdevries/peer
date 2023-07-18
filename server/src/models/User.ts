@@ -26,6 +26,19 @@ import parseNetID from "../util/parseNetID";
 import Group from "./Group";
 import Preferences from "./Preferences";
 
+interface UserInterface {
+  netid: string;
+  affiliation?: Affiliation[];
+  study?: Study[];
+  organisationUnit?: OrganisationUnit[];
+  studentNumber?: number | null;
+  firstName?: string | null;
+  prefix?: string | null;
+  lastName?: string | null;
+  email?: string | null;
+  displayName?: string | null;
+}
+
 @Entity()
 export default class User extends BaseModel {
   // length of max 191 due to UTF-8MB4 encoding of strings
@@ -111,38 +124,29 @@ export default class User extends BaseModel {
   @JoinColumn()
   preferences!: Preferences;
 
-  constructor(
-    netid: string,
-    affiliation?: Affiliation[],
-    study?: Study[],
-    organisationUnit?: OrganisationUnit[],
-    studentNumber?: number | null,
-    firstName?: string | null,
-    prefix?: string | null,
-    lastName?: string | null,
-    email?: string | null,
-    displayName?: string | null
-  ) {
-    super();
-    this.netid = netid;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.studentNumber = studentNumber!;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.firstName = firstName!;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.prefix = prefix!;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.lastName = lastName!;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.email = email!;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.displayName = displayName!;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.affiliation = affiliation!;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.study = study!;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.organisationUnit = organisationUnit!;
+  constructor(init?: UserInterface) {
+    if (init !== undefined) {
+      super();
+      this.netid = init.netid;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      this.studentNumber = init.studentNumber!;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      this.firstName = init.firstName!;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      this.prefix = init.prefix!;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      this.lastName = init.lastName!;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      this.email = init.email!;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      this.displayName = init.displayName!;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      this.affiliation = init.affiliation!;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      this.study = init.study!;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      this.organisationUnit = init.organisationUnit!;
+    }
   }
 
   async validateOrReject(): Promise<void> {

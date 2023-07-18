@@ -97,7 +97,7 @@ router.post("/", validateBody(enrollmentSchema), async (req, res) => {
       let user = await transactionalEntityManager.findOne(User, userNetid);
       // in case the user doesnt exists in the database yet, create it
       if (!user) {
-        user = new User(userNetid);
+        user = new User({ netid: userNetid });
         await user.validateOrReject();
         await transactionalEntityManager.save(user);
       }
@@ -217,7 +217,7 @@ router.post(
                 );
                 // in case the user doesnt exists in the database yet, create it
                 if (!user) {
-                  user = new User(userNetid);
+                  user = new User({ netid: userNetid });
                   await user.validateOrReject();
                   await transactionalEntityManager.save(user);
                 }

@@ -37,7 +37,7 @@ const importGroupsForAssignment = async function (
           let user = await transactionalEntityManager.findOne(User, netid);
           // in case the user doesnt exists in the database yet, create it
           if (!user) {
-            user = new User(netid);
+            user = new User({ netid: netid });
             await user.validateOrReject();
             await transactionalEntityManager.save(user);
           }

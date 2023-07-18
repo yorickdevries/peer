@@ -147,7 +147,7 @@ router.patch(
     let newUser = await User.findOne(newUserNetid);
     // in case the user doesnt exists in the database yet, create it
     if (!newUser) {
-      newUser = new User(newUserNetid);
+      newUser = new User({ netid: newUserNetid });
       await newUser.save();
     }
     if (await group.hasUser(newUser)) {

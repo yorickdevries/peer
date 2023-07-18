@@ -43,10 +43,10 @@ describe("MCQ Question Test", () => {
     instanceOfG1.name = "g1";
 
     //submitter
-    instanceOfU1 = new User("u1");
+    instanceOfU1 = new User({ netid: "u1" });
 
     //reviewer
-    instanceOfU2 = new User("u2");
+    instanceOfU2 = new User({ netid: "u2" });
     //instanceOfU2.studentNumber = 2;
     s1 = mock(Submission);
     instanceOfS1 = instance(s1);
