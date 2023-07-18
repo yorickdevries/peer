@@ -16,7 +16,12 @@ define(OpenQuestion, (faker: typeof Faker) => {
   const optional = faker.random.boolean();
   const questionnaire = Object.create(Questionnaire);
 
-  return new OpenQuestion(text, number, optional, questionnaire);
+  return new OpenQuestion({
+    text: text,
+    number: number,
+    optional: optional,
+    questionnaire: questionnaire,
+  });
 });
 
 export { createOpenQuestion };

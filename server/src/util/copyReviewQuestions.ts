@@ -76,12 +76,12 @@ const addDefaultReviewEvaluationQuestions = async function (
             break;
           }
           case QuestionType.OPEN: {
-            const question = new OpenQuestion(
-              questionToCopy.text,
-              questionToCopy.number,
-              questionToCopy.optional,
-              questionnaire
-            );
+            const question = new OpenQuestion({
+              text: questionToCopy.text,
+              number: questionToCopy.number,
+              optional: questionToCopy.optional,
+              questionnaire: questionnaire,
+            });
             await question.validateOrReject();
             await transactionalEntityManager.save(question);
             break;
@@ -182,12 +182,12 @@ const addCopyOfQuestions = async function (
             await transactionalEntityManager.save(option);
           }
         } else if (questionToCopy instanceof OpenQuestion) {
-          const question = new OpenQuestion(
-            questionToCopy.text,
-            questionToCopy.number,
-            questionToCopy.optional,
-            questionnaire
-          );
+          const question = new OpenQuestion({
+            text: questionToCopy.text,
+            number: questionToCopy.number,
+            optional: questionToCopy.optional,
+            questionnaire: questionnaire,
+          });
           await question.validateOrReject();
           await transactionalEntityManager.save(question);
         } else if (questionToCopy instanceof RangeQuestion) {
