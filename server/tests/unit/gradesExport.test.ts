@@ -60,7 +60,13 @@ describe("MCQ Question Test", () => {
     instanceOfR1.submitted = true;
     instanceOfR1.flaggedByReviewer = false;
 
-    m = new MultipleChoiceQuestion("this is mcq", 1, false, true, instanceOfQ);
+    m = new MultipleChoiceQuestion({
+      text: "this is mcq",
+      number: 1,
+      optional: false,
+      graded: true,
+      questionnaire: instanceOfQ,
+    });
     m.options = [
       new MultipleChoiceQuestionOption("correct", m, 100),
       new MultipleChoiceQuestionOption("wrong", m, 0),

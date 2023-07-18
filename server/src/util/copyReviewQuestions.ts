@@ -54,13 +54,13 @@ const addDefaultReviewEvaluationQuestions = async function (
             break;
           }
           case QuestionType.MULTIPLE_CHOICE: {
-            const question = new MultipleChoiceQuestion(
-              questionToCopy.text,
-              questionToCopy.number,
-              questionToCopy.optional,
-              graded ? questionToCopy.graded : false,
-              questionnaire
-            );
+            const question = new MultipleChoiceQuestion({
+              text: questionToCopy.text,
+              number: questionToCopy.number,
+              optional: questionToCopy.optional,
+              graded: graded ? questionToCopy.graded : false,
+              questionnaire: questionnaire,
+            });
             await question.validateOrReject();
             await transactionalEntityManager.save(question);
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -162,13 +162,13 @@ const addCopyOfQuestions = async function (
             await transactionalEntityManager.save(option);
           }
         } else if (questionToCopy instanceof MultipleChoiceQuestion) {
-          const question = new MultipleChoiceQuestion(
-            questionToCopy.text,
-            questionToCopy.number,
-            questionToCopy.optional,
-            questionToCopy.graded,
-            questionnaire
-          );
+          const question = new MultipleChoiceQuestion({
+            text: questionToCopy.text,
+            number: questionToCopy.number,
+            optional: questionToCopy.optional,
+            graded: questionToCopy.graded,
+            questionnaire: questionnaire,
+          });
           await question.validateOrReject();
           await transactionalEntityManager.save(question);
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

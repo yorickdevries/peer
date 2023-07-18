@@ -5,6 +5,14 @@ import QuestionType from "../enum/QuestionType";
 import MultipleChoiceQuestionOption from "./MultipleChoiceQuestionOption";
 import ResponseMessage from "../enum/ResponseMessage";
 
+interface MultipleChoiceQuestionInterface {
+  text: string;
+  number: number;
+  optional: boolean;
+  graded: boolean;
+  questionnaire: Questionnaire;
+}
+
 @ChildEntity(QuestionType.MULTIPLE_CHOICE)
 export default class MultipleChoiceQuestion extends Question {
   @OneToMany(
@@ -17,14 +25,16 @@ export default class MultipleChoiceQuestion extends Question {
   )
   options!: MultipleChoiceQuestionOption[];
 
-  constructor(
-    text: string,
-    number: number,
-    optional: boolean,
-    graded: boolean,
-    questionnaire: Questionnaire
-  ) {
-    super(text, number, optional, graded, questionnaire);
+  constructor(init?: MultipleChoiceQuestionInterface) {
+    if (init !== undefined) {
+      super(
+        init.text,
+        init.number,
+        init.optional,
+        init.graded,
+        init.questionnaire
+      );
+    }
   }
 
   async validateOrReject(): Promise<void> {
