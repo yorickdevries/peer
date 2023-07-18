@@ -39,7 +39,9 @@ export default class CheckboxQuestionAnswer extends QuestionAnswer {
 
   async getQuestion(): Promise<CheckboxQuestion> {
     const questionId = this.question ? this.question.id : this.questionId;
-    return CheckboxQuestion.findOneOrFail(questionId);
+    return CheckboxQuestion.findOneByOrFail({
+      id: questionId,
+    });
   }
 
   getAnswerText(): string {

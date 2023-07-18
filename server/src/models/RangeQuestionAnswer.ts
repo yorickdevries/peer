@@ -28,7 +28,7 @@ export default class RangeQuestionAnswer extends QuestionAnswer {
 
   constructor(init?: RangeQuestionInterface) {
     if (init !== undefined) {
-      super(init.question, init.review);
+      super({ question: init.question, review: init.review });
       this.rangeAnswer = init.answer;
     }
   }
@@ -46,7 +46,9 @@ export default class RangeQuestionAnswer extends QuestionAnswer {
 
   async getQuestion(): Promise<RangeQuestion> {
     const questionId = this.question ? this.question.id : this.questionId;
-    return RangeQuestion.findOneOrFail(questionId);
+    return RangeQuestion.findOneByOrFail({
+      id: questionId,
+    });
   }
 
   getAnswerText(): string {

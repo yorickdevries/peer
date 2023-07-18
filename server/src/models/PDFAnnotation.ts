@@ -100,14 +100,20 @@ export default abstract class PDFAnnotation extends BaseModel {
   }
 
   async getUser(): Promise<User> {
-    return User.findOneOrFail(this.userNetid);
+    return User.findOneByOrFail({
+      netid: this.userNetid,
+    });
   }
 
   async getFile(): Promise<File> {
-    return File.findOneOrFail(this.fileId);
+    return File.findOneByOrFail({
+      id: this.fileId,
+    });
   }
 
   async getReview(): Promise<ReviewOfSubmission> {
-    return ReviewOfSubmission.findOneOrFail(this.reviewId);
+    return ReviewOfSubmission.findOneByOrFail({
+      id: this.reviewId,
+    });
   }
 }

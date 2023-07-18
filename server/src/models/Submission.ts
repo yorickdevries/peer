@@ -26,6 +26,7 @@ import ReviewOfSubmission from "./ReviewOfSubmission";
 import ServerFlagReason from "../enum/ServerFlagReason";
 import QuestionAnswer from "./QuestionAnswer";
 import ReviewOfReview from "./ReviewOfReview";
+import { dataSource } from "../databaseConnection";
 
 interface SubmissionInterface {
   user: User;
@@ -197,19 +198,25 @@ export default class Submission extends BaseModel {
   }
 
   async getGroup(): Promise<Group> {
-    return Group.findOneOrFail(this.groupId);
+    return Group.findOneByOrFail({
+      id: this.groupId,
+    });
   }
 
   async getAssignmentVersion(): Promise<AssignmentVersion> {
-    return AssignmentVersion.findOneOrFail(this.assignmentVersionId);
+    return AssignmentVersion.findOneByOrFail({
+      id: this.assignmentVersionId,
+    });
   }
 
   async getUser(): Promise<User> {
-    return User.findOneOrFail(this.userNetid);
+    return User.findOneByOrFail({
+      netid: this.userNetid,
+    });
   }
 
   async getReviewOfSubmissions(): Promise<ReviewOfSubmission[]> {
-    return ReviewOfSubmission.find({ where: { submission: this } });
+    return ReviewOfSubmission.find({ where: { submission: { id: this.id } } });
   }
 
   async isTeacherOrTeachingAssistantInCourse(user: User): Promise<boolean> {
@@ -231,7 +238,7 @@ export default class Submission extends BaseModel {
     const reviewIds = ids.map((idObject: { rid: any }) => idObject.rid);
 
     if (reviewIds.length > 0) {
-      await QuestionAnswer.createQueryBuilder()
+      await dataSource.getRepository(QuestionAnswer).createQueryBuilder()
         .delete()
         .where("reviewId IN (:...idValues)", { idValues: reviewIds })
         .execute();
@@ -269,7 +276,7 @@ export default class Submission extends BaseModel {
       );
 
       if (feedbackReviewIds.length > 0) {
-        await QuestionAnswer.createQueryBuilder()
+        await dataSource.getRepository(QuestionAnswer).createQueryBuilder()
           .delete()
           .where("reviewId IN (:...idValues)", { idValues: feedbackReviewIds })
           .execute();

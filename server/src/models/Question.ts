@@ -5,7 +5,6 @@ import {
   PrimaryGeneratedColumn,
   RelationId,
   TableInheritance,
-  getManager,
 } from "typeorm";
 import {
   IsBoolean,
@@ -20,7 +19,7 @@ import BaseModel from "./BaseModel";
 import QuestionOperation from "../enum/QuestionOperation";
 import QuestionType from "../enum/QuestionType";
 import Questionnaire from "./Questionnaire";
-
+import { dataSource } from "../databaseConnection";
 import User from "./User";
 
 interface QuestionInterface {
@@ -93,7 +92,9 @@ export default abstract class Question extends BaseModel {
   }
 
   async getQuestionnaire(): Promise<Questionnaire> {
-    return Questionnaire.findOneOrFail(this.questionnaireId);
+    return dataSource.getRepository(Questionnaire).findOneByOrFail({
+      id: this.questionnaireId,
+    });
   }
 
   // checks whether the user is teacher
@@ -145,7 +146,7 @@ export default abstract class Question extends BaseModel {
       ? this.questionnaireId
       : this.questionnaire?.id;
 
-    await getManager().transaction(
+    await dataSource.manager.transaction(
       "READ COMMITTED",
       async (transactionalEntityManager) => {
         let questions: Question[] = await transactionalEntityManager

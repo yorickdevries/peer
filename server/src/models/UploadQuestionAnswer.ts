@@ -41,7 +41,9 @@ export default class UploadQuestionAnswer extends QuestionAnswer {
 
   async getQuestion(): Promise<UploadQuestion> {
     const questionId = this.question ? this.question.id : this.questionId;
-    return UploadQuestion.findOneOrFail(questionId);
+    return UploadQuestion.findOneByOrFail({
+      id: questionId,
+    });
   }
 
   getAnswerText(): string {

@@ -334,7 +334,7 @@ export default class Assignment extends BaseModel {
   }
 
   async getCourse(): Promise<Course> {
-    return Course.findOneOrFail(this.courseId);
+    return Course.findOneByOrFail({ id: this.courseId });
   }
 
   async getGroups(): Promise<Group[]> {
@@ -361,7 +361,7 @@ export default class Assignment extends BaseModel {
     if (group) {
       await group.reload();
     }
-    return group;
+    return group === null ? undefined : group;
   }
 
   // check whether the assignment is enrollable for a user
@@ -384,7 +384,7 @@ export default class Assignment extends BaseModel {
   }
 
   async getAssignmentExports(): Promise<AssignmentExport[]> {
-    return AssignmentExport.find({ where: { assignment: this } });
+    return AssignmentExport.find({ where: { assignmentId: this.id } });
   }
 
   // check whether the assignment contains groups
@@ -464,9 +464,9 @@ export default class Assignment extends BaseModel {
         for (const version of this.versions) {
           const versionSubmissions = await Submission.find({
             where: {
-              group: group,
+              groupId: group.id,
               final: true,
-              assignmentVersion: version,
+              assignmentVersionId: version.id,
             },
           });
           submissions.push(...versionSubmissions);

@@ -72,7 +72,9 @@ export default class ReviewOfReview extends Review {
   }
 
   async getReviewOfSubmission(): Promise<ReviewOfSubmission> {
-    return ReviewOfSubmission.findOneOrFail(this.reviewOfSubmissionId);
+    return ReviewOfSubmission.findOneByOrFail({
+      id: this.reviewOfSubmissionId,
+    });
   }
 
   // checks whether the user is reviewed

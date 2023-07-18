@@ -58,6 +58,6 @@ export default class AssignmentExport extends BaseModel {
   }
 
   async getAssignment(): Promise<Assignment> {
-    return Assignment.findOneOrFail(this.assignmentId);
+    return Assignment.findOneByOrFail({ id: this.assignmentId });
   }
 }

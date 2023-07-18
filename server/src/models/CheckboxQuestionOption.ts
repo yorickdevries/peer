@@ -30,6 +30,8 @@ export default class CheckboxQuestionOption extends QuestionOption {
   }
 
   async getQuestion(): Promise<CheckboxQuestion> {
-    return CheckboxQuestion.findOneOrFail(this.questionId);
+    return CheckboxQuestion.findOneByOrFail({
+      id: this.questionId,
+    });
   }
 }

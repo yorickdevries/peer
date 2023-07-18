@@ -145,7 +145,7 @@ export default class AssignmentVersion extends BaseModel {
   }
 
   async getAssignment(): Promise<Assignment> {
-    return Assignment.findOneOrFail(this.assignmentId);
+    return Assignment.findOneByOrFail({ id: this.assignmentId });
   }
 
   async getVersionsToReview(): Promise<AssignmentVersion[]> {
@@ -158,8 +158,8 @@ export default class AssignmentVersion extends BaseModel {
   private async getSubmissionsOfGroup(group: Group): Promise<Submission[]> {
     return Submission.find({
       where: {
-        assignmentVersion: this,
-        group: group,
+        assignmentVersionId: this.id,
+        groupId: group.id,
       },
     });
   }
@@ -168,7 +168,7 @@ export default class AssignmentVersion extends BaseModel {
     if (group) {
       return this.getSubmissionsOfGroup(group);
     } else {
-      return Submission.find({ where: { assignmentVersion: this } });
+      return Submission.find({ where: { assignmentVersionId: this.id } });
     }
   }
 
@@ -219,13 +219,13 @@ export default class AssignmentVersion extends BaseModel {
 
   async getFinalSubmissionsOfEachGroup(): Promise<Submission[]> {
     return await Submission.find({
-      where: { assignmentVersion: this, final: true },
+      where: { assignmentVersionId: this.id, final: true },
     });
   }
 
   async getFinalSubmission(group: Group): Promise<Submission | undefined> {
     const finalSubmissions = await Submission.find({
-      where: { assignmentVersion: this, group: group, final: true },
+      where: { assignmentVersionId: this.id, groupId: group.id, final: true },
     });
     if (finalSubmissions.length === 0) {
       return undefined;
@@ -247,8 +247,11 @@ export default class AssignmentVersion extends BaseModel {
   }
 
   async getAssignmentVersionWithVersionsToReview(): Promise<AssignmentVersion> {
-    return await AssignmentVersion.findOneOrFail(this.id, {
-      relations: ["versionsToReview"],
+    return await AssignmentVersion.findOneOrFail({
+      where: {
+        id: this.id,
+      },
+      relations: { versionsToReview: true },
     });
   }
 
@@ -256,9 +259,9 @@ export default class AssignmentVersion extends BaseModel {
     if (!this.submissionQuestionnaireId) {
       return null;
     } else {
-      return SubmissionQuestionnaire.findOneOrFail(
-        this.submissionQuestionnaireId
-      );
+      return SubmissionQuestionnaire.findOneByOrFail({
+        id: this.submissionQuestionnaireId,
+      });
     }
   }
 
@@ -266,7 +269,9 @@ export default class AssignmentVersion extends BaseModel {
     if (!this.reviewQuestionnaireId) {
       return null;
     } else {
-      return ReviewQuestionnaire.findOneOrFail(this.reviewQuestionnaireId);
+      return ReviewQuestionnaire.findOneByOrFail({
+        id: this.reviewQuestionnaireId,
+      });
     }
   }
 }

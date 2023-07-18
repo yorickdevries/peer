@@ -2,7 +2,7 @@
 
 // Module dependencies.
 import http from "http";
-import createDatabaseConnection from "../databaseConnection";
+import { dataSource } from "../databaseConnection";
 import app from "../app";
 import isTSNode from "../util/isTSNode";
 import { sendMailToAdmin } from "../util/mailer";
@@ -31,7 +31,8 @@ app.set("port", port);
 // Create HTTP server.
 const server = http.createServer(app);
 
-createDatabaseConnection()
+dataSource
+  .initialize()
   .then((connection) => {
     console.log(
       `Connected to ${connection.options.type} database: ${connection.options.database}`

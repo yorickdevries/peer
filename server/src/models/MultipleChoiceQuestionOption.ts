@@ -34,6 +34,8 @@ export default class MultipleChoiceQuestionOption extends QuestionOption {
   }
 
   async getQuestion(): Promise<MultipleChoiceQuestion> {
-    return MultipleChoiceQuestion.findOneOrFail(this.questionId);
+    return MultipleChoiceQuestion.findOneByOrFail({
+      id: this.questionId,
+    });
   }
 }

@@ -79,6 +79,8 @@ export default class CodeAnnotation extends BaseModel {
   }
 
   async getReview(): Promise<ReviewOfSubmission> {
-    return ReviewOfSubmission.findOneOrFail(this.reviewId);
+    return ReviewOfSubmission.findOneByOrFail({
+      id: this.reviewId,
+    });
   }
 }

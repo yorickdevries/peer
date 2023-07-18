@@ -10,6 +10,7 @@ import BaseModel from "./BaseModel";
 import QuestionAnswerType from "../enum/QuestionAnswerType";
 import Question from "./Question";
 import Review from "./Review";
+import { dataSource } from "../databaseConnection";
 
 interface QuestionAnswerInterface {
   question: Question;
@@ -71,6 +72,8 @@ export default abstract class QuestionAnswer extends BaseModel {
   }
 
   async getReview(): Promise<Review> {
-    return await Review.findOneOrFail(this.reviewId);
+    return await dataSource.getRepository(Review).findOneByOrFail({
+      id: this.reviewId,
+    });
   }
 }

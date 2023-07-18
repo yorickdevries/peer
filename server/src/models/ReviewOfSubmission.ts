@@ -7,6 +7,7 @@ import Review from "./Review";
 import ReviewOfReview from "./ReviewOfReview";
 import PDFAnnotation from "./PDFAnnotation";
 import CodeAnnotation from "./CodeAnnotation";
+import { dataSource } from "../databaseConnection";
 
 interface ReviewOfSubmissionInterface {
   questionnaire: SubmissionQuestionnaire;
@@ -72,20 +73,24 @@ export default class ReviewOfSubmission extends Review {
     return await group.hasUser(user);
   }
 
-  async getReviewOfThisReview(): Promise<ReviewOfReview | undefined> {
+  async getReviewOfThisReview(): Promise<ReviewOfReview | null> {
     const reviewOfReview = await ReviewOfReview.findOne({
       where: {
-        reviewOfSubmission: this,
+        reviewOfSubmissionId: this.id,
       },
     });
     return reviewOfReview;
   }
 
   async getPDFAnnotations(): Promise<PDFAnnotation[]> {
-    return await PDFAnnotation.find({ where: { review: this } });
+    return await dataSource
+      .getRepository(PDFAnnotation)
+      .find({ where: { reviewId: this.id } });
   }
 
   async getCodeAnnotations(): Promise<CodeAnnotation[]> {
-    return CodeAnnotation.find({ where: { review: this } });
+    return dataSource
+      .getRepository(CodeAnnotation)
+      .find({ where: { reviewId: this.id } });
   }
 }

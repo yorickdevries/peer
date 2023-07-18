@@ -43,6 +43,8 @@ export default class Enrollment extends BaseModel {
   }
 
   async getUser(): Promise<User> {
-    return User.findOneOrFail(this.userNetid);
+    return User.findOneByOrFail({
+      netid: this.userNetid,
+    });
   }
 }

@@ -84,7 +84,9 @@ export default class Group extends BaseModel {
   }
 
   async getCourse(): Promise<Course> {
-    return Course.findOneOrFail(this.courseId);
+    return Course.findOneByOrFail({
+      id: this.courseId,
+    });
   }
 
   async getUsers(): Promise<User[]> {

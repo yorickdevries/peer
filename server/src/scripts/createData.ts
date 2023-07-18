@@ -1,5 +1,5 @@
 import AcademicYear from "../models/AcademicYear";
-import createDatabaseConnection from "../databaseConnection";
+import { dataSource } from "../databaseConnection";
 
 // boolean which indicates whether the script can be run, can se set to True temporarily
 const runScript = false;
@@ -13,7 +13,8 @@ const createData = async function (): Promise<void> {
 if (!runScript) {
   throw new Error(`Not allowed to run script`);
 } else {
-  createDatabaseConnection()
+  dataSource
+    .initialize()
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     .then((_connection) => {
       createData()

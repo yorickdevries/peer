@@ -23,6 +23,7 @@ import UserRole from "../enum/UserRole";
 import QuestionAnswer from "./QuestionAnswer";
 import Question from "./Question";
 import _ from "lodash";
+import { dataSource } from "../databaseConnection";
 
 interface AnonymousReview {
   id: number;
@@ -230,11 +231,15 @@ export default abstract class Review extends BaseModel {
   }
 
   async getQuestionnaire(): Promise<Questionnaire> {
-    return Questionnaire.findOneOrFail(this.questionnaireId);
+    return dataSource.getRepository(Questionnaire).findOneByOrFail({
+      id: this.questionnaireId,
+    });
   }
 
   async getQuestionAnswers(): Promise<QuestionAnswer[]> {
-    return QuestionAnswer.find({ where: { review: this } });
+    return dataSource
+      .getRepository(QuestionAnswer)
+      .find({ where: { reviewId: this.id } });
   }
 
   // checks whether the user is teacher
@@ -276,9 +281,9 @@ export default abstract class Review extends BaseModel {
     };
   }
 
-  async getAnswer(question: Question): Promise<QuestionAnswer | undefined> {
-    return QuestionAnswer.findOne({
-      where: { review: this, question: question },
+  async getAnswer(question: Question): Promise<QuestionAnswer | null> {
+    return dataSource.getRepository(QuestionAnswer).findOne({
+      where: { reviewId: this.id, questionId: question.id },
     });
   }
 }

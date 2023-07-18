@@ -39,7 +39,9 @@ export default class MultipleChoiceQuestionAnswer extends QuestionAnswer {
 
   async getQuestion(): Promise<MultipleChoiceQuestion> {
     const questionId = this.question ? this.question.id : this.questionId;
-    return MultipleChoiceQuestion.findOneOrFail(questionId);
+    return MultipleChoiceQuestion.findOneByOrFail({
+      id: questionId,
+    });
   }
 
   getAnswerText(): string {

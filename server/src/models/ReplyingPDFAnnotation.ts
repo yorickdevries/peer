@@ -32,7 +32,13 @@ export default class ReplyingPDFAnnotation extends PDFAnnotation {
 
   constructor(init?: ReplyingPDFAnnotationInterface) {
     if (init !== undefined) {
-      super(init.id, init.bodyValue, init.user, init.file, init.review);
+      super({
+        id: init.id,
+        bodyValue: init.bodyValue,
+        user: init.user,
+        file: init.file,
+        review: init.review,
+      });
       this.commentingPDFAnnotation = init.commentingPDFAnnotation;
     }
   }
@@ -55,9 +61,9 @@ export default class ReplyingPDFAnnotation extends PDFAnnotation {
   }
 
   async getCommentingPDFAnnotation(): Promise<CommentingPDFAnnotation> {
-    return CommentingPDFAnnotation.findOneOrFail(
-      this.commentingPDFAnnotationId
-    );
+    return CommentingPDFAnnotation.findOneByOrFail({
+      id: this.commentingPDFAnnotationId,
+    });
   }
 
   // https://www.w3.org/TR/annotation-model/

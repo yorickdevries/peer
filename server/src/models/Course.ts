@@ -91,7 +91,7 @@ export default class Course extends BaseModel {
   }
 
   async getAssignments(): Promise<Assignment[]> {
-    return await Assignment.find({ where: { course: this } });
+    return await Assignment.find({ where: { courseId: this.id } });
   }
 
   async getEnrollableAssignments(user: User): Promise<Assignment[]> {
@@ -129,10 +129,10 @@ export default class Course extends BaseModel {
 
   async isEnrolled(user: User, role?: UserRole): Promise<boolean> {
     const where: {
-      user: User;
-      course: Course;
+      userNetid: string;
+      courseId: number;
       role?: UserRole;
-    } = { user: user, course: this };
+    } = { userNetid: user.netid, courseId: this.id };
     // add role to query if specified
     if (role) {
       where.role = role;
@@ -145,7 +145,7 @@ export default class Course extends BaseModel {
 
   async getTeacherEnrollments(): Promise<Enrollment[]> {
     return await Enrollment.find({
-      where: { course: this, role: UserRole.TEACHER },
+      where: { courseId: this.id, role: UserRole.TEACHER },
     });
   }
 

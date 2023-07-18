@@ -11,6 +11,7 @@ import Question from "./Question";
 import User from "./User";
 import QuestionnaireType from "../enum/QuestionnaireType";
 import Review from "./Review";
+import { dataSource } from "../databaseConnection";
 
 // formely called rubric
 @Entity()
@@ -43,15 +44,15 @@ export default abstract class Questionnaire extends BaseModel {
 
   async getReviews(submitted?: boolean): Promise<Review[]> {
     const where: {
-      questionnaire: Questionnaire;
+      questionnaireId: number;
       submitted?: boolean;
     } = {
-      questionnaire: this,
+      questionnaireId: this.id,
     };
     if (submitted !== undefined) {
       where.submitted = submitted;
     }
-    return await Review.find({ where: where });
+    return await dataSource.getRepository(Review).find({ where: where });
   }
 
   // checks whether the user is teacher
@@ -67,7 +68,9 @@ export default abstract class Questionnaire extends BaseModel {
   }
 
   async getReviewsWhereUserIsReviewer(user: User): Promise<Review[]> {
-    return Review.find({ where: { questionnaire: this, reviewer: user } });
+    return dataSource.getRepository(Review).find({
+      where: { questionnaireId: this.id, reviewer: { netid: user.netid } },
+    });
   }
 
   async hasReviewsWhereUserIsReviewer(user: User): Promise<boolean> {
@@ -76,8 +79,12 @@ export default abstract class Questionnaire extends BaseModel {
   }
 
   async hasUnsubmittedReviewsWhereUserIsReviewer(user: User): Promise<boolean> {
-    const reviews = await Review.find({
-      where: { questionnaire: this, reviewer: user, submitted: false },
+    const reviews = await dataSource.getRepository(Review).find({
+      where: {
+        questionnaireId: this.id,
+        reviewer: { netid: user.netid },
+        submitted: false,
+      },
     });
     return reviews.length > 0;
   }

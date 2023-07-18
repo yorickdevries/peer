@@ -29,7 +29,9 @@ export default class OpenQuestionAnswer extends QuestionAnswer {
 
   async getQuestion(): Promise<OpenQuestion> {
     const questionId = this.question ? this.question.id : this.questionId;
-    return OpenQuestion.findOneOrFail(questionId);
+    return OpenQuestion.findOneByOrFail({
+      id: questionId,
+    });
   }
 
   getAnswerText(): string {
