@@ -326,11 +326,10 @@ export default {
                 },
             }.options
 
+            // Option ids don't necessarily start at 1
             let optionMap = {}
             for (let i = 0; i < question.options.length; i++) {
                 optionMap[question.options[i].id] = i
-            }
-            for (let i = 0; i < question.options.length; i++) {
                 ret.answers.push({
                     text: question.options[i].text,
                     votes: 0,
@@ -364,11 +363,9 @@ export default {
 
             // Option ids don't necessarily start at 1
             let optionMap = {}
-            for (let i = 0; i < question.options.length; i++) {
-                optionMap[question.options[i].id] = i
-            }
 
             for (let i = 0; i < question.options.length; i++) {
+                optionMap[question.options[i].id] = i
                 ret.answers.push({
                     text: question.options[i].text,
                     votes: 0,
