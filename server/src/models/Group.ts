@@ -15,6 +15,12 @@ import Assignment from "./Assignment";
 import UserRole from "../enum/UserRole";
 import Course from "./Course";
 
+interface GroupInterface {
+  name: string;
+  course: Course;
+  users: User[];
+  assignments: Assignment[];
+}
 @Entity()
 export default class Group extends BaseModel {
   @PrimaryGeneratedColumn()
@@ -43,17 +49,14 @@ export default class Group extends BaseModel {
   @JoinTable()
   assignments?: Assignment[];
 
-  constructor(
-    name: string,
-    course: Course,
-    users: User[],
-    assignments: Assignment[]
-  ) {
-    super();
-    this.name = name;
-    this.course = course;
-    this.users = users;
-    this.assignments = assignments;
+  constructor(init?: GroupInterface) {
+    if (init !== undefined) {
+      super();
+      this.name = init.name;
+      this.course = init.course;
+      this.users = init.users;
+      this.assignments = init.assignments;
+    }
   }
 
   async validateOrReject(): Promise<void> {

@@ -99,7 +99,12 @@ const importGroupsForAssignment = async function (
 
         const groupName = groupNameWithNetidList.groupName;
         // make the group
-        const group = new Group(groupName, course, users, [assignment]);
+        const group = new Group({
+          name: groupName,
+          course: course,
+          users: users,
+          assignments: [assignment],
+        });
         await group.validateOrReject();
         await transactionalEntityManager.save(group);
         groups.push(group);

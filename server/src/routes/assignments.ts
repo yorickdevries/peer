@@ -696,7 +696,12 @@ router.post("/:id/enroll", validateParams(idSchema), async (req, res) => {
     return;
   }
   const course = await assignment.getCourse();
-  const group = new Group(user.netid, course, [user], [assignment]);
+  const group = new Group({
+    name: user.netid,
+    course: course,
+    users: [user],
+    assignments: [assignment],
+  });
   // validate outside transaction as it otherwise might block the transaction
   await group.validateOrReject();
   // save the group in an transaction to make sure no 2 groups are saved at the same time

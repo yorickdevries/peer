@@ -131,9 +131,12 @@ describe("Review distribution", () => {
       ) {
         studentsOfGroup.push(students[i]);
       }
-      const group = new Group(`group${j}`, course, studentsOfGroup, [
-        assignment,
-      ]);
+      const group = new Group({
+        name: `group${j}`,
+        course: course,
+        users: studentsOfGroup,
+        assignments: [assignment],
+      });
       await group.save();
       // make submission
       const exampleSubmissionFile = path.resolve(
@@ -314,9 +317,12 @@ describe("Review distribution", () => {
         studentsOfGroup.push(students[studentIndex]);
         studentIndex++;
       }
-      const group = new Group(`group${j}`, course, studentsOfGroup, [
-        assignment,
-      ]);
+      const group = new Group({
+        name: `group${j}`,
+        course: course,
+        users: studentsOfGroup,
+        assignments: [assignment],
+      });
       await group.save();
       // make submission
       const file = new File({
@@ -452,7 +458,12 @@ describe("Review distribution", () => {
     const submissions: Submission[] = [];
 
     // submission 1
-    const group1 = new Group(`group1`, course, [student1], [assignment]);
+    const group1 = new Group({
+      name: `group1`,
+      course: course,
+      users: [student1],
+      assignments: [assignment],
+    });
     await group1.save();
     // make submission
     const file1 = new File({ name: "filename", extension: ".pdf", hash: null });
@@ -469,12 +480,12 @@ describe("Review distribution", () => {
     submissions.push(submission1);
 
     // submission 1
-    const group2 = new Group(
-      `group2`,
-      course,
-      [student2, student3],
-      [assignment]
-    );
+    const group2 = new Group({
+      name: `group2`,
+      course: course,
+      users: [student2, student3],
+      assignments: [assignment],
+    });
     await group2.save();
     // make submission
     const file2 = new File({ name: "filename", extension: ".pdf", hash: null });

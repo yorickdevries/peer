@@ -413,7 +413,12 @@ router.post("/", validateBody(groupSchema), async (req, res) => {
     return;
   }
   const course = await assignment.getCourse();
-  const group = new Group(req.body.name, course, [], [assignment]);
+  const group = new Group({
+    name: req.body.name,
+    course: course,
+    users: [],
+    assignments: [assignment],
+  });
   await group.save();
   res.send(group);
 });

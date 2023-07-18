@@ -185,7 +185,12 @@ const importWebLabSubmissions = async function (
         });
 
         // make the group
-        const group = new Group(user.netid, course, [user], [assignment]);
+        const group = new Group({
+          name: user.netid,
+          course: course,
+          users: [user],
+          assignments: [assignment],
+        });
         await group.validateOrReject();
         await transactionalEntityManager.save(group);
 
