@@ -6,6 +6,12 @@ import config from "config";
 
 const uploadFolder = config.get("uploadFolder") as string;
 
+interface FileInterface {
+  name: string;
+  extension: string;
+  hash: string | null;
+}
+
 @Entity()
 export default class File extends BaseModel {
   @PrimaryGeneratedColumn()
@@ -30,17 +36,19 @@ export default class File extends BaseModel {
   @IsNotEmpty()
   hash: string;
 
-  constructor(name: string, extension: string, hash: string | null) {
-    super();
-    this.name = name;
-    this.extension = extension;
-    if (hash === null) {
-      // placeholder untill it's calculated
-      // future: const fileHash = hasha(fileBuffer, { algorithm: "sha256" });
-      this.hash =
-        "0000000000000000000000000000000000000000000000000000000000000000";
-    } else {
-      this.hash = hash;
+  constructor(init?: FileInterface) {
+    if (init !== undefined) {
+      super();
+      this.name = init.name;
+      this.extension = init.extension;
+      if (init.hash === null) {
+        // placeholder untill it's calculated
+        // future: const fileHash = hasha(fileBuffer, { algorithm: "sha256" });
+        this.hash =
+          "0000000000000000000000000000000000000000000000000000000000000000";
+      } else {
+        this.hash = init.hash;
+      }
     }
   }
 

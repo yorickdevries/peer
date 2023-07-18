@@ -318,7 +318,11 @@ router.post(
       const fileExtension = path.extname(req.file.originalname);
       const fileName = path.basename(req.file.originalname, fileExtension);
       const fileHash = null;
-      file = new File(fileName, fileExtension, fileHash);
+      file = new File({
+        name: fileName,
+        extension: fileExtension,
+        hash: fileHash,
+      });
     }
 
     // start transaction make sure the file and assignment are both saved
@@ -467,7 +471,11 @@ router.patch(
       const fileExtension = path.extname(req.file.originalname);
       const fileName = path.basename(req.file.originalname, fileExtension);
       const fileHash = null;
-      newFile = new File(fileName, fileExtension, fileHash);
+      newFile = new File({
+        name: fileName,
+        extension: fileExtension,
+        hash: fileHash,
+      });
     }
 
     // save old existing file

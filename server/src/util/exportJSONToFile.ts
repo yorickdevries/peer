@@ -38,7 +38,11 @@ const exportJSONToFile = async function (
   const fileBuffer = Buffer.from(result);
   const fileExtension = `.${exportType}`;
   const fileHash = null;
-  const file = new File(fileName, fileExtension, fileHash);
+  const file = new File({
+    name: fileName,
+    extension: fileExtension,
+    hash: fileHash,
+  });
 
   await getManager().transaction(
     "READ COMMITTED",

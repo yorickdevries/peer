@@ -140,7 +140,11 @@ describe("Review distribution", () => {
         __dirname,
         "../../exampleData/submissions/submission1.c"
       );
-      const file = new File("filename", ".pdf", null);
+      const file = new File({
+        name: "filename",
+        extension: ".pdf",
+        hash: null,
+      });
       await file.save();
       const uploadFolder = config.get("uploadFolder") as string;
       const fp = path.resolve(uploadFolder, file.id.toString());
@@ -166,7 +170,7 @@ describe("Review distribution", () => {
       assignment: assignment,
       file: null,
     });
-    const file = new File("a", "ads", null);
+    const file = new File({ name: "a", extension: "ads", hash: null });
     await getManager().transaction(
       "READ COMMITTED",
       async (transactionalEntityManager) => {
@@ -315,7 +319,11 @@ describe("Review distribution", () => {
       ]);
       await group.save();
       // make submission
-      const file = new File("filename", ".pdf", null);
+      const file = new File({
+        name: "filename",
+        extension: ".pdf",
+        hash: null,
+      });
       await file.save();
 
       const submission = new Submission(
@@ -447,7 +455,7 @@ describe("Review distribution", () => {
     const group1 = new Group(`group1`, course, [student1], [assignment]);
     await group1.save();
     // make submission
-    const file1 = new File("filename", ".pdf", null);
+    const file1 = new File({ name: "filename", extension: ".pdf", hash: null });
     await file1.save();
 
     const submission1 = new Submission(
@@ -469,7 +477,7 @@ describe("Review distribution", () => {
     );
     await group2.save();
     // make submission
-    const file2 = new File("filename", ".pdf", null);
+    const file2 = new File({ name: "filename", extension: ".pdf", hash: null });
     await file1.save();
 
     const submission2 = new Submission(

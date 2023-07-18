@@ -90,7 +90,7 @@ const importWebLabSubmissions = async function (
       // generate zip file
       const buffer = await zip.generateAsync({ type: "nodebuffer" });
       const fileName = `assignmentversion${assignmentVersion.id}_submission${studentNumber}`;
-      const file = new File(fileName, ".zip", null);
+      const file = new File({ name: fileName, extension: ".zip", hash: null });
       submissions.set(studentNumber, { file, buffer });
     }
   } catch (error) {
