@@ -18,6 +18,11 @@ import QuestionOptionType from "../enum/QuestionType";
 import Question from "./Question";
 import ResponseMessage from "../enum/ResponseMessage";
 
+interface QuestionOptionInterface {
+  text: string;
+  points: number | null;
+}
+
 @Entity()
 @TableInheritance({ column: { type: "varchar", name: "type" } })
 export default abstract class QuestionOption extends BaseModel {
@@ -46,10 +51,12 @@ export default abstract class QuestionOption extends BaseModel {
 
   abstract question?: Question;
 
-  constructor(text: string, points: number | null) {
-    super();
-    this.text = text;
-    this.points = points;
+  constructor(init?: QuestionOptionInterface) {
+    if (init !== undefined) {
+      super();
+      this.text = init.text;
+      this.points = init.points;
+    }
   }
 
   async validateOrReject(): Promise<void> {
