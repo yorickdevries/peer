@@ -6,6 +6,12 @@ import { IsDefined } from "class-validator";
 import UploadQuestion from "./UploadQuestion";
 import File from "./File";
 
+interface UploadQuestionInterface {
+  question: UploadQuestion;
+  review: Review;
+  answer: File;
+}
+
 @ChildEntity(QuestionAnswerType.UPLOAD)
 export default class UploadQuestionAnswer extends QuestionAnswer {
   // file_path varchar(500) NOT NULL,
@@ -15,9 +21,11 @@ export default class UploadQuestionAnswer extends QuestionAnswer {
   @IsDefined()
   uploadAnswer: File;
 
-  constructor(question: UploadQuestion, review: Review, answer: File) {
-    super(question, review);
-    this.uploadAnswer = answer;
+  constructor(init?: UploadQuestionInterface) {
+    if (init !== undefined) {
+      super(init.question, init.review);
+      this.uploadAnswer = init.answer;
+    }
   }
 
   // validation: file should have the right extension

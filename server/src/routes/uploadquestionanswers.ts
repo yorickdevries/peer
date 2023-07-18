@@ -181,7 +181,11 @@ router.post(
     });
 
     // new Upload Answer
-    const newUploadAnser = new UploadQuestionAnswer(question, review, newFile);
+    const newUploadAnser = new UploadQuestionAnswer({
+      question: question,
+      review: review,
+      answer: newFile,
+    });
     await newUploadAnser.validateOrReject();
 
     // oldfile in case of update
