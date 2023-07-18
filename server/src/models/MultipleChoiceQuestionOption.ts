@@ -3,6 +3,12 @@ import { ChildEntity, ManyToOne, RelationId } from "typeorm";
 import QuestionOptionType from "../enum/QuestionOptionType";
 import MultipleChoiceQuestion from "./MultipleChoiceQuestion";
 
+interface MultipleChoiceQuestionOptionInterface {
+  text: string;
+  question: MultipleChoiceQuestion;
+  points: number | null;
+}
+
 @ChildEntity(QuestionOptionType.MULTIPLE_CHOICE)
 export default class MultipleChoiceQuestionOption extends QuestionOption {
   @RelationId(
@@ -20,13 +26,11 @@ export default class MultipleChoiceQuestionOption extends QuestionOption {
   )
   question?: MultipleChoiceQuestion;
 
-  constructor(
-    text: string,
-    question: MultipleChoiceQuestion,
-    points: number | null
-  ) {
-    super(text, points);
-    this.question = question;
+  constructor(init?: MultipleChoiceQuestionOptionInterface) {
+    if (init !== undefined) {
+      super(init.text, init.points);
+      this.question = init.question;
+    }
   }
 
   async getQuestion(): Promise<MultipleChoiceQuestion> {

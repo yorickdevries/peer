@@ -68,8 +68,16 @@ describe("MCQ Question Test", () => {
       questionnaire: instanceOfQ,
     });
     m.options = [
-      new MultipleChoiceQuestionOption("correct", m, 100),
-      new MultipleChoiceQuestionOption("wrong", m, 0),
+      new MultipleChoiceQuestionOption({
+        text: "correct",
+        question: m,
+        points: 100,
+      }),
+      new MultipleChoiceQuestionOption({
+        text: "wrong",
+        question: m,
+        points: 0,
+      }),
     ];
     instanceOfQ.questions = [m];
 
