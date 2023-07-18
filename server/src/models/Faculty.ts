@@ -2,6 +2,11 @@ import { Column, Entity } from "typeorm";
 import { IsDefined, IsNotEmpty, IsString } from "class-validator";
 import NamedModel from "./NamedModel";
 
+interface FacultyInterface {
+  name: string;
+  longName: string;
+}
+
 @Entity()
 export default class Faculty extends NamedModel {
   @Column()
@@ -10,8 +15,10 @@ export default class Faculty extends NamedModel {
   @IsNotEmpty()
   longName: string;
 
-  constructor(name: string, longName: string) {
-    super(name);
-    this.longName = longName;
+  constructor(init?: FacultyInterface) {
+    if (init !== undefined) {
+      super(init.name);
+      this.longName = init.longName;
+    }
   }
 }

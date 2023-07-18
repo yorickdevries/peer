@@ -23,7 +23,7 @@ const initializeData = async function (): Promise<void> {
     const existingFaculties = await Faculty.find();
     if (existingFaculties.length === 0) {
       for (const faculty of faculties) {
-        await new Faculty(faculty[0], faculty[1]).save();
+        await new Faculty({ name: faculty[0], longName: faculty[1] }).save();
       }
       console.log("Initialized Faculties");
     }
