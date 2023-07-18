@@ -5,6 +5,12 @@ import MultipleChoiceQuestion from "./MultipleChoiceQuestion";
 import Review from "./Review";
 import MultipleChoiceQuestionOption from "./MultipleChoiceQuestionOption";
 
+interface MultipleChoiceQuestionAnswerInterface {
+  question: MultipleChoiceQuestion;
+  review: Review;
+  answer: MultipleChoiceQuestionOption;
+}
+
 @ChildEntity(QuestionAnswerType.MULTIPLE_CHOICE)
 export default class MultipleChoiceQuestionAnswer extends QuestionAnswer {
   // answer int NOT NULL,
@@ -14,13 +20,11 @@ export default class MultipleChoiceQuestionAnswer extends QuestionAnswer {
   })
   multipleChoiceAnswer: MultipleChoiceQuestionOption;
 
-  constructor(
-    question: MultipleChoiceQuestion,
-    review: Review,
-    answer: MultipleChoiceQuestionOption
-  ) {
-    super(question, review);
-    this.multipleChoiceAnswer = answer;
+  constructor(init?: MultipleChoiceQuestionAnswerInterface) {
+    if (init !== undefined) {
+      super(init.question, init.review);
+      this.multipleChoiceAnswer = init.answer;
+    }
   }
 
   async validateOrReject(): Promise<void> {
