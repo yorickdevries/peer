@@ -5,6 +5,12 @@ import Review from "./Review";
 import { IsDefined, IsNotEmpty, IsString } from "class-validator";
 import OpenQuestion from "./OpenQuestion";
 
+interface OpenQuestionAnswerInterface {
+  question: OpenQuestion;
+  review: Review;
+  answer: string;
+}
+
 @ChildEntity(QuestionAnswerType.OPEN)
 export default class OpenQuestionAnswer extends QuestionAnswer {
   // answer varchar(100000) NOT NULL,
@@ -14,9 +20,11 @@ export default class OpenQuestionAnswer extends QuestionAnswer {
   @IsNotEmpty()
   openAnswer: string;
 
-  constructor(question: OpenQuestion, review: Review, answer: string) {
-    super(question, review);
-    this.openAnswer = answer;
+  constructor(init?: OpenQuestionAnswerInterface) {
+    if (init !== undefined) {
+      super(init.question, init.review);
+      this.openAnswer = init.answer;
+    }
   }
 
   async getQuestion(): Promise<OpenQuestion> {
