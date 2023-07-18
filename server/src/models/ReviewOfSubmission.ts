@@ -8,6 +8,17 @@ import ReviewOfReview from "./ReviewOfReview";
 import PDFAnnotation from "./PDFAnnotation";
 import CodeAnnotation from "./CodeAnnotation";
 
+interface ReviewOfSubmissionInterface {
+  questionnaire: SubmissionQuestionnaire;
+  user: User;
+  flaggedByReviewer: boolean;
+  submitted: boolean;
+  startedAt: Date | null;
+  downloadedAt: Date | null;
+  submittedAt: Date | null;
+  submission: Submission;
+}
+
 @ChildEntity(ReviewType.REVIEW_OF_SUBMISSION)
 export default class ReviewOfSubmission extends Review {
   @ManyToOne(
@@ -19,26 +30,19 @@ export default class ReviewOfSubmission extends Review {
   // can be null as it is in the same table as reviewOfReview
   submission: Submission;
 
-  constructor(
-    questionnaire: SubmissionQuestionnaire,
-    user: User,
-    flaggedByReviewer: boolean,
-    submitted: boolean,
-    startedAt: Date | null,
-    downloadedAt: Date | null,
-    submittedAt: Date | null,
-    submission: Submission
-  ) {
-    super(
-      questionnaire,
-      user,
-      flaggedByReviewer,
-      submitted,
-      startedAt,
-      downloadedAt,
-      submittedAt
-    );
-    this.submission = submission;
+  constructor(init?: ReviewOfSubmissionInterface) {
+    if (init !== undefined) {
+      super(
+        init.questionnaire,
+        init.user,
+        init.flaggedByReviewer,
+        init.submitted,
+        init.startedAt,
+        init.downloadedAt,
+        init.submittedAt
+      );
+      this.submission = init.submission;
+    }
   }
 
   // custom validation which is run before saving

@@ -246,16 +246,16 @@ const distributeReviewsForAssignmentHelper = async function (
       // iterate over fullReviewDistribution
       for (const reviewAssignment of fullReviewDistribution) {
         // make the review
-        const review = new ReviewOfSubmission(
-          reviewAssignment.submissionQuestionnaire,
-          reviewAssignment.reviewer,
-          false,
-          false,
-          null,
-          null,
-          null,
-          reviewAssignment.submission
-        );
+        const review = new ReviewOfSubmission({
+          questionnaire: reviewAssignment.submissionQuestionnaire,
+          user: reviewAssignment.reviewer,
+          flaggedByReviewer: false,
+          submitted: false,
+          startedAt: null,
+          downloadedAt: null,
+          submittedAt: null,
+          submission: reviewAssignment.submission,
+        });
         await review.validateOrReject();
         await transactionalEntityManager.save(review);
       }
