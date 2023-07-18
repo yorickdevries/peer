@@ -139,7 +139,7 @@ const parseAndSaveOrganisationUnit = async function (
                 }
               );
               if (!ssoField) {
-                ssoField = new OrganisationUnit(name);
+                ssoField = new OrganisationUnit({ name: name });
                 await ssoField.validateOrReject();
                 await transactionalEntityManager.save(ssoField);
               }
