@@ -144,6 +144,10 @@
                                                     read-only
                                                 />
                                             </b-card>
+                                            <b-card v-if="question.type === 'checkbox'">
+                                                <h6>Checkbox Overview:</h6>
+                                                <vue-poll v-bind="aggregateCheckbox(question)" showResults="true" />
+                                            </b-card>
                                         </b-list-group-item>
                                         <b-list-group-item v-for="(answer, index) in answers[question.id]" :key="index">
                                             <!-- It can be null when a review is redacted -->
@@ -169,7 +173,6 @@
                                                         >{{ option.text }}</b-form-radio
                                                     >
                                                 </b-form-radio-group>
-
                                                 <!-- CHECKBOX QUESTION -->
                                                 <b-form-checkbox-group
                                                     v-if="question.type === 'checkbox'"
@@ -316,6 +319,42 @@ export default {
                 }) / this.answers[question.id].length
             )
         },
+        aggregateCheckbox(question) {
+            let ret = {
+                options: {
+                    question: "",
+                    answers: [],
+                },
+            }.options
+
+            let optionMap = {}
+            for (let i = 0; i < question.options.length; i++) {
+                optionMap[question.options[i].id] = i
+            }
+            for (let i = 0; i < question.options.length; i++) {
+                ret.answers.push({
+                    text: question.options[i].text,
+                    votes: 0,
+                })
+            }
+
+            for (let i = 0; i < this.answers[question.id].length; i++) {
+                if (this.answers[question.id][i].length === 0) {
+                    continue
+                }
+                for (let k = 0; k < question.options.length; k++) {
+                    if (this.answers[question.id][i][k] === undefined) {
+                        continue
+                    }
+                    let optionId = this.answers[question.id][i][k].id
+                    let index = optionMap[optionId]
+                    if (index !== undefined) {
+                        ret.answers[index].votes++
+                    }
+                }
+            }
+            return ret
+        },
         aggregateMultipleChoice(question) {
             let ret = {
                 options: {
@@ -323,6 +362,12 @@ export default {
                     answers: [],
                 },
             }.options
+
+            // Option ids don't necessarily start at 1
+            let optionMap = {}
+            for (let i = 0; i < question.options.length; i++) {
+                optionMap[question.options[i].id] = i
+            }
 
             for (let i = 0; i < question.options.length; i++) {
                 ret.answers.push({
@@ -332,8 +377,13 @@ export default {
             }
 
             for (let i = 0; i < this.answers[question.id].length; i++) {
-                ret.answers[this.answers[question.id][i].id - 1].votes++
+                let optionId = this.answers[question.id][i].id
+                let index = optionMap[optionId]
+                if (index !== undefined) {
+                    ret.answers[index].votes++
+                }
             }
+
             return ret
         },
         async fetchData() {
