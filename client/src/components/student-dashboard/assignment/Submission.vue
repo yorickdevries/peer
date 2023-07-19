@@ -187,10 +187,6 @@
                                 Please make sure you have not included personal information anywhere unless specifically
                                 mentioned otherwise!
                             </b-alert>
-                            <b-alert show variant="warning">
-                                After taking pictures, make sure the rotation is correct in the preview. If not, retake
-                                the pictures.
-                            </b-alert>
                             <b-progress :value="fileProgress" :animated="fileProgress !== 100" class="mb-3" />
                             <b-alert show variant="secondary">Allowed file types: image files</b-alert>
 
