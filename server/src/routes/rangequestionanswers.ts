@@ -9,7 +9,7 @@ import RangeQuestionAnswer from "../models/RangeQuestionAnswer";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import moment from "moment";
-import { getManager } from "typeorm";
+import { dataSource } from "../databaseConnection";
 
 const router = express.Router();
 
@@ -24,14 +24,18 @@ const rangeAnswerSchema = Joi.object({
 router.post("/", validateBody(rangeAnswerSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const question = await RangeQuestion.findOne(req.body.rangeQuestionId);
+  const question = await RangeQuestion.findOneBy({
+    id: Number(req.body.rangeQuestionId),
+  });
   if (!question) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
       .send(ResponseMessage.QUESTION_NOT_FOUND);
     return;
   }
-  const review = await Review.findOne(req.body.reviewId);
+  const review = await dataSource.getRepository(Review).findOneBy({
+    id: Number(req.body.reviewId),
+  });
   if (!review) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
@@ -116,8 +120,8 @@ router.delete("/", validateQuery(deleteRangeAnswerSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let questionAnswer = await RangeQuestionAnswer.findOne({
     where: {
-      questionId: req.query.rangeQuestionId,
-      reviewId: req.query.reviewId,
+      questionId: Number(req.query.rangeQuestionId),
+      reviewId: Number(req.query.reviewId),
     },
   });
   if (!questionAnswer) {
@@ -167,7 +171,7 @@ router.delete("/", validateQuery(deleteRangeAnswerSchema), async (req, res) => {
     return;
   }
   // start transaction to make sure an asnwer isnt deleted from a submitted review
-  await getManager().transaction(
+  await dataSource.manager.transaction(
     "REPEATABLE READ",
     async (transactionalEntityManager) => {
       // review with update lock
@@ -187,8 +191,8 @@ router.delete("/", validateQuery(deleteRangeAnswerSchema), async (req, res) => {
         RangeQuestionAnswer,
         {
           where: {
-            questionId: req.query.rangeQuestionId,
-            reviewId: req.query.reviewId,
+            questionId: Number(req.query.rangeQuestionId),
+            reviewId: Number(req.query.reviewId),
           },
         }
       );

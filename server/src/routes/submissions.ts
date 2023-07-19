@@ -19,7 +19,6 @@ import { AssignmentState } from "../enum/AssignmentState";
 import ResponseMessage from "../enum/ResponseMessage";
 import _ from "lodash";
 import moment from "moment";
-import { getManager } from "typeorm";
 import removePDFMetadata from "../util/removePDFMetadata";
 import AssignmentExport from "../models/AssignmentExport";
 import {
@@ -28,6 +27,7 @@ import {
   startSubmissionFlaggingWorker,
   //startImportWebLabSubmissionsWorker,
 } from "../workers/pool";
+import { dataSource } from "../databaseConnection";
 //import AssignmentType from "../enum/AssignmentType";
 
 // config values
@@ -47,9 +47,9 @@ router.get("/", validateQuery(assignmentVersionIdSchema), async (req, res) => {
   // this value has been parsed by the validate function
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const assignmentVersionId: number = req.query.assignmentVersionId as any;
-  const assignmentVersion = await AssignmentVersion.findOne(
-    assignmentVersionId
-  );
+  const assignmentVersion = await AssignmentVersion.findOneBy({
+    id: assignmentVersionId,
+  });
   if (!assignmentVersion) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
@@ -77,9 +77,9 @@ router.get(
   async (req, res) => {
     const user = req.user!;
     const assignmentVersionId: number = req.query.assignmentVersionId as any;
-    const assignmentVersion = await AssignmentVersion.findOne(
-      assignmentVersionId
-    );
+    const assignmentVersion = await AssignmentVersion.findOneBy({
+      id: assignmentVersionId,
+    });
     if (!assignmentVersion) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
@@ -121,9 +121,9 @@ router.get(
     const user = req.user!;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const assignmentVersionId: number = req.query.assignmentVersionId as any;
-    const assignmentVersion = await AssignmentVersion.findOne(
-      assignmentVersionId
-    );
+    const assignmentVersion = await AssignmentVersion.findOneBy({
+      id: assignmentVersionId,
+    });
     if (!assignmentVersion) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
@@ -150,7 +150,9 @@ router.get(
 router.get("/:id", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const submission = await Submission.findOne(req.params.id);
+  const submission = await Submission.findOneBy({
+    id: Number(req.params.id),
+  });
   if (!submission) {
     res
       .status(HttpStatusCode.NOT_FOUND)
@@ -177,7 +179,9 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
 router.get("/:id/file", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const submission = await Submission.findOne(req.params.id);
+  const submission = await Submission.findOneBy({
+    id: Number(req.params.id),
+  });
   if (!submission) {
     res
       .status(HttpStatusCode.NOT_FOUND)
@@ -208,7 +212,9 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
 router.get("/:id/feedback", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const submission = await Submission.findOne(req.params.id);
+  const submission = await Submission.findOneBy({
+    id: Number(req.params.id),
+  });
   if (!submission) {
     res
       .status(HttpStatusCode.NOT_FOUND)
@@ -277,16 +283,18 @@ router.post(
         .send("File is needed for the submission");
       return;
     }
-    const group = await Group.findOne(req.body.groupId);
+    const group = await Group.findOneBy({
+      id: Number(req.body.groupId),
+    });
     if (!group) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
         .send(ResponseMessage.GROUP_NOT_FOUND);
       return;
     }
-    const assignmentVersion = await AssignmentVersion.findOne(
-      req.body.assignmentVersionId
-    );
+    const assignmentVersion = await AssignmentVersion.findOneBy({
+      id: Number(req.body.assignmentVersionId),
+    });
     if (!assignmentVersion) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
@@ -370,7 +378,7 @@ router.post(
     });
     // this checks for the right extension in the validate function
     await submission.validateOrReject();
-    await getManager().transaction(
+    await dataSource.manager.transaction(
       "SERIALIZABLE", // serializable is the only way double final submissions can be prevented
       async (transactionalEntityManager) => {
         for (const assignmentVersion of assignment.versions) {
@@ -378,8 +386,8 @@ router.post(
           const submissionsOfGroupForAssignment =
             await transactionalEntityManager.find(Submission, {
               where: {
-                assignmentVersion: assignmentVersion,
-                group: group,
+                assignmentVersion: { id: assignmentVersion.id },
+                group: { id: group.id },
               },
             });
           // Set boolean of submission of older submissions to false
@@ -432,7 +440,9 @@ router.patch(
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
-    const submission = await Submission.findOne(req.params.id);
+    const submission = await Submission.findOneBy({
+      id: Number(req.params.id),
+    });
     if (!submission) {
       res
         .status(HttpStatusCode.NOT_FOUND)
@@ -482,15 +492,15 @@ router.patch(
     await submission.validateOrReject();
 
     // start transaction make sure all submissions are changed at the same time
-    await getManager().transaction(
+    await dataSource.manager.transaction(
       "SERIALIZABLE", // serializable is the only way double final submissions can be prevented
       async (transactionalEntityManager) => {
         for (const assignmentVersion of assignment.versions) {
           const submissionsOfGroupForAssignment =
             await transactionalEntityManager.find(Submission, {
               where: {
-                assignmentVersion: assignmentVersion,
-                group: group,
+                assignmentVersion: { id: assignmentVersion.id },
+                group: { id: group.id },
               },
             });
           // set booleans to false for all other assignments
@@ -526,7 +536,9 @@ router.patch(
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
-    const submission = await Submission.findOne(req.params.id);
+    const submission = await Submission.findOneBy({
+      id: Number(req.params.id),
+    });
     if (!submission) {
       res
         .status(HttpStatusCode.NOT_FOUND)
@@ -576,9 +588,9 @@ router.post(
     const assignmentVersionId: number = req.query.assignmentVersionId as any;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const exportType: "csv" | "xls" = req.query.exportType as any;
-    const assignmentVersion = await AssignmentVersion.findOne(
-      assignmentVersionId
-    );
+    const assignmentVersion = await AssignmentVersion.findOneBy({
+      id: assignmentVersionId,
+    });
     if (!assignmentVersion) {
       res
         .status(HttpStatusCode.BAD_REQUEST)

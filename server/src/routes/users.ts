@@ -11,7 +11,9 @@ router.get(
   checkEmployee,
   validateParams(idStringSchema),
   async (req, res) => {
-    const user = await User.findOne(req.params.id);
+    const user = await User.findOneBy({
+      netid: req.params.id,
+    });
     if (!user) {
       res.status(HttpStatusCode.NOT_FOUND).send("User not found");
     } else {

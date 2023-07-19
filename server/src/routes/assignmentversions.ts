@@ -19,7 +19,9 @@ const router = express.Router();
 router.get("/:id", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const assignmentVersion = await AssignmentVersion.findOne(req.params.id);
+  const assignmentVersion = await AssignmentVersion.findOneBy({
+    id: Number(req.params.id),
+  });
   if (!assignmentVersion) {
     res
       .status(HttpStatusCode.NOT_FOUND)
@@ -62,7 +64,9 @@ const assignmentVersionSchema = Joi.object({
 router.post("/", validateBody(assignmentVersionSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const assignment = await Assignment.findOne(req.body.assignmentId);
+  const assignment = await Assignment.findOneBy({
+    id: Number(req.body.assignmentId),
+  });
   if (!assignment) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
@@ -89,7 +93,7 @@ router.post("/", validateBody(assignmentVersionSchema), async (req, res) => {
       req.body.reviewsPerUserPerAssignmentVersionToReview,
     selfReview: false, // default self review is false (can be changed via patch route)
     submissionQuestionnaire: null, // submissionQuestionnaire (initially empty)
-    reviewQuestionnaire: null // reviewQuestionnaire (initially empty)
+    reviewQuestionnaire: null, // reviewQuestionnaire (initially empty)
   });
   await assignmentVersion.save();
   const assignmentVersionWithVersionsToReview =
@@ -114,7 +118,9 @@ router.patch(
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
-    const assignmentVersion = await AssignmentVersion.findOne(req.params.id);
+    const assignmentVersion = await AssignmentVersion.findOneBy({
+      id: Number(req.params.id),
+    });
     if (!assignmentVersion) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
@@ -137,9 +143,9 @@ router.patch(
     const versionsToReview: AssignmentVersion[] = [];
     for (const assignmentVersionsToReviewId of req.body
       .assignmentVersionsToReview) {
-      const versionToReview = await AssignmentVersion.findOne(
-        assignmentVersionsToReviewId
-      );
+      const versionToReview = await AssignmentVersion.findOneBy({
+        id: Number(assignmentVersionsToReviewId),
+      });
       if (!versionToReview) {
         res
           .status(HttpStatusCode.BAD_REQUEST)
@@ -186,16 +192,18 @@ router.get(
     // this value has been parsed by the validate function
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const groupId: number = req.query.groupId as any;
-    const assignmentVersion = await AssignmentVersion.findOne(
-      assignmentVersionId
-    );
+    const assignmentVersion = await AssignmentVersion.findOneBy({
+      id: Number(assignmentVersionId),
+    });
     if (!assignmentVersion) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
         .send(ResponseMessage.ASSIGNMENTVERSION_NOT_FOUND);
       return;
     }
-    const group = await Group.findOne(groupId);
+    const group = await Group.findOneBy({
+      id: groupId,
+    });
     if (!group) {
       res
         .status(HttpStatusCode.BAD_REQUEST)

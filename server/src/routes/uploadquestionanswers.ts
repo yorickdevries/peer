@@ -10,13 +10,13 @@ import UploadQuestionAnswer from "../models/UploadQuestionAnswer";
 import File from "../models/File";
 import upload from "../middleware/upload";
 import config from "config";
-import { getManager } from "typeorm";
 import path from "path";
 import fsPromises from "fs/promises";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import moment from "moment";
 import removePDFMetadata from "../util/removePDFMetadata";
+import { dataSource } from "../databaseConnection";
 
 const router = express.Router();
 
@@ -107,14 +107,18 @@ router.post(
         .send("File is needed for the answer");
       return;
     }
-    const question = await UploadQuestion.findOne(req.body.uploadQuestionId);
+    const question = await UploadQuestion.findOneBy({
+      id: Number(req.body.uploadQuestionId),
+    });
     if (!question) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
         .send(ResponseMessage.QUESTION_NOT_FOUND);
       return;
     }
-    const review = await Review.findOne(req.body.reviewId);
+    const review = await dataSource.getRepository(Review).findOneBy({
+      id: Number(req.body.reviewId),
+    });
     if (!review) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
@@ -192,9 +196,9 @@ router.post(
     let oldFile: File | undefined;
 
     // uploadAnswer
-    let uploadAnswer: UploadQuestionAnswer | undefined;
+    let uploadAnswer: UploadQuestionAnswer | null;
     // start transaction make sure the file and submission are both saved
-    await getManager().transaction(
+    await dataSource.manager.transaction(
       "REPEATABLE READ",
       async (transactionalEntityManager) => {
         // fetch existing answer if present
@@ -267,8 +271,8 @@ router.delete(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let questionAnswer = await UploadQuestionAnswer.findOne({
       where: {
-        questionId: req.query.uploadQuestionId,
-        reviewId: req.query.reviewId,
+        questionId: Number(req.query.uploadQuestionId),
+        reviewId: Number(req.query.reviewId),
       },
     });
     if (!questionAnswer) {
@@ -319,7 +323,7 @@ router.delete(
     }
 
     // start transaction to make sure an asnwer isnt deleted from a submitted review
-    await getManager().transaction(
+    await dataSource.manager.transaction(
       "REPEATABLE READ",
       async (transactionalEntityManager) => {
         // review with update lock
@@ -339,8 +343,8 @@ router.delete(
           UploadQuestionAnswer,
           {
             where: {
-              questionId: req.query.uploadQuestionId,
-              reviewId: req.query.reviewId,
+              questionId: Number(req.query.uploadQuestionId),
+              reviewId: Number(req.query.reviewId),
             },
           }
         );

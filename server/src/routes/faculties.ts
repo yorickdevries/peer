@@ -27,7 +27,9 @@ router.get("/", async (_req, res) => {
 });
 
 router.get("/:id", validateParams(idSchema), async (req, res) => {
-  const faculty = await Faculty.findOne({ where: { id: req.params.id } });
+  const faculty = await Faculty.findOne({
+    where: { id: Number(req.params.id) },
+  });
   if (!faculty) {
     res
       .status(HttpStatusCode.NOT_FOUND)
@@ -52,7 +54,9 @@ router.patch(
   validateParams(idSchema),
   validateBody(patchSchema),
   async (req, res) => {
-    const faculty = await Faculty.findOne({ where: { id: req.params.id } });
+    const faculty = await Faculty.findOne({
+      where: { id: Number(req.params.id) },
+    });
     if (!faculty) {
       res
         .status(HttpStatusCode.NOT_FOUND)
@@ -68,7 +72,9 @@ router.patch(
 );
 
 router.delete("/:id", isAdmin, validateParams(idSchema), async (req, res) => {
-  const faculty = await Faculty.findOne({ where: { id: req.params.id } });
+  const faculty = await Faculty.findOne({
+    where: { id: Number(req.params.id) },
+  });
 
   if (!faculty) {
     res
@@ -77,7 +83,7 @@ router.delete("/:id", isAdmin, validateParams(idSchema), async (req, res) => {
     return;
   }
 
-  const courses = await Course.find({ where: { faculty: faculty } });
+  const courses = await Course.find({ where: { faculty: { id: faculty.id } } });
   if (courses.length > 0) {
     res
       .status(HttpStatusCode.BAD_REQUEST)

@@ -7,7 +7,6 @@ import {
 } from "../middleware/validation";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
-import { getManager } from "typeorm";
 import ResponseMessage from "../enum/ResponseMessage";
 import {
   addCopyOfQuestions,
@@ -19,6 +18,7 @@ import CheckboxQuestion from "../models/CheckboxQuestion";
 import MultipleChoiceQuestion from "../models/MultipleChoiceQuestion";
 import Questionnaire from "../models/Questionnaire";
 import AssignmentVersion from "../models/AssignmentVersion";
+import { dataSource } from "../databaseConnection";
 
 const router = express.Router();
 
@@ -27,7 +27,9 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   // also loads the questions
-  const questionnaire = await ReviewQuestionnaire.findOne(req.params.id);
+  const questionnaire = await ReviewQuestionnaire.findOneBy({
+    id: Number(req.params.id),
+  });
   if (!questionnaire) {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
     return;
@@ -71,9 +73,9 @@ const questionnaireSchema = Joi.object({
 router.post("/", validateBody(questionnaireSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const assignmentVersion = await AssignmentVersion.findOne(
-    req.body.assignmentVersionId
-  );
+  const assignmentVersion = await AssignmentVersion.findOneBy({
+    id: Number(req.body.assignmentVersionId),
+  });
   if (!assignmentVersion) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
@@ -103,13 +105,13 @@ router.post("/", validateBody(questionnaireSchema), async (req, res) => {
   const questionnaire = new ReviewQuestionnaire();
   // start transaction make sure the questionnaire and assignment are both saved
   // and no questionnaire is made in the mean time
-  await getManager().transaction(
+  await dataSource.manager.transaction(
     "REPEATABLE READ",
     async (transactionalEntityManager) => {
       // get the assignment with questionnaires
       const assignmentVersion = await transactionalEntityManager.findOneOrFail(
         AssignmentVersion,
-        req.body.assignmentVersionId
+        { where: { id: Number(req.body.assignmentVersionId) } }
       );
       // make sure the questionnaire not already exists
       if (assignmentVersion.reviewQuestionnaireId) {
@@ -146,11 +148,15 @@ router.patch(
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     const questionnaireId = req.params.id;
-    const questionnaire = await ReviewQuestionnaire.findOne(questionnaireId);
+    const questionnaire = await ReviewQuestionnaire.findOneBy({
+      id: Number(questionnaireId),
+    });
     const copyFromQuestionnaireId = req.body.copyFromQuestionnaireId;
-    const copyFromQuestionnaire = await Questionnaire.findOne(
-      copyFromQuestionnaireId
-    );
+    const copyFromQuestionnaire = await dataSource
+      .getRepository(Questionnaire)
+      .findOneBy({
+        id: Number(copyFromQuestionnaireId),
+      });
     if (!questionnaire || !copyFromQuestionnaire) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
@@ -199,7 +205,9 @@ router.patch(
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     const questionnaireId = req.params.id;
-    const questionnaire = await ReviewQuestionnaire.findOne(questionnaireId);
+    const questionnaire = await ReviewQuestionnaire.findOneBy({
+      id: Number(questionnaireId),
+    });
     if (!questionnaire) {
       res
         .status(HttpStatusCode.BAD_REQUEST)

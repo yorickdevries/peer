@@ -26,9 +26,9 @@ const questionOptionSchema = Joi.object({
 router.post("/", validateBody(questionOptionSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const question = await MultipleChoiceQuestion.findOne(
-    req.body.multipleChoiceQuestionId
-  );
+  const question = await MultipleChoiceQuestion.findOneBy({
+    id: Number(req.body.multipleChoiceQuestionId),
+  });
   if (!question) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
@@ -99,9 +99,9 @@ router.patch(
     // this value has been parsed by the validate function
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const questionOptionId: number = req.params.id as any;
-    const questionOption = await MultipleChoiceQuestionOption.findOne(
-      questionOptionId
-    );
+    const questionOption = await MultipleChoiceQuestionOption.findOneBy({
+      id: questionOptionId,
+    });
     if (!questionOption) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
@@ -162,9 +162,9 @@ router.delete("/:id", validateParams(idSchema), async (req, res) => {
   // this value has been parsed by the validate function
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const questionOptionId: number = req.params.id as any;
-  const questionOption = await MultipleChoiceQuestionOption.findOne(
-    questionOptionId
-  );
+  const questionOption = await MultipleChoiceQuestionOption.findOneBy({
+    id: questionOptionId,
+  });
   if (!questionOption) {
     res
       .status(HttpStatusCode.BAD_REQUEST)

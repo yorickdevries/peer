@@ -9,7 +9,7 @@ import OpenQuestionAnswer from "../models/OpenQuestionAnswer";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import moment from "moment";
-import { getManager } from "typeorm";
+import { dataSource } from "../databaseConnection";
 
 const router = express.Router();
 
@@ -24,14 +24,18 @@ const openAnswerSchema = Joi.object({
 router.post("/", validateBody(openAnswerSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const question = await OpenQuestion.findOne(req.body.openQuestionId);
+  const question = await OpenQuestion.findOneBy({
+    id: Number(req.body.openQuestionId),
+  });
   if (!question) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
       .send(ResponseMessage.QUESTION_NOT_FOUND);
     return;
   }
-  const review = await Review.findOne(req.body.reviewId);
+  const review = await dataSource.getRepository(Review).findOneBy({
+    id: Number(req.body.reviewId),
+  });
   if (!review) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
@@ -116,8 +120,8 @@ router.delete("/", validateQuery(deleteOpenAnswerSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let questionAnswer = await OpenQuestionAnswer.findOne({
     where: {
-      questionId: req.query.openQuestionId,
-      reviewId: req.query.reviewId,
+      questionId: Number(req.query.openQuestionId),
+      reviewId: Number(req.query.reviewId),
     },
   });
   if (!questionAnswer) {
@@ -167,7 +171,7 @@ router.delete("/", validateQuery(deleteOpenAnswerSchema), async (req, res) => {
     return;
   }
   // start transaction to make sure an asnwer isnt deleted from a submitted review
-  await getManager().transaction(
+  await dataSource.manager.transaction(
     "REPEATABLE READ",
     async (transactionalEntityManager) => {
       // review with update lock
@@ -187,8 +191,8 @@ router.delete("/", validateQuery(deleteOpenAnswerSchema), async (req, res) => {
         OpenQuestionAnswer,
         {
           where: {
-            questionId: req.query.openQuestionId,
-            reviewId: req.query.reviewId,
+            questionId: Number(req.query.openQuestionId),
+            reviewId: Number(req.query.reviewId),
           },
         }
       );

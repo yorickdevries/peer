@@ -6,13 +6,13 @@ import UserRole from "../enum/UserRole";
 import Joi from "joi";
 import { validateBody, validateQuery } from "../middleware/validation";
 import ResponseMessage from "../enum/ResponseMessage";
-import { getManager } from "typeorm";
 import User from "../models/User";
 import upload from "../middleware/upload";
 import config from "config";
 import path from "path";
 import { parse } from "csv-parse";
 import * as fs from "fs";
+import { dataSource } from "../databaseConnection";
 
 const router = express.Router();
 
@@ -28,7 +28,9 @@ router.get("/", validateQuery(queryCourseIdSchema), async (req, res) => {
   // this value has been parsed by the validate function
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const courseId: number = req.query.courseId as any;
-  const course = await Course.findOne(courseId);
+  const course = await Course.findOneBy({
+    id: courseId,
+  });
   if (!course) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
@@ -68,7 +70,9 @@ router.post("/", validateBody(enrollmentSchema), async (req, res) => {
   const role: UserRole = req.body.role as any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const courseId: number = req.body.courseId as any;
-  const course = await Course.findOne(courseId);
+  const course = await Course.findOneBy({
+    id: courseId,
+  });
   if (!course) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
@@ -91,10 +95,12 @@ router.post("/", validateBody(enrollmentSchema), async (req, res) => {
     return;
   }
   let enrollment: Enrollment;
-  await getManager().transaction(
+  await dataSource.manager.transaction(
     "READ COMMITTED",
     async (transactionalEntityManager) => {
-      let user = await transactionalEntityManager.findOne(User, userNetid);
+      let user = await transactionalEntityManager.findOne(User, {
+        where: { netid: userNetid },
+      });
       // in case the user doesnt exists in the database yet, create it
       if (!user) {
         user = new User().init({ netid: userNetid });
@@ -102,7 +108,11 @@ router.post("/", validateBody(enrollmentSchema), async (req, res) => {
         await transactionalEntityManager.save(user);
       }
       // enroll user in the course if not already
-      enrollment = new Enrollment().init({ user: user, course: course, role: role });
+      enrollment = new Enrollment().init({
+        user: user,
+        course: course,
+        role: role,
+      });
       // in case another enrollment is made in the meantime it will error due to primary key constraints
       await enrollment.validateOrReject();
       await transactionalEntityManager.save(enrollment);
@@ -195,7 +205,9 @@ router.post(
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const courseId = req.body.courseId;
 
-            const course = await Course.findOne(courseId);
+            const course = await Course.findOneBy({
+              id: Number(courseId),
+            });
             if (!course) {
               res
                 .status(HttpStatusCode.BAD_REQUEST)
@@ -208,13 +220,12 @@ router.post(
                 .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
               return;
             }
-            await getManager().transaction(
+            await dataSource.manager.transaction(
               "READ COMMITTED",
               async (transactionalEntityManager) => {
-                let user = await transactionalEntityManager.findOne(
-                  User,
-                  userNetid
-                );
+                let user = await transactionalEntityManager.findOne(User, {
+                  where: { netid: userNetid },
+                });
                 // in case the user doesnt exists in the database yet, create it
                 if (!user) {
                   user = new User().init({ netid: userNetid });
@@ -250,10 +261,12 @@ router.delete("/", validateQuery(deleteEnrollmentSchema), async (req, res) => {
   const user = req.user!;
   // this value has been parsed by the validate function
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const userNetid: number = req.query.userNetid as any;
+  const userNetid: string = req.query.userNetid as any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const courseId: number = req.query.courseId as any;
-  const course = await Course.findOne(courseId);
+  const course = await Course.findOneBy({
+    id: courseId,
+  });
   if (!course) {
     res
       .status(HttpStatusCode.BAD_REQUEST)

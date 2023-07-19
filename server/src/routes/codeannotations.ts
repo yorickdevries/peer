@@ -31,14 +31,16 @@ router.get("/", validateQuery(getAnnotationsSchema), async (req, res) => {
   const user = req.user!;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const reviewId: number = req.query.reviewId as any;
-  const review = await ReviewOfSubmission.findOne(reviewId);
+  const review = await ReviewOfSubmission.findOneBy({
+    id: reviewId,
+  });
   if (!review) {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.REVIEW_NOT_FOUND);
     return;
   }
   // GET CODE ANNOTATIONS
   const codeAnnotations = await CodeAnnotation.find({
-    where: { review: review },
+    where: { review: { id: review.id } },
   });
 
   // get assignmentstate
@@ -93,7 +95,9 @@ const annotationSchema = Joi.object({
 router.post("/", validateBody(annotationSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const review = await ReviewOfSubmission.findOne(req.body.reviewId);
+  const review = await ReviewOfSubmission.findOneBy({
+    id: Number(req.body.reviewId),
+  });
   if (!review) {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.REVIEW_NOT_FOUND);
     return;
@@ -139,7 +143,9 @@ router.post("/", validateBody(annotationSchema), async (req, res) => {
 router.delete("/:id", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const annotation = await CodeAnnotation.findOne(req.params.id);
+  const annotation = await CodeAnnotation.findOneBy({
+    id: Number(req.params.id),
+  });
   if (!annotation) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
@@ -189,7 +195,9 @@ router.patch(
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
-    const annotation = await CodeAnnotation.findOne(req.params.id);
+    const annotation = await CodeAnnotation.findOneBy({
+      id: Number(req.params.id),
+    });
     if (!annotation) {
       res
         .status(HttpStatusCode.BAD_REQUEST)

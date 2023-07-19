@@ -13,6 +13,7 @@ import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import { AssignmentState } from "../enum/AssignmentState";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import QuestionOperation from "../enum/QuestionOperation";
+import { dataSource } from "../databaseConnection";
 
 const router = express.Router();
 
@@ -20,7 +21,9 @@ const router = express.Router();
 router.get("/:id", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const question = await RangeQuestion.findOne(req.params.id);
+  const question = await RangeQuestion.findOneBy({
+    id: Number(req.params.id),
+  });
   if (!question) {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
     return;
@@ -56,7 +59,11 @@ const questionSchema = Joi.object({
 router.post("/", validateBody(questionSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const questionnaire = await Questionnaire.findOne(req.body.questionnaireId);
+  const questionnaire = await dataSource
+    .getRepository(Questionnaire)
+    .findOneBy({
+      id: Number(req.body.questionnaireId),
+    });
   if (!questionnaire) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
@@ -89,7 +96,7 @@ router.post("/", validateBody(questionSchema), async (req, res) => {
       .send("The assignment is already in feedback state");
     return;
   }
-  const question = new RangeQuestion({
+  const question = new RangeQuestion().init({
     text: req.body.text,
     number: req.body.number,
     optional: req.body.optional,
@@ -119,7 +126,9 @@ router.patch(
     // this value has been parsed by the validate function
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const questionId: number = req.params.id as any;
-    const question = await RangeQuestion.findOne(questionId);
+    const question = await RangeQuestion.findOneBy({
+      id: questionId,
+    });
     if (!question) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
@@ -171,7 +180,9 @@ router.delete("/:id", validateParams(idSchema), async (req, res) => {
   // this value has been parsed by the validate function
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const questionId: number = req.params.id as any;
-  const question = await RangeQuestion.findOne(questionId);
+  const question = await RangeQuestion.findOneBy({
+    id: questionId,
+  });
   if (!question) {
     res
       .status(HttpStatusCode.BAD_REQUEST)

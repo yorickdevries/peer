@@ -10,7 +10,7 @@ import CheckboxQuestionOption from "../models/CheckboxQuestionOption";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import moment from "moment";
-import { getManager } from "typeorm";
+import { dataSource } from "../databaseConnection";
 
 const router = express.Router();
 
@@ -27,14 +27,18 @@ const checkboxAnswerSchema = Joi.object({
 router.post("/", validateBody(checkboxAnswerSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const question = await CheckboxQuestion.findOne(req.body.checkboxQuestionId);
+  const question = await CheckboxQuestion.findOneBy({
+    id: Number(req.body.checkboxQuestionId),
+  });
   if (!question) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
       .send(ResponseMessage.QUESTION_NOT_FOUND);
     return;
   }
-  const review = await Review.findOne(req.body.reviewId);
+  const review = await dataSource.getRepository(Review).findOneBy({
+    id: Number(req.body.reviewId),
+  });
   if (!review) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
@@ -62,9 +66,9 @@ router.post("/", validateBody(checkboxAnswerSchema), async (req, res) => {
   }
   const checkboxQuestionOptions: CheckboxQuestionOption[] = [];
   for (const checkboxQuestionOptionId of req.body.checkboxQuestionOptionIds) {
-    const questionOption = await CheckboxQuestionOption.findOne(
-      checkboxQuestionOptionId
-    );
+    const questionOption = await CheckboxQuestionOption.findOneBy({
+      id: Number(checkboxQuestionOptionId),
+    });
     if (!questionOption) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
@@ -141,8 +145,8 @@ router.delete(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let questionAnswer = await CheckboxQuestionAnswer.findOne({
       where: {
-        questionId: req.query.checkboxQuestionId,
-        reviewId: req.query.reviewId,
+        questionId: Number(req.query.checkboxQuestionId),
+        reviewId: Number(req.query.reviewId),
       },
     });
     if (!questionAnswer) {
@@ -192,7 +196,7 @@ router.delete(
       return;
     }
     // start transaction to make sure an asnwer isnt deleted from a submitted review
-    await getManager().transaction(
+    await dataSource.manager.transaction(
       "REPEATABLE READ",
       async (transactionalEntityManager) => {
         // review with update lock
@@ -212,8 +216,8 @@ router.delete(
           CheckboxQuestionAnswer,
           {
             where: {
-              questionId: req.query.checkboxQuestionId,
-              reviewId: req.query.reviewId,
+              questionId: Number(req.query.checkboxQuestionId),
+              reviewId: Number(req.query.reviewId),
             },
           }
         );

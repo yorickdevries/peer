@@ -14,8 +14,8 @@ import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import { AssignmentState } from "../enum/AssignmentState";
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import _ from "lodash";
-import { getManager } from "typeorm";
 import QuestionOperation from "../enum/QuestionOperation";
+import { dataSource } from "../databaseConnection";
 
 const router = express.Router();
 
@@ -23,7 +23,9 @@ const router = express.Router();
 router.get("/:id", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const question = await MultipleChoiceQuestion.findOne(req.params.id);
+  const question = await MultipleChoiceQuestion.findOneBy({
+    id: Number(req.params.id),
+  });
   if (!question) {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
     return;
@@ -61,7 +63,11 @@ const questionSchema = Joi.object({
 router.post("/", validateBody(questionSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const questionnaire = await Questionnaire.findOne(req.body.questionnaireId);
+  const questionnaire = await dataSource
+    .getRepository(Questionnaire)
+    .findOneBy({
+      id: Number(req.body.questionnaireId),
+    });
   if (!questionnaire) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
@@ -124,7 +130,9 @@ router.patch(
     // this value has been parsed by the validate function
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const questionId: number = req.params.id as any;
-    const question = await MultipleChoiceQuestion.findOne(questionId);
+    const question = await MultipleChoiceQuestion.findOneBy({
+      id: questionId,
+    });
     if (!question) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
@@ -174,18 +182,18 @@ router.patch(
       question.graded = req.body.graded;
       await question.save();
     } else {
-      await getManager().transaction(
+      await dataSource.manager.transaction(
         "SERIALIZABLE", // make sure no new options can be added in the mean time
         async (transactionalEntityManager) => {
           // reload the question in transaction
           const reloadedQuestion =
             await transactionalEntityManager.findOneOrFail(
               MultipleChoiceQuestion,
-              questionId
+              { where: { id: questionId } }
             );
           const reloadedQuestionOptions = await transactionalEntityManager.find(
             MultipleChoiceQuestionOption,
-            { where: { question: reloadedQuestion } }
+            { where: { question: { id: reloadedQuestion.id } } }
           );
           // update question
           reloadedQuestion.text = req.body.text;
@@ -215,7 +223,9 @@ router.delete("/:id", validateParams(idSchema), async (req, res) => {
   // this value has been parsed by the validate function
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const questionId: number = req.params.id as any;
-  const question = await MultipleChoiceQuestion.findOne(questionId);
+  const question = await MultipleChoiceQuestion.findOneBy({
+    id: questionId,
+  });
   if (!question) {
     res
       .status(HttpStatusCode.BAD_REQUEST)

@@ -1,12 +1,12 @@
-import { createQueryBuilder } from "typeorm";
-
 import express from "express";
+import { dataSource } from "../databaseConnection";
 const router = express.Router();
 
 router.get("/assignment", async (_req, res) => {
   const currDate: Date = new Date();
   //reviews
-  const dueDates = await createQueryBuilder("Assignment", "assignment")
+  const dueDates = await dataSource
+    .createQueryBuilder("Assignment", "assignment")
     .leftJoin("assignment.course", "course")
     .select([
       "course.courseCode",

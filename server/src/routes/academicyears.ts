@@ -39,7 +39,9 @@ router.get("/", validateQuery(querySchema), async (req, res) => {
 });
 
 router.get("/:id", validateParams(idSchema), async (req, res) => {
-  const year = await AcademicYear.findOne({ where: { id: req.params.id } });
+  const year = await AcademicYear.findOne({
+    where: { id: Number(req.params.id) },
+  });
   if (!year) {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.YEAR_NOT_FOUND);
     return;
@@ -62,7 +64,9 @@ router.patch(
   validateParams(idSchema),
   validateBody(patchSchema),
   async (req, res) => {
-    const year = await AcademicYear.findOne({ where: { id: req.params.id } });
+    const year = await AcademicYear.findOne({
+      where: { id: Number(req.params.id) },
+    });
     if (!year) {
       res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.YEAR_NOT_FOUND);
       return;
@@ -76,14 +80,18 @@ router.patch(
 );
 
 router.delete("/:id", isAdmin, validateParams(idSchema), async (req, res) => {
-  const year = await AcademicYear.findOne({ where: { id: req.params.id } });
+  const year = await AcademicYear.findOne({
+    where: { id: Number(req.params.id) },
+  });
 
   if (!year) {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.YEAR_NOT_FOUND);
     return;
   }
 
-  const courses = await Course.find({ where: { academicYear: year } });
+  const courses = await Course.find({
+    where: { academicYear: { id: year.id } },
+  });
   if (courses.length > 0) {
     res
       .status(HttpStatusCode.BAD_REQUEST)

@@ -21,7 +21,9 @@ router.get("/", validateQuery(querySchema), async (req, res) => {
   const user = req.user!;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const assignmentId = req.query.assignmentId as any;
-  const assignment = await Assignment.findOne(assignmentId);
+  const assignment = await Assignment.findOneBy({
+    id: assignmentId,
+  });
   if (!assignment) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
@@ -41,7 +43,9 @@ router.get("/", validateQuery(querySchema), async (req, res) => {
 router.get("/:id/file", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const assignmentExport = await AssignmentExport.findOne(req.params.id);
+  const assignmentExport = await AssignmentExport.findOneBy({
+    id: Number(req.params.id),
+  });
   if (!assignmentExport) {
     res.status(HttpStatusCode.NOT_FOUND).send("assignmentExport not found");
     return;

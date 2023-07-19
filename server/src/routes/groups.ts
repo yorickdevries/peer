@@ -36,7 +36,9 @@ router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
   // this value has been parsed by the validate function
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const assignmentId: number = req.query.assignmentId as any;
-  const assignment = await Assignment.findOne(assignmentId);
+  const assignment = await Assignment.findOneBy({
+    id: assignmentId,
+  });
   if (!assignment) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
@@ -60,7 +62,9 @@ router.get("/", validateQuery(assignmentIdSchema), async (req, res) => {
 router.get("/:id", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const group = await Group.findOne(req.params.id);
+  const group = await Group.findOneBy({
+    id: Number(req.params.id),
+  });
   if (!group) {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
     return;
@@ -79,7 +83,9 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
 router.delete("/:id", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const group = await Group.findOne(req.params.id);
+  const group = await Group.findOneBy({
+    id: Number(req.params.id),
+  });
   if (!group) {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
     return;
@@ -130,7 +136,9 @@ router.patch(
     // this value has been parsed by the validate function
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const groupId: number = req.params.id as any;
-    const group = await Group.findOne(groupId);
+    const group = await Group.findOneBy({
+      id: groupId,
+    });
     if (!group) {
       res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
       return;
@@ -144,7 +152,9 @@ router.patch(
     // NOTE: This should be done in an transaction in the future
     const groupUsers = await group.getUsers();
     const newUserNetid = req.body.userNetid;
-    let newUser = await User.findOne(newUserNetid);
+    let newUser = await User.findOneBy({
+      netid: newUserNetid,
+    });
     // in case the user doesnt exists in the database yet, create it
     if (!newUser) {
       newUser = new User().init({ netid: newUserNetid });
@@ -199,7 +209,9 @@ router.patch(
     await group.save();
 
     // reload the complete group
-    const newGroup = await Group.findOne(groupId);
+    const newGroup = await Group.findOneBy({
+      id: groupId,
+    });
     const newUsers = await group.getUsers();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     newGroup!.users = newUsers;
@@ -218,7 +230,9 @@ router.patch(
     // this value has been parsed by the validate function
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const groupId: number = req.params.id as any;
-    const group = await Group.findOne(groupId);
+    const group = await Group.findOneBy({
+      id: groupId,
+    });
     if (!group) {
       res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
       return;
@@ -232,7 +246,9 @@ router.patch(
     // NOTE: This should be done in an transaction in the future
     const groupUsers = await group.getUsers();
     const removedUserNetid = req.body.userNetid;
-    const removedUser = await User.findOne(removedUserNetid);
+    const removedUser = await User.findOneBy({
+      netid: removedUserNetid,
+    });
     if (!removedUser) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
@@ -276,7 +292,9 @@ router.patch(
     await group.save();
 
     // reload the complete group
-    const newGroup = await Group.findOne(groupId);
+    const newGroup = await Group.findOneBy({
+      id: groupId,
+    });
     const newUsers = await group.getUsers();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     newGroup!.users = newUsers;
@@ -318,7 +336,9 @@ router.post(
       res.status(HttpStatusCode.BAD_REQUEST).send(String(error));
       return;
     }
-    const assignment = await Assignment.findOne(req.body.assignmentId);
+    const assignment = await Assignment.findOneBy({
+      id: Number(req.body.assignmentId),
+    });
     if (!assignment) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
@@ -390,7 +410,9 @@ const groupSchema = Joi.object({
 router.post("/", validateBody(groupSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const assignment = await Assignment.findOne(req.body.assignmentId);
+  const assignment = await Assignment.findOneBy({
+    id: Number(req.body.assignmentId),
+  });
   if (!assignment) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
@@ -434,10 +456,12 @@ router.post(
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
-    const assignment = await Assignment.findOne(req.body.assignmentId);
-    const copyFromAssignment = await Assignment.findOne(
-      req.body.copyFromAssignmentId
-    );
+    const assignment = await Assignment.findOneBy({
+      id: Number(req.body.assignmentId),
+    });
+    const copyFromAssignment = await Assignment.findOneBy({
+      id: Number(req.body.copyFromAssignmentId),
+    });
     if (!assignment || !copyFromAssignment) {
       res
         .status(HttpStatusCode.BAD_REQUEST)

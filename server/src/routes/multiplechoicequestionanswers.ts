@@ -10,7 +10,7 @@ import MultipleChoiceQuestionOption from "../models/MultipleChoiceQuestionOption
 import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import moment from "moment";
-import { getManager } from "typeorm";
+import { dataSource } from "../databaseConnection";
 
 const router = express.Router();
 
@@ -25,16 +25,18 @@ const multipleChoiceAnswerSchema = Joi.object({
 router.post("/", validateBody(multipleChoiceAnswerSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const question = await MultipleChoiceQuestion.findOne(
-    req.body.multipleChoiceQuestionId
-  );
+  const question = await MultipleChoiceQuestion.findOneBy({
+    id: Number(req.body.multipleChoiceQuestionId),
+  });
   if (!question) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
       .send(ResponseMessage.QUESTION_NOT_FOUND);
     return;
   }
-  const review = await Review.findOne(req.body.reviewId);
+  const review = await dataSource.getRepository(Review).findOneBy({
+    id: Number(req.body.reviewId),
+  });
   if (!review) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
@@ -60,9 +62,9 @@ router.post("/", validateBody(multipleChoiceAnswerSchema), async (req, res) => {
       .send("The question is not part of this review");
     return;
   }
-  const questionOption = await MultipleChoiceQuestionOption.findOne(
-    req.body.multipleChoiceQuestionOptionId
-  );
+  const questionOption = await MultipleChoiceQuestionOption.findOneBy({
+    id: Number(req.body.multipleChoiceQuestionOptionId),
+  });
   if (!questionOption) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
@@ -134,8 +136,8 @@ router.delete(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let questionAnswer = await MultipleChoiceQuestionAnswer.findOne({
       where: {
-        questionId: req.query.multipleChoiceQuestionId,
-        reviewId: req.query.reviewId,
+        questionId: Number(req.query.multipleChoiceQuestionId),
+        reviewId: Number(req.query.reviewId),
       },
     });
     if (!questionAnswer) {
@@ -185,7 +187,7 @@ router.delete(
       return;
     }
     // start transaction to make sure an asnwer isnt deleted from a submitted review
-    await getManager().transaction(
+    await dataSource.manager.transaction(
       "REPEATABLE READ",
       async (transactionalEntityManager) => {
         // review with update lock
@@ -205,8 +207,8 @@ router.delete(
           MultipleChoiceQuestionAnswer,
           {
             where: {
-              questionId: req.query.multipleChoiceQuestionId,
-              reviewId: req.query.reviewId,
+              questionId: Number(req.query.multipleChoiceQuestionId),
+              reviewId: Number(req.query.reviewId),
             },
           }
         );

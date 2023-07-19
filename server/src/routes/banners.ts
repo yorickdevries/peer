@@ -25,7 +25,7 @@ router.get("/", async (_req, res) => {
 });
 
 router.get("/:id", validateParams(idSchema), async (req, res) => {
-  const banner = await Banner.findOne({ where: { id: req.params.id } });
+  const banner = await Banner.findOne({ where: { id: Number(req.params.id) } });
   if (!banner) {
     res.status(HttpStatusCode.NOT_FOUND).send();
     return;
@@ -48,7 +48,7 @@ router.patch(
   validateParams(idSchema),
   validateBody(schema),
   async (req, res) => {
-    const banner = await Banner.findOne({ where: { id: req.params.id } });
+    const banner = await Banner.findOne({ where: { id: Number(req.params.id) } });
     if (!banner) {
       res.status(HttpStatusCode.NOT_FOUND).send();
       return;
@@ -63,7 +63,7 @@ router.patch(
 );
 
 router.delete("/:id", validateParams(idSchema), async (req, res) => {
-  const banner = await Banner.findOne({ where: { id: req.params.id } });
+  const banner = await Banner.findOne({ where: { id: Number(req.params.id) } });
 
   if (!banner) {
     res.status(HttpStatusCode.NOT_FOUND).send();

@@ -28,7 +28,9 @@ const mockPassportConfiguration = async function (
     ]
   );
 
-  const tempUser = await User.findOneOrFail(userNetid);
+  const tempUser = await User.findOneByOrFail({
+    netid: userNetid,
+  });
   tempUser.admin = admin;
   await User.save(tempUser);
 

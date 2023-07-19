@@ -13,10 +13,10 @@ import PDFAnnotationMotivation from "../enum/PDFAnnotationMotivation";
 import CommentingPDFAnnotation from "../models/CommentingPDFAnnotation";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import ReplyingPDFAnnotation from "../models/ReplyingPDFAnnotation";
-import { getManager } from "typeorm";
 import ResponseMessage from "../enum/ResponseMessage";
 import { AssignmentState } from "../enum/AssignmentState";
 import moment from "moment";
+import { dataSource } from "../databaseConnection";
 
 const router = express.Router();
 
@@ -30,14 +30,18 @@ router.get("/", validateQuery(getAnnotationSchema), async (req, res) => {
   const user = req.user!;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const reviewId: number = req.query.reviewId as any;
-  const review = await ReviewOfSubmission.findOne(reviewId);
+  const review = await ReviewOfSubmission.findOneBy({
+    id: reviewId,
+  });
   if (!review) {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.REVIEW_NOT_FOUND);
     return;
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const fileId: number = req.query.fileId as any;
-  const file = await File.findOne(fileId);
+  const file = await File.findOneBy({
+    id: fileId,
+  });
   if (!file) {
     res.status(HttpStatusCode.NOT_FOUND).send("File not found");
     return;
@@ -51,10 +55,10 @@ router.get("/", validateQuery(getAnnotationSchema), async (req, res) => {
 
   // GET THE ANNOTATIONS
   const commentingPDFAnnotations = await CommentingPDFAnnotation.find({
-    where: { review: review, file: file },
+    where: { review: { id: review.id }, file: { id: file.id } },
   });
   const replyingPDFAnnotations = await ReplyingPDFAnnotation.find({
-    where: { review: review, file: file },
+    where: { review: { id: review.id }, file: { id: file.id } },
   });
   const webAnnotations = [];
   // sort the webannotations so comments are loaded before replys
@@ -129,12 +133,16 @@ const annotationSchema = Joi.object({
 router.post("/", validateBody(annotationSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const review = await ReviewOfSubmission.findOne(req.body.reviewId);
+  const review = await ReviewOfSubmission.findOneBy({
+    id: Number(req.body.reviewId),
+  });
   if (!review) {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.REVIEW_NOT_FOUND);
     return;
   }
-  const file = await File.findOne(req.body.fileId);
+  const file = await File.findOneBy({
+    id: Number(req.body.fileId),
+  });
   if (!file) {
     res.status(HttpStatusCode.NOT_FOUND).send("File not found");
     return;
@@ -174,7 +182,11 @@ router.post("/", validateBody(annotationSchema), async (req, res) => {
   }
   // create the annotation
   const annotation = req.body.annotation;
-  const existingAnnotation = await PDFAnnotation.findOne(annotation.id);
+  const existingAnnotation = await dataSource
+    .getRepository(PDFAnnotation)
+    .findOneBy({
+      id: annotation.id,
+    });
   if (existingAnnotation) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
@@ -204,9 +216,10 @@ router.post("/", validateBody(annotationSchema), async (req, res) => {
     // REPLYING
   } else if (annotation.motivation === PDFAnnotationMotivation.REPLYING) {
     const commentingPDFAnnotationId = annotation.target.source;
-    const commentingPDFAnnotation = await CommentingPDFAnnotation.findOneOrFail(
-      commentingPDFAnnotationId
-    );
+    const commentingPDFAnnotation =
+      await CommentingPDFAnnotation.findOneByOrFail({
+        id: commentingPDFAnnotationId,
+      });
     if (!commentingPDFAnnotation) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
@@ -249,7 +262,9 @@ router.patch(
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
-    const annotation = await PDFAnnotation.findOne(req.params.id);
+    const annotation = await dataSource.getRepository(PDFAnnotation).findOneBy({
+      id: String(req.params.id),
+    });
     if (!annotation) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
@@ -297,7 +312,9 @@ router.patch(
 router.delete("/:id", validateParams(idStringSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const annotation = await PDFAnnotation.findOne(req.params.id);
+  const annotation = await dataSource.getRepository(PDFAnnotation).findOneBy({
+    id: String(req.params.id),
+  });
   if (!annotation) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
@@ -334,15 +351,15 @@ router.delete("/:id", validateParams(idStringSchema), async (req, res) => {
   }
   if (annotation instanceof CommentingPDFAnnotation) {
     // delete annotation including replies
-    await getManager().transaction(
+    await dataSource.manager.transaction(
       "SERIALIZABLE", // serializable is the only way phantom replyingPDFAnnotations can be prevented
       async (transactionalEntityManager) => {
         const commentingPDFAnnotationWithReplies =
           await transactionalEntityManager.findOneOrFail(
             CommentingPDFAnnotation,
-            annotation.id,
             {
-              relations: ["replyingPDFAnnotations"],
+              where: { id: annotation.id },
+              relations: { replyingPDFAnnotations: true },
             }
           );
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

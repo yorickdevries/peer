@@ -12,7 +12,6 @@ import ResponseMessage from "../enum/ResponseMessage";
 import _ from "lodash";
 import { AssignmentState } from "../enum/AssignmentState";
 import ReviewOfSubmission from "../models/ReviewOfSubmission";
-import { getManager } from "typeorm";
 import moment from "moment";
 import ReviewOfReview from "../models/ReviewOfReview";
 import AssignmentExport from "../models/AssignmentExport";
@@ -25,6 +24,7 @@ import {
 import submitReview from "../util/submitReview";
 import AssignmentVersion from "../models/AssignmentVersion";
 import { genMailForLateReview, sendMessageBatch } from "../util/mailer";
+import { dataSource } from "../databaseConnection";
 
 const router = express.Router();
 
@@ -40,9 +40,9 @@ router.get("/", validateQuery(assignmentSubmitIdSchema), async (req, res) => {
   // this value has been parsed by the validate function
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const assignmentVersionId: number = req.query.assignmentVersionId as any;
-  const assignmentVersion = await AssignmentVersion.findOne(
-    assignmentVersionId
-  );
+  const assignmentVersion = await AssignmentVersion.findOneBy({
+    id: assignmentVersionId,
+  });
   if (!assignmentVersion) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
@@ -89,9 +89,9 @@ router.post(
     const assignmentVersionId: number = req.query.assignmentVersionId as any;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const exportType: "csv" | "xls" = req.query.exportType as any;
-    const assignmentVersion = await AssignmentVersion.findOne(
-      assignmentVersionId
-    );
+    const assignmentVersion = await AssignmentVersion.findOneBy({
+      id: assignmentVersionId,
+    });
     if (!assignmentVersion) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
@@ -153,9 +153,9 @@ router.post(
     const assignmentVersionId: number = req.query.assignmentVersionId as any;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const exportType: "csv" | "xls" = req.query.exportType as any;
-    const assignmentVersion = await AssignmentVersion.findOne(
-      assignmentVersionId
-    );
+    const assignmentVersion = await AssignmentVersion.findOneBy({
+      id: assignmentVersionId,
+    });
     if (!assignmentVersion) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
@@ -187,7 +187,11 @@ router.post(
     }
     // make export entry without file
     const assignment = await assignmentVersion.getAssignment();
-    const assignmentExport = new AssignmentExport().init({user, assignment, null});
+    const assignmentExport = new AssignmentExport().init({
+      user: user,
+      assignment: assignment,
+      file: null,
+    });
     await assignmentExport.save();
 
     // offload a function to a worker
@@ -215,7 +219,9 @@ router.patch(
     // this value has been parsed by the validate function
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const assignmentId: number = req.query.assignmentId as any;
-    const assignment = await Assignment.findOne(assignmentId);
+    const assignment = await Assignment.findOneBy({
+      id: assignmentId,
+    });
     if (!assignment) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
@@ -243,7 +249,9 @@ router.patch(
 router.get("/:id", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const review = await ReviewOfSubmission.findOne(req.params.id);
+  const review = await ReviewOfSubmission.findOneBy({
+    id: Number(req.params.id),
+  });
   if (!review) {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.REVIEW_NOT_FOUND);
     return;
@@ -289,7 +297,9 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
 router.get("/:id/answers", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const review = await ReviewOfSubmission.findOne(req.params.id);
+  const review = await ReviewOfSubmission.findOneBy({
+    id: Number(req.params.id),
+  });
   if (!review) {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.REVIEW_NOT_FOUND);
     return;
@@ -325,7 +335,9 @@ router.get("/:id/answers", validateParams(idSchema), async (req, res) => {
 router.get("/:id/filemetadata", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const review = await ReviewOfSubmission.findOne(req.params.id);
+  const review = await ReviewOfSubmission.findOneBy({
+    id: Number(req.params.id),
+  });
   if (!review) {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.REVIEW_NOT_FOUND);
     return;
@@ -369,7 +381,9 @@ router.get("/:id/filemetadata", validateParams(idSchema), async (req, res) => {
 router.get("/:id/file", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const review = await ReviewOfSubmission.findOne(req.params.id);
+  const review = await ReviewOfSubmission.findOneBy({
+    id: Number(req.params.id),
+  });
   if (!review) {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.REVIEW_NOT_FOUND);
     return;
@@ -429,7 +443,9 @@ router.patch(
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
-    const review = await ReviewOfSubmission.findOne(req.params.id);
+    const review = await ReviewOfSubmission.findOneBy({
+      id: Number(req.params.id),
+    });
     if (!review) {
       res
         .status(HttpStatusCode.NOT_FOUND)
@@ -500,7 +516,9 @@ router.patch(
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
-    const review = await ReviewOfSubmission.findOne(req.params.id);
+    const review = await ReviewOfSubmission.findOneBy({
+      id: Number(req.params.id),
+    });
     if (!review) {
       res
         .status(HttpStatusCode.NOT_FOUND)
@@ -552,7 +570,9 @@ router.patch(
 router.get("/:id/evaluation", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const review = await ReviewOfSubmission.findOne(req.params.id);
+  const review = await ReviewOfSubmission.findOneBy({
+    id: Number(req.params.id),
+  });
   if (!review) {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.REVIEW_NOT_FOUND);
     return;
@@ -563,7 +583,7 @@ router.get("/:id/evaluation", validateParams(idSchema), async (req, res) => {
     await submissionQuestionnaire.getAssignmentVersion();
   const assignment = await assignmentVersion.getAssignment();
   const reviewEvaluation = await ReviewOfReview.findOne({
-    where: { reviewOfSubmission: review.id },
+    where: { reviewOfSubmission: { id: review.id } },
   });
   if (!reviewEvaluation) {
     res.status(HttpStatusCode.NOT_FOUND).send("Evaluation is not found");
@@ -595,7 +615,9 @@ router.get("/:id/evaluation", validateParams(idSchema), async (req, res) => {
 router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const review = await ReviewOfSubmission.findOne(req.params.id);
+  const review = await ReviewOfSubmission.findOneBy({
+    id: Number(req.params.id),
+  });
   if (!review) {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.REVIEW_NOT_FOUND);
     return;
@@ -634,7 +656,7 @@ router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
     return;
   }
   const existingReview = await ReviewOfReview.findOne({
-    where: { reviewOfSubmission: review.id },
+    where: { reviewOfSubmission: { id: review.id } },
   });
   if (existingReview) {
     res
@@ -656,13 +678,13 @@ router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
   });
   // validate outside transaction as it otherwise might block the transaction
   await reviewEvaluation.validateOrReject();
-  await getManager().transaction(
+  await dataSource.manager.transaction(
     "SERIALIZABLE", // serializable is the only way double reviewevaluations can be prevented
     async (transactionalEntityManager) => {
       // check whether the review is already evaluated
       const existingReview = await transactionalEntityManager.findOne(
         ReviewOfReview,
-        { where: { reviewOfSubmission: review.id } }
+        { where: { reviewOfSubmission: { id: review.id } } }
       );
       if (existingReview) {
         throw new Error("There already exists a reviewEvaluation");
@@ -687,7 +709,9 @@ router.post(
     // this value has been parsed by the validate function
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const assignmentId: number = req.query.assignmentId as any;
-    const assignment = await Assignment.findOne(assignmentId);
+    const assignment = await Assignment.findOneBy({
+      id: assignmentId,
+    });
     if (!assignment) {
       res
         .status(HttpStatusCode.BAD_REQUEST)

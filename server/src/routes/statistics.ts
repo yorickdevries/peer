@@ -11,10 +11,11 @@ import Assignment from "../models/Assignment";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import ResponseMessage from "../enum/ResponseMessage";
 import ReviewOfSubmission from "../models/ReviewOfSubmission";
-import { In, getManager } from "typeorm";
+import { In } from "typeorm";
 import moment from "moment";
 import Submission from "../models/Submission";
 import ReviewOfReview from "../models/ReviewOfReview";
+import { dataSource } from "../databaseConnection";
 
 const router = express.Router();
 
@@ -32,7 +33,9 @@ router.get(
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
-    const assignment = await Assignment.findOne(req.params.id);
+    const assignment = await Assignment.findOneBy({
+      id: Number(req.params.id),
+    });
     if (!assignment) {
       res
         .status(HttpStatusCode.NOT_FOUND)
@@ -48,7 +51,7 @@ router.get(
 
     switch (req.query.dataType) {
       case DataType.Assignment.AVG_REVIEW_TIME: {
-        const reviews: ReviewOfSubmission[] = await getManager()
+        const reviews: ReviewOfSubmission[] = await dataSource.manager
           .createQueryBuilder(ReviewOfSubmission, "review")
           .where("review.submitted IS TRUE")
           .leftJoin("review.submission", "submission")
@@ -65,7 +68,7 @@ router.get(
         break;
       }
       case DataType.Assignment.TIME_SUBMIT_BEFORE_DEADLINE: {
-        const submissions: Submission[] = await getManager()
+        const submissions: Submission[] = await dataSource.manager
           .createQueryBuilder(Submission, "submission")
           .where("submission.final IS TRUE")
           .leftJoin("submission.assignmentVersion", "assignmentVersion")
@@ -87,7 +90,7 @@ router.get(
         const groups = await assignment.getGroups();
         const assignmentVersions = assignment.versions;
 
-        const reviews: ReviewOfSubmission[] = await getManager()
+        const reviews: ReviewOfSubmission[] = await dataSource.manager
           .createQueryBuilder(ReviewOfSubmission, "review")
           .leftJoin("review.submission", "submission")
           .leftJoin("submission.assignmentVersion", "assignmentVersion")

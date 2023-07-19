@@ -10,7 +10,9 @@ const checkAndSetAuthentication = async function (
   if (req.isAuthenticated() && req.user?.netid) {
     // set req.user to the User object
     const netid = req.user.netid;
-    const user = await User.findOneOrFail(netid);
+    const user = await User.findOneByOrFail({
+      netid: netid,
+    });
     req.user = user;
     next();
   } else {

@@ -1,5 +1,4 @@
 import express from "express";
-import { getManager } from "typeorm";
 import Joi from "joi";
 import checkEmployee from "../middleware/authentication/checkEmployee";
 import Course from "../models/Course";
@@ -16,6 +15,7 @@ import {
 import _ from "lodash";
 import ResponseMessage from "../enum/ResponseMessage";
 import isAdmin from "../middleware/authentication/isAdmin";
+import { dataSource } from "../databaseConnection";
 
 const router = express.Router();
 
@@ -37,7 +37,9 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
   // this value has been parsed by the validate function
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const courseId: number = req.params.id as any;
-  const course = await Course.findOne(courseId);
+  const course = await Course.findOneBy({
+    id: courseId,
+  });
   if (!course) {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
     return;
@@ -94,7 +96,7 @@ router.post(
       description: req.body.description,
     });
     // start transaction to both save the course and teacher enrollment
-    await getManager().transaction(
+    await dataSource.manager.transaction(
       "READ COMMITTED",
       async (transactionalEntityManager) => {
         // save the course so it gets an id
@@ -128,7 +130,9 @@ router.patch(
     // this value has been parsed by the validate function
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const courseId: number = req.params.id as any;
-    const course = await Course.findOne(courseId);
+    const course = await Course.findOneBy({
+      id: courseId,
+    });
     if (!course) {
       res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
       return;
@@ -140,14 +144,18 @@ router.patch(
       return;
     }
     // find the faculty and academic year in the database
-    const faculty = await Faculty.findOne(req.body.facultyId);
+    const faculty = await Faculty.findOneBy({
+      id: Number(req.body.facultyId),
+    });
     if (!faculty) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
         .send("The specified faculty is not found");
       return;
     }
-    const academicYear = await AcademicYear.findOne(req.body.academicYearId);
+    const academicYear = await AcademicYear.findOneBy({
+      id: Number(req.body.academicYearId),
+    });
     if (!academicYear) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
@@ -170,7 +178,9 @@ router.post("/:id/enroll", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const courseId = req.params.id;
-  const course = await Course.findOne(courseId);
+  const course = await Course.findOneBy({
+    id: Number(courseId),
+  });
   if (!course) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
@@ -181,7 +191,11 @@ router.post("/:id/enroll", validateParams(idSchema), async (req, res) => {
     res.status(HttpStatusCode.BAD_REQUEST).send("The course is not enrollable");
     return;
   }
-  const enrollment = new Enrollment().init({user: user, course: course, role: UserRole.STUDENT});
+  const enrollment = new Enrollment().init({
+    user: user,
+    course: course,
+    role: UserRole.STUDENT,
+  });
   await enrollment.save();
   res.send(enrollment);
 });
@@ -195,7 +209,9 @@ router.post(
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     const courseId = req.params.id;
-    const course = await Course.findOne(courseId);
+    const course = await Course.findOneBy({
+      id: Number(courseId),
+    });
 
     if (!course) {
       res
@@ -225,7 +241,9 @@ router.get("/:id/enrollment", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const courseId = req.params.id;
-  const course = await Course.findOne(courseId);
+  const course = await Course.findOneBy({
+    id: Number(courseId),
+  });
   if (!course) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
@@ -233,7 +251,7 @@ router.get("/:id/enrollment", validateParams(idSchema), async (req, res) => {
     return;
   }
   const enrollment = await Enrollment.findOne({
-    where: { courseId: courseId, userNetid: user.netid },
+    where: { courseId: Number(courseId), userNetid: user.netid },
   });
   if (!enrollment) {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);
@@ -249,7 +267,9 @@ router.get(
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
-    const course = await Course.findOne(req.params.id);
+    const course = await Course.findOneBy({
+      id: Number(req.params.id),
+    });
     if (!course) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
@@ -275,7 +295,9 @@ router.get(
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
-    const course = await Course.findOne(req.params.id);
+    const course = await Course.findOneBy({
+      id: Number(req.params.id),
+    });
     if (!course) {
       res
         .status(HttpStatusCode.BAD_REQUEST)

@@ -19,7 +19,9 @@ const router = express.Router();
 router.get("/:id", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const reviewOfReview = await ReviewOfReview.findOne(req.params.id);
+  const reviewOfReview = await ReviewOfReview.findOneBy({
+    id: Number(req.params.id),
+  });
   if (!reviewOfReview) {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.REVIEW_NOT_FOUND);
     return;
@@ -44,7 +46,9 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
 router.get("/:id/answers", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const reviewOfReview = await ReviewOfReview.findOne(req.params.id);
+  const reviewOfReview = await ReviewOfReview.findOneBy({
+    id: Number(req.params.id),
+  });
   if (!reviewOfReview) {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.REVIEW_NOT_FOUND);
     return;
@@ -84,7 +88,9 @@ router.patch(
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
-    const review = await ReviewOfReview.findOne(req.params.id);
+    const review = await ReviewOfReview.findOneBy({
+      id: Number(req.params.id),
+    });
     if (!review) {
       res
         .status(HttpStatusCode.NOT_FOUND)

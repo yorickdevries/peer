@@ -1,6 +1,5 @@
 import express from "express";
 import Joi, { CustomHelpers } from "joi";
-import { getManager } from "typeorm";
 import {
   idSchema,
   validateBody,
@@ -25,6 +24,7 @@ import publishAssignment from "../assignmentProgression/publishAssignment";
 import closeSubmission from "../assignmentProgression/closeSubmission";
 import { scheduleJobsForAssignment } from "../assignmentProgression/scheduler";
 import * as Sentry from "@sentry/node";
+import { dataSource } from "../databaseConnection";
 
 const router = express.Router();
 
@@ -44,7 +44,9 @@ router.get("/", validateQuery(queryCourseIdSchema), async (req, res) => {
   // this value has been parsed by the validate function
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const courseId: number = req.query.courseId as any;
-  const course = await Course.findOne(courseId);
+  const course = await Course.findOneBy({
+    id: courseId,
+  });
   if (!course) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
@@ -65,7 +67,9 @@ router.get("/", validateQuery(queryCourseIdSchema), async (req, res) => {
 router.get("/:id", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const assignment = await Assignment.findOne(req.params.id);
+  const assignment = await Assignment.findOneBy({
+    id: Number(req.params.id),
+  });
   if (!assignment) {
     res
       .status(HttpStatusCode.NOT_FOUND)
@@ -99,7 +103,9 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
 router.get("/:id/file", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const assignment = await Assignment.findOne(req.params.id);
+  const assignment = await Assignment.findOneBy({
+    id: Number(req.params.id),
+  });
   if (!assignment) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
@@ -143,7 +149,9 @@ router.get("/:id/file", validateParams(idSchema), async (req, res) => {
 router.get("/:id/group", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const assignment = await Assignment.findOne(req.params.id);
+  const assignment = await Assignment.findOneBy({
+    id: Number(req.params.id),
+  });
   if (!assignment) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
@@ -182,14 +190,18 @@ router.get(
     // this value has been parsed by the validate function
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const groupId: number = req.query.groupId as any;
-    const assignment = await Assignment.findOne(assignmentId);
+    const assignment = await Assignment.findOneBy({
+      id: Number(assignmentId),
+    });
     if (!assignment) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
         .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
       return;
     }
-    const group = await Group.findOne(groupId);
+    const group = await Group.findOneBy({
+      id: groupId,
+    });
     if (!group) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
@@ -273,7 +285,9 @@ router.post(
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
-    const course = await Course.findOne(req.body.courseId);
+    const course = await Course.findOneBy({
+      id: Number(req.body.courseId),
+    });
     if (!course) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
@@ -308,7 +322,7 @@ router.post(
       lateReviewEvaluations: req.body.lateReviewEvaluations,
       automaticStateProgression: req.body.automaticStateProgression,
       assignmentType: req.body.assignmentType,
-      sendNotifcationEmails: req.body.sendNotificationEmails
+      sendNotifcationEmails: req.body.sendNotificationEmails,
     });
 
     // construct file to be saved in transaction
@@ -326,7 +340,7 @@ router.post(
     }
 
     // start transaction make sure the file and assignment are both saved
-    await getManager().transaction(
+    await dataSource.manager.transaction(
       "READ COMMITTED",
       async (transactionalEntityManager) => {
         if (file) {
@@ -396,7 +410,9 @@ router.patch(
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     const assignmentId = req.params.id;
-    let assignment = await Assignment.findOne(assignmentId);
+    let assignment = await Assignment.findOneBy({
+      id: Number(assignmentId),
+    });
     if (!assignment) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
@@ -482,13 +498,13 @@ router.patch(
     let oldFile: File | null | undefined;
 
     // start transaction make sure the file and assignment are both saved
-    await getManager().transaction(
+    await dataSource.manager.transaction(
       "REPEATABLE READ",
       async (transactionalEntityManager) => {
         // fetch assignment form database
         assignment = await transactionalEntityManager.findOneOrFail(
           Assignment,
-          assignmentId
+          { where: { id: Number(assignmentId) } }
         );
         // in case a new file is sent or file is set to null, the old one needs to be deleted
         if (newFile || req.body.file === null) {
@@ -572,7 +588,9 @@ router.patch(
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     const assignmentId = req.params.id;
-    const assignment = await Assignment.findOne(assignmentId);
+    const assignment = await Assignment.findOneBy({
+      id: Number(assignmentId),
+    });
     if (!assignment) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
@@ -624,7 +642,9 @@ router.patch("/:id/publish", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const assignmentId = req.params.id;
-  const assignment = await Assignment.findOne(assignmentId);
+  const assignment = await Assignment.findOneBy({
+    id: Number(assignmentId),
+  });
   if (!assignment) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
@@ -655,7 +675,9 @@ router.patch(
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     const assignmentId = req.params.id;
-    const assignment = await Assignment.findOne(assignmentId);
+    const assignment = await Assignment.findOneBy({
+      id: Number(assignmentId),
+    });
     if (!assignment) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
@@ -682,7 +704,9 @@ router.patch(
 router.post("/:id/enroll", validateParams(idSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const assignment = await Assignment.findOne(req.params.id);
+  const assignment = await Assignment.findOneBy({
+    id: Number(req.params.id),
+  });
   if (!assignment) {
     res
       .status(HttpStatusCode.BAD_REQUEST)
@@ -705,7 +729,7 @@ router.post("/:id/enroll", validateParams(idSchema), async (req, res) => {
   // validate outside transaction as it otherwise might block the transaction
   await group.validateOrReject();
   // save the group in an transaction to make sure no 2 groups are saved at the same time
-  await getManager().transaction(
+  await dataSource.manager.transaction(
     "SERIALIZABLE", // serializable is the only way double groups can be prevented
     async (transactionalEntityManager) => {
       // get group
