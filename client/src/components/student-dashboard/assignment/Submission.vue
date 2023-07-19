@@ -140,8 +140,8 @@
                             Assignment version:
                             <b-badge pill>{{ assignmentVersion.name }}</b-badge>
                             <hr />
-                            <b-alert show variant="warning">
-                                If you have already uploaded a file, it will not be used for reviewing anymore!
+                            <b-alert v-if="submissions.length > 0" show variant="warning">
+                                This will replace your previous submission.
                             </b-alert>
                             <b-alert show variant="warning">
                                 Please make sure you have not included personal information anywhere unless specifically
@@ -180,8 +180,8 @@
                             Assignment version:
                             <b-badge pill>{{ assignmentVersion.name }}</b-badge>
                             <hr />
-                            <b-alert show variant="warning">
-                                If you have already uploaded a file, it will not be used for reviewing anymore!
+                            <b-alert v-if="submissions.length > 0" show variant="warning">
+                                This will replace your previous submission.
                             </b-alert>
                             <b-alert show variant="warning">
                                 Please make sure you have not included personal information anywhere unless specifically
