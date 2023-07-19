@@ -145,8 +145,8 @@ router.delete(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let questionAnswer = await CheckboxQuestionAnswer.findOne({
       where: {
-        questionId: Number(req.query.checkboxQuestionId),
-        reviewId: Number(req.query.reviewId),
+        question: { id: Number(req.query.checkboxQuestionId) },
+        review: { id: Number(req.query.reviewId) },
       },
     });
     if (!questionAnswer) {
@@ -216,8 +216,8 @@ router.delete(
           CheckboxQuestionAnswer,
           {
             where: {
-              questionId: Number(req.query.checkboxQuestionId),
-              reviewId: Number(req.query.reviewId),
+              question: { id: Number(req.query.checkboxQuestionId) },
+              review: { id: Number(req.query.reviewId) },
             },
           }
         );

@@ -19,7 +19,7 @@ export default class ReviewQuestionnaire extends Questionnaire {
 
   async getAssignmentVersion(): Promise<AssignmentVersion> {
     return AssignmentVersion.findOneOrFail({
-      where: { reviewQuestionnaireId: this.id },
+      where: { reviewQuestionnaire: { id: this.id } },
     });
   }
 }

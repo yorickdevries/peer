@@ -58,7 +58,7 @@ export default class CommentingPDFAnnotation extends PDFAnnotation {
 
   async getReplyingPDFAnnotations(): Promise<ReplyingPDFAnnotation[]> {
     return ReplyingPDFAnnotation.find({
-      where: { commentingPDFAnnotationId: this.id },
+      where: { commentingPDFAnnotation: { id: this.id } },
     });
   }
 

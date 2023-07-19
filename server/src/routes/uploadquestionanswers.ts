@@ -271,8 +271,8 @@ router.delete(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let questionAnswer = await UploadQuestionAnswer.findOne({
       where: {
-        questionId: Number(req.query.uploadQuestionId),
-        reviewId: Number(req.query.reviewId),
+        question: { id: Number(req.query.uploadQuestionId) },
+        review: { id: Number(req.query.reviewId) },
       },
     });
     if (!questionAnswer) {
@@ -343,8 +343,8 @@ router.delete(
           UploadQuestionAnswer,
           {
             where: {
-              questionId: Number(req.query.uploadQuestionId),
-              reviewId: Number(req.query.reviewId),
+              question: { id: Number(req.query.uploadQuestionId) },
+              review: { id: Number(req.query.reviewId) },
             },
           }
         );

@@ -45,7 +45,7 @@ import RangeQuestion from "../models/RangeQuestion";
 import Submission from "../models/Submission";
 import ReviewOfSubmission from "../models/ReviewOfSubmission";
 import { createReviewOfReview } from "../factories/ReviewOfReview.factory";
-import { DataSource } from "typeorm";
+import { DataSource, In } from "typeorm";
 
 const uploadFolder = path.resolve(config.get("uploadFolder") as string);
 const exampleFile = path.join(
@@ -276,7 +276,8 @@ export default class InitialDatabaseSeed extends Seeder {
         netid,
       });
       admin.admin = true;
-      await dataSource.createEntityManager().save<User>(admin);
+      await admin.save();
+      // await dataSource.createEntityManager().save<User>(admin);
     }
 
     const studentTeacher = teachers[0];
@@ -427,7 +428,8 @@ export default class InitialDatabaseSeed extends Seeder {
         );
 
         submission.createdAt = submissionMoment.toDate();
-        await dataSource.createEntityManager().save<Submission>(submission);
+        await submission.save;
+        // await dataSource.createEntityManager().save<Submission>(submission);
       }
 
       if (
@@ -444,6 +446,20 @@ export default class InitialDatabaseSeed extends Seeder {
       if (!isBeforeState(AssignmentState.REVIEW, schema.assignmentState)) {
         continue;
       }
+
+      // const aVersions = await AssignmentVersion.findBy({
+      //   assignment: { id: assignment.id },
+      // });
+      // const mappedVersions = aVersions.map((a) => a.id);
+      // const aSubmissions = await Submission.findBy({
+      //   assignmentVersion: { id: In(mappedVersions) },
+      // });
+      //
+      // for (const aSubmission of aSubmissions) {
+      //   console.log("NEW SUBMISSION");
+      //   console.log(aSubmission.approvalByTA);
+      //   console.log(aSubmission.commentByTA);
+      // }
 
       await distributeReviewsForAssignment(assignment.id);
 
@@ -478,7 +494,8 @@ export default class InitialDatabaseSeed extends Seeder {
             await review.reload();
             review.submittedAt = submissionMoment.toDate();
             review.startedAt = startMoment.toDate();
-            await dataSource.createEntityManager().save<Review>(review);
+            await review.save();
+            // await dataSource.createEntityManager().save<Review>(review);
           }
         }
       }

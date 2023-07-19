@@ -131,10 +131,10 @@ export default class Course extends BaseModel {
 
   async isEnrolled(user: User, role?: UserRole): Promise<boolean> {
     const where: {
-      userNetid: string;
-      courseId: number;
+      user: { netid: string };
+      course: { id: number };
       role?: UserRole;
-    } = { userNetid: user.netid, courseId: this.id };
+    } = { user: { netid: user.netid }, course: { id: this.id } };
     // add role to query if specified
     if (role) {
       where.role = role;

@@ -120,8 +120,8 @@ router.delete("/", validateQuery(deleteOpenAnswerSchema), async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let questionAnswer = await OpenQuestionAnswer.findOne({
     where: {
-      questionId: Number(req.query.openQuestionId),
-      reviewId: Number(req.query.reviewId),
+      question: { id: Number(req.query.openQuestionId) },
+      review: { id: Number(req.query.reviewId) },
     },
   });
   if (!questionAnswer) {
@@ -191,8 +191,8 @@ router.delete("/", validateQuery(deleteOpenAnswerSchema), async (req, res) => {
         OpenQuestionAnswer,
         {
           where: {
-            questionId: Number(req.query.openQuestionId),
-            reviewId: Number(req.query.reviewId),
+            question: { id: Number(req.query.openQuestionId) },
+            review: { id: Number(req.query.reviewId) },
           },
         }
       );

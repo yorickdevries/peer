@@ -47,7 +47,9 @@ const importGroupsForAssignment = async function (
           // enroll user in the course if not already
           let enrollment = await transactionalEntityManager.findOne(
             Enrollment,
-            { where: { userNetid: user.netid, courseId: course.id } }
+            {
+              where: { user: { netid: user.netid }, course: { id: course.id } },
+            }
           );
 
           if (enrollment) {

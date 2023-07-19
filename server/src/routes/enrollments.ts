@@ -45,7 +45,7 @@ router.get("/", validateQuery(queryCourseIdSchema), async (req, res) => {
   }
   const enrollments = await Enrollment.find({
     where: req.query,
-    relations: ["user"],
+    relations: { user: true },
     order: { userNetid: "ASC" },
   });
   res.send(enrollments);
@@ -130,7 +130,7 @@ router.get("/enrolled", async (req, res) => {
   const user = req.user!;
   const enrollments = await Enrollment.find({
     where: { userNetid: user.netid },
-    relations: ["course"],
+    relations: { course: true },
     order: { courseId: "ASC" },
   });
   res.send(enrollments);
@@ -280,7 +280,7 @@ router.delete("/", validateQuery(deleteEnrollmentSchema), async (req, res) => {
     return;
   }
   const existingEnrollment = await Enrollment.findOne({
-    where: { userNetid: userNetid, courseId: courseId },
+    where: { user: { netid: userNetid }, course: { id: courseId } },
   });
   if (!existingEnrollment) {
     res

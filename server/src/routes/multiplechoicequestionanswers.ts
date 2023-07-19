@@ -136,8 +136,8 @@ router.delete(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let questionAnswer = await MultipleChoiceQuestionAnswer.findOne({
       where: {
-        questionId: Number(req.query.multipleChoiceQuestionId),
-        reviewId: Number(req.query.reviewId),
+        question: { id: Number(req.query.multipleChoiceQuestionId) },
+        review: { id: Number(req.query.reviewId) },
       },
     });
     if (!questionAnswer) {
@@ -207,8 +207,8 @@ router.delete(
           MultipleChoiceQuestionAnswer,
           {
             where: {
-              questionId: Number(req.query.multipleChoiceQuestionId),
-              reviewId: Number(req.query.reviewId),
+              question: { id: Number(req.query.multipleChoiceQuestionId) },
+              review: { id: Number(req.query.reviewId) },
             },
           }
         );

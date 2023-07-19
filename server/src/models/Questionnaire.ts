@@ -44,10 +44,10 @@ export default abstract class Questionnaire extends BaseModel {
 
   async getReviews(submitted?: boolean): Promise<Review[]> {
     const where: {
-      questionnaireId: number;
+      questionnaire: { id: number };
       submitted?: boolean;
     } = {
-      questionnaireId: this.id,
+      questionnaire: { id: this.id },
     };
     if (submitted !== undefined) {
       where.submitted = submitted;
