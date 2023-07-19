@@ -1,13 +1,12 @@
-import { Connection, getManager } from "typeorm";
 import { ConfigureOption, runSeeder, useSeeding } from "typeorm-seeding";
 import InitialDatabaseSeed from "../../src/seeds/initial.seed";
-import createDatabaseConnection from "../../src/databaseConnection";
 import Assignment from "../../src/models/Assignment";
 import moment from "moment";
 import { genMailForMissingStageSubmission } from "../../src/util/mailer";
 import User from "../../src/models/User";
 import Submission from "../../src/models/Submission";
 import ReviewOfReview from "../../src/models/ReviewOfReview";
+import { dataSource } from "../../src/databaseConnection";
 
 async function shiftDueDates(assignments: Assignment[], shift: number) {
   for (const assignment of assignments) {
@@ -103,7 +102,7 @@ async function genExpectedEvaluations(
 
       for (const review of reviews) {
         //Check if received review has an associated feedback review (made by the user(s) in question)
-        const feedbackReview = await getManager()
+        const feedbackReview = await dataSource.manager
           .createQueryBuilder(ReviewOfReview, "review")
           .where("review.reviewOfSubmission = :rid", { rid: review.id })
           .andWhere("review.reviewer IN (:...reviewers)", {
@@ -143,7 +142,6 @@ async function genExpectedEvaluations(
 }
 
 describe("Email notifications", () => {
-  let connection: Connection;
   jest.setTimeout(600000);
 
   let group_submission: Assignment;
@@ -154,7 +152,7 @@ describe("Email notifications", () => {
   let group_feedback: Assignment;
 
   beforeAll(async () => {
-    connection = await createDatabaseConnection();
+    await dataSource.initialize();
 
     const options: ConfigureOption = {
       root: "src/../../src",
@@ -203,7 +201,7 @@ describe("Email notifications", () => {
   });
 
   afterAll(async () => {
-    await connection.close();
+    await dataSource.destroy();
   });
 
   test("automatic daily mail sending", async () => {

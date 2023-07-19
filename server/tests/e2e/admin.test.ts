@@ -1,12 +1,11 @@
 import http from "http";
 import request from "supertest";
-import { Connection } from "typeorm";
 import app from "../../src/app";
-import createDatabaseConnection from "../../src/databaseConnection";
 import HttpStatusCode from "../../src/enum/HttpStatusCode";
 import mockLoginCookie from "../helpers/mockLoginCookie";
 import initializeData from "../../src/util/initializeData";
 import User from "../../src/models/User";
+import { dataSource } from "../../src/databaseConnection";
 
 async function setAdminUser(netid: string): Promise<void> {
   const adminUser = await User.findOneOrFail({ where: { netid } });
@@ -15,11 +14,10 @@ async function setAdminUser(netid: string): Promise<void> {
 }
 
 describe("Admin tests", () => {
-  let connection: Connection;
   let server: http.Server;
 
   beforeAll(async () => {
-    connection = await createDatabaseConnection();
+    await dataSource.initialize();
     server = http.createServer(app);
     // initialize faculties and academic years
     await initializeData();
@@ -27,7 +25,7 @@ describe("Admin tests", () => {
 
   afterAll(async () => {
     server.close();
-    await connection.close();
+    await dataSource.destroy();
   });
 
   test("Admin Enroll", async () => {

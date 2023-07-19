@@ -43,10 +43,10 @@ describe("MCQ Question Test", () => {
     instanceOfG1.name = "g1";
 
     //submitter
-    instanceOfU1 = new User({ netid: "u1" });
+    instanceOfU1 = new User().init({ netid: "u1" });
 
     //reviewer
-    instanceOfU2 = new User({ netid: "u2" });
+    instanceOfU2 = new User().init({ netid: "u2" });
     //instanceOfU2.studentNumber = 2;
     s1 = mock(Submission);
     instanceOfS1 = instance(s1);
@@ -60,7 +60,7 @@ describe("MCQ Question Test", () => {
     instanceOfR1.submitted = true;
     instanceOfR1.flaggedByReviewer = false;
 
-    m = new MultipleChoiceQuestion({
+    m = new MultipleChoiceQuestion().init({
       text: "this is mcq",
       number: 1,
       optional: false,
@@ -68,12 +68,12 @@ describe("MCQ Question Test", () => {
       questionnaire: instanceOfQ,
     });
     m.options = [
-      new MultipleChoiceQuestionOption({
+      new MultipleChoiceQuestionOption().init({
         text: "correct",
         question: m,
         points: 100,
       }),
-      new MultipleChoiceQuestionOption({
+      new MultipleChoiceQuestionOption().init({
         text: "wrong",
         question: m,
         points: 0,
@@ -132,8 +132,8 @@ describe("MCQ Question Test", () => {
       })
     );
     when(r1.getReviewOfThisReview()).thenReturn(
-      new Promise<ReviewOfReview | undefined>((reject) => {
-        reject(undefined);
+      new Promise<ReviewOfReview | null>((reject) => {
+        reject(null);
       })
     );
     when(aVersion.getAssignment()).thenReturn(

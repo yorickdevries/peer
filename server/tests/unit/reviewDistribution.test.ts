@@ -1,6 +1,4 @@
-import createDatabaseConnection from "../../src/databaseConnection";
 import initializeData from "../../src/util/initializeData";
-import { Connection, getManager } from "typeorm";
 import User from "../../src/models/User";
 import Group from "../../src/models/Group";
 import Submission from "../../src/models/Submission";
@@ -23,29 +21,33 @@ import fs from "fs";
 import JSZip from "jszip";
 import path from "path";
 import config from "config";
+import { dataSource } from "../../src/databaseConnection";
 
 describe("Review distribution", () => {
   // will be initialized and closed in beforeAll / afterAll
-  let connection: Connection;
 
   beforeAll(async () => {
     // For the in memory test database, the schema is automatically dropped upon connect
-    connection = await createDatabaseConnection();
+    await dataSource.initialize();
     await initializeData();
   });
 
   afterAll(async () => {
-    await connection.close();
+    await dataSource.destroy();
   });
 
   test("regular review distribution", async () => {
     // academic year
-    const academicYear = await AcademicYear.findOneOrFail(1);
+    const academicYear = await AcademicYear.findOneByOrFail({
+      id: 1,
+    });
     /// faculty
-    const faculty = await Faculty.findOneOrFail(1);
+    const faculty = await Faculty.findOneByOrFail({
+      id: 1,
+    });
 
     // course
-    const course = new Course({
+    const course = new Course().init({
       name: "CourseName",
       courseCode: "ABC123",
       enrollable: false,
@@ -56,7 +58,7 @@ describe("Review distribution", () => {
     await course.save();
 
     // assignment
-    const assignment = new Assignment({
+    const assignment = new Assignment().init({
       name: "Example title",
       course: course,
       enrollable: true,
@@ -85,7 +87,7 @@ describe("Review distribution", () => {
     const submissionQuestionnaire = new SubmissionQuestionnaire();
     await submissionQuestionnaire.save();
     // assignmentVersion
-    const assignmentVersion = new AssignmentVersion({
+    const assignmentVersion = new AssignmentVersion().init({
       name: "default",
       assignment: assignment,
       versionsToReview: [],
@@ -107,9 +109,9 @@ describe("Review distribution", () => {
     const students = [];
     const expectedResult: any[] = ["pdfs/"];
     for (let i = 0; i < numStudents; i++) {
-      const student = new User({ netid: `student${i}` });
+      const student = new User().init({ netid: `student${i}` });
       await student.save();
-      const enrollment = new Enrollment({
+      const enrollment = new Enrollment().init({
         user: student,
         course: course,
         role: UserRole.STUDENT,
@@ -131,7 +133,7 @@ describe("Review distribution", () => {
       ) {
         studentsOfGroup.push(students[i]);
       }
-      const group = new Group({
+      const group = new Group().init({
         name: `group${j}`,
         course: course,
         users: studentsOfGroup,
@@ -143,7 +145,7 @@ describe("Review distribution", () => {
         __dirname,
         "../../exampleData/submissions/submission1.c"
       );
-      const file = new File({
+      const file = new File().init({
         name: "filename",
         extension: ".pdf",
         hash: null,
@@ -157,7 +159,7 @@ describe("Review distribution", () => {
 
       expectedResult.push(`pdfs/${student.netid + "_" + j}.pdf`);
 
-      const submission = new Submission({
+      const submission = new Submission().init({
         user: student,
         group: group,
         assignmentVersion: assignmentVersion,
@@ -168,13 +170,13 @@ describe("Review distribution", () => {
       submissions.push(submission);
     }
     //make export of submissions
-    const assignmentExport: AssignmentExport = new AssignmentExport({
+    const assignmentExport: AssignmentExport = new AssignmentExport().init({
       user: students[0],
       assignment: assignment,
       file: null,
     });
-    const file = new File({ name: "a", extension: "ads", hash: null });
-    await getManager().transaction(
+    const file = new File().init({ name: "a", extension: "ads", hash: null });
+    await dataSource.manager.transaction(
       "READ COMMITTED",
       async (transactionalEntityManager) => {
         // save file entry to database
@@ -227,12 +229,16 @@ describe("Review distribution", () => {
 
   test("review distribution with uneven groups", async () => {
     // academic year
-    const academicYear = await AcademicYear.findOneOrFail(1);
+    const academicYear = await AcademicYear.findOneByOrFail({
+      id: 1,
+    });
     /// faculty
-    const faculty = await Faculty.findOneOrFail(1);
+    const faculty = await Faculty.findOneByOrFail({
+      id: 1,
+    });
 
     // course
-    const course = new Course({
+    const course = new Course().init({
       name: "CourseName",
       courseCode: "ABC123",
       enrollable: false,
@@ -243,7 +249,7 @@ describe("Review distribution", () => {
     await course.save();
 
     // assignment
-    const assignment = new Assignment({
+    const assignment = new Assignment().init({
       name: "Example title",
       course: course,
       enrollable: true,
@@ -272,7 +278,7 @@ describe("Review distribution", () => {
     const submissionQuestionnaire = new SubmissionQuestionnaire();
     await submissionQuestionnaire.save();
     // assignmentVersion
-    const assignmentVersion = new AssignmentVersion({
+    const assignmentVersion = new AssignmentVersion().init({
       name: "default",
       assignment: assignment,
       versionsToReview: [],
@@ -293,9 +299,9 @@ describe("Review distribution", () => {
 
     const students = [];
     for (let i = 0; i < numStudents; i++) {
-      const student = new User({ netid: `student${i}` });
+      const student = new User().init({ netid: `student${i}` });
       await student.save();
-      const enrollment = new Enrollment({
+      const enrollment = new Enrollment().init({
         user: student,
         course: course,
         role: UserRole.STUDENT,
@@ -317,7 +323,7 @@ describe("Review distribution", () => {
         studentsOfGroup.push(students[studentIndex]);
         studentIndex++;
       }
-      const group = new Group({
+      const group = new Group().init({
         name: `group${j}`,
         course: course,
         users: studentsOfGroup,
@@ -325,14 +331,14 @@ describe("Review distribution", () => {
       });
       await group.save();
       // make submission
-      const file = new File({
+      const file = new File().init({
         name: "filename",
         extension: ".pdf",
         hash: null,
       });
       await file.save();
 
-      const submission = new Submission({
+      const submission = new Submission().init({
         user: student,
         group: group,
         assignmentVersion: assignmentVersion,
@@ -371,12 +377,16 @@ describe("Review distribution", () => {
 
   test("situation where review distribution is not possible", async () => {
     // academic year
-    const academicYear = await AcademicYear.findOneOrFail(1);
+    const academicYear = await AcademicYear.findOneByOrFail({
+      id: 1,
+    });
     /// faculty
-    const faculty = await Faculty.findOneOrFail(1);
+    const faculty = await Faculty.findOneByOrFail({
+      id: 1,
+    });
 
     // course
-    const course = new Course({
+    const course = new Course().init({
       name: "CourseName",
       courseCode: "ABC123",
       enrollable: false,
@@ -387,7 +397,7 @@ describe("Review distribution", () => {
     await course.save();
 
     // assignment
-    const assignment = new Assignment({
+    const assignment = new Assignment().init({
       name: "Example title",
       course: course,
       enrollable: true,
@@ -416,7 +426,7 @@ describe("Review distribution", () => {
     const submissionQuestionnaire = new SubmissionQuestionnaire();
     await submissionQuestionnaire.save();
     // assignmentVersion
-    const assignmentVersion = new AssignmentVersion({
+    const assignmentVersion = new AssignmentVersion().init({
       name: "default",
       assignment: assignment,
       versionsToReview: [],
@@ -430,25 +440,25 @@ describe("Review distribution", () => {
     assignmentVersion.versionsToReview = [assignmentVersion];
     await assignmentVersion.save();
 
-    const student1 = new User({ netid: `student1` });
+    const student1 = new User().init({ netid: `student1` });
     await student1.save();
-    const enrollment1 = new Enrollment({
+    const enrollment1 = new Enrollment().init({
       user: student1,
       course: course,
       role: UserRole.STUDENT,
     });
     await enrollment1.save();
-    const student2 = new User({ netid: `student2` });
+    const student2 = new User().init({ netid: `student2` });
     await student2.save();
-    const enrollment2 = new Enrollment({
+    const enrollment2 = new Enrollment().init({
       user: student2,
       course: course,
       role: UserRole.STUDENT,
     });
     await enrollment2.save();
-    const student3 = new User({ netid: `student3` });
+    const student3 = new User().init({ netid: `student3` });
     await student3.save();
-    const enrollment3 = new Enrollment({
+    const enrollment3 = new Enrollment().init({
       user: student3,
       course: course,
       role: UserRole.STUDENT,
@@ -458,7 +468,7 @@ describe("Review distribution", () => {
     const submissions: Submission[] = [];
 
     // submission 1
-    const group1 = new Group({
+    const group1 = new Group().init({
       name: `group1`,
       course: course,
       users: [student1],
@@ -466,10 +476,14 @@ describe("Review distribution", () => {
     });
     await group1.save();
     // make submission
-    const file1 = new File({ name: "filename", extension: ".pdf", hash: null });
+    const file1 = new File().init({
+      name: "filename",
+      extension: ".pdf",
+      hash: null,
+    });
     await file1.save();
 
-    const submission1 = new Submission({
+    const submission1 = new Submission().init({
       user: student1,
       group: group1,
       assignmentVersion: assignmentVersion,
@@ -480,7 +494,7 @@ describe("Review distribution", () => {
     submissions.push(submission1);
 
     // submission 1
-    const group2 = new Group({
+    const group2 = new Group().init({
       name: `group2`,
       course: course,
       users: [student2, student3],
@@ -488,10 +502,14 @@ describe("Review distribution", () => {
     });
     await group2.save();
     // make submission
-    const file2 = new File({ name: "filename", extension: ".pdf", hash: null });
+    const file2 = new File().init({
+      name: "filename",
+      extension: ".pdf",
+      hash: null,
+    });
     await file1.save();
 
-    const submission2 = new Submission({
+    const submission2 = new Submission().init({
       user: student2,
       group: group2,
       assignmentVersion: assignmentVersion,

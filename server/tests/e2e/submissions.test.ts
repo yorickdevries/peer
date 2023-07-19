@@ -1,10 +1,8 @@
 import http from "http";
 import request from "supertest";
-import { Connection } from "typeorm";
 import app from "../../src/app";
 import fs from "fs";
 import path from "path";
-import createDatabaseConnection from "../../src/databaseConnection";
 import initializeData from "../../src/util/initializeData";
 import mockLoginCookie from "../helpers/mockLoginCookie";
 import createAssignmentRequest from "../helpers/createAssignmentRequest";
@@ -14,9 +12,9 @@ import HttpStatusCode from "../../src/enum/HttpStatusCode";
 import AssignmentType from "../../src/enum/AssignmentType";
 import publishAssignment from "../../src/assignmentProgression/publishAssignment";
 import Assignment from "../../src/models/Assignment";
+import { dataSource } from "../../src/databaseConnection";
 
 describe("Submissions", () => {
-  let connection: Connection;
   let server: http.Server;
   let sessionCookie: string;
   let assignmentVersion: AssignmentVersion;
@@ -25,7 +23,7 @@ describe("Submissions", () => {
   let assignment: Assignment;
 
   beforeAll(async () => {
-    connection = await createDatabaseConnection();
+    await dataSource.initialize();
     server = http.createServer(app);
     // initialize faculties and academic years
     await initializeData();
@@ -86,7 +84,7 @@ describe("Submissions", () => {
 
   afterAll(async () => {
     server.close();
-    await connection.close();
+    await dataSource.destroy();
   });
 
   test("make a submission with valid file type", async () => {

@@ -1,20 +1,18 @@
 import http from "http";
 import request from "supertest";
-import { Connection } from "typeorm";
 import app from "../../src/app";
-import createDatabaseConnection from "../../src/databaseConnection";
 import HttpStatusCode from "../../src/enum/HttpStatusCode";
 import mockLoginCookie from "../helpers/mockLoginCookie";
 import initializeData from "../../src/util/initializeData";
 import User from "../../src/models/User";
+import { dataSource } from "../../src/databaseConnection";
 
 describe("Preferences", () => {
-  let connection: Connection;
   let server: http.Server;
   let user: User;
 
   beforeAll(async () => {
-    connection = await createDatabaseConnection();
+    await dataSource.initialize();
     server = http.createServer(app);
     // initialize faculties and academic years
     await initializeData();
@@ -22,13 +20,13 @@ describe("Preferences", () => {
 
   afterAll(async () => {
     server.close();
-    await connection.close();
+    await dataSource.destroy();
   });
 
   test("disable settings", async () => {
     const sessionCookie = await mockLoginCookie(server, "user123");
 
-    user = await User.findOneOrFail("user123");
+    user = await User.findOneByOrFail({ netid: "user123" });
     expect(user.preferences).toMatchObject({
       stRemLateSubmission: true,
       stRemStageNotSubmitted: true,
@@ -51,7 +49,7 @@ describe("Preferences", () => {
       .set("cookie", sessionCookie);
     expect(res.status).toBe(HttpStatusCode.OK);
 
-    user = await User.findOneOrFail("user123");
+    user = await User.findOneByOrFail({ netid: "user123" });
     expect(user.preferences).toMatchObject({
       stRemLateSubmission: false,
       stRemStageNotSubmitted: false,

@@ -1,23 +1,18 @@
 import http from "http";
 import request from "supertest";
-import { Connection } from "typeorm";
 import app from "../../src/app";
-import createDatabaseConnection from "../../src/databaseConnection";
 import HttpStatusCode from "../../src/enum/HttpStatusCode";
 import mockLoginCookie from "../helpers/mockLoginCookie";
 import initializeData from "../../src/util/initializeData";
+import { dataSource } from "../../src/databaseConnection";
 
 describe("API", () => {
   // will be initialized and closed in beforeAll / afterAll
-  let connection: Connection;
   let server: http.Server;
 
   beforeAll(async () => {
     // For the in memory test database, the schema is automatically dropped upon connect
-    connection = await createDatabaseConnection();
-    console.log(
-      `Connected to ${connection.options.type} database: ${connection.options.database}`
-    );
+    await dataSource.initialize();
     server = http.createServer(app);
     // initialize faculties and academic years
     await initializeData();
@@ -26,7 +21,7 @@ describe("API", () => {
   afterAll(async () => {
     //close server and connection
     server.close();
-    await connection.close();
+    await dataSource.destroy();
   });
 
   test("check /me route without logging in", async () => {

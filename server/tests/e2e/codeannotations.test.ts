@@ -1,8 +1,6 @@
 import http from "http";
 import request from "supertest";
-import { Connection } from "typeorm";
 import app from "../../src/app";
-import createDatabaseConnection from "../../src/databaseConnection";
 import HttpStatusCode from "../../src/enum/HttpStatusCode";
 import mockLoginCookie from "../helpers/mockLoginCookie";
 import initializeData from "../../src/util/initializeData";
@@ -12,9 +10,9 @@ import publishAssignment from "../../src/assignmentProgression/publishAssignment
 import closeSubmission from "../../src/assignmentProgression/closeSubmission";
 import fs from "fs";
 import path from "path";
+import { dataSource } from "../../src/databaseConnection";
 
 describe("CodeAnnotations", () => {
-  let connection: Connection;
   let server: http.Server;
   let sessionCookie1: string;
   let sessionCookie2: string;
@@ -26,7 +24,7 @@ describe("CodeAnnotations", () => {
   const maxAnnotationLength = 65535;
 
   beforeAll(async () => {
-    connection = await createDatabaseConnection();
+    await dataSource.initialize();
     server = http.createServer(app);
     // initialize faculties and academic years
     await initializeData();
@@ -194,7 +192,7 @@ describe("CodeAnnotations", () => {
 
   afterAll(async () => {
     server.close();
-    await connection.close();
+    await dataSource.destroy();
   });
 
   test("get maximum annotation length", async () => {

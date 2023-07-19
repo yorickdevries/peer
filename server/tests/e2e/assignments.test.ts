@@ -1,8 +1,6 @@
 import http from "http";
 import request from "supertest";
-import { Connection } from "typeorm";
 import app from "../../src/app";
-import createDatabaseConnection from "../../src/databaseConnection";
 import HttpStatusCode from "../../src/enum/HttpStatusCode";
 import mockLoginCookie from "../helpers/mockLoginCookie";
 import initializeData from "../../src/util/initializeData";
@@ -11,15 +9,15 @@ import Course from "../../src/models/Course";
 import publishAssignment from "../../src/assignmentProgression/publishAssignment";
 import createAssignmentRequest from "../helpers/createAssignmentRequest";
 import patchAssignmentRequest from "../helpers/patchAssignmentRequest";
+import { dataSource } from "../../src/databaseConnection";
 
 describe("Assignments", () => {
-  let connection: Connection;
   let server: http.Server;
   let course: Course;
   let sessionCookie: string;
 
   beforeAll(async () => {
-    connection = await createDatabaseConnection();
+    await dataSource.initialize();
     server = http.createServer(app);
     // initialize faculties and academic years
     await initializeData();
@@ -46,7 +44,7 @@ describe("Assignments", () => {
 
   afterAll(async () => {
     server.close();
-    await connection.close();
+    await dataSource.destroy();
   });
 
   test("make an assignment", async () => {
