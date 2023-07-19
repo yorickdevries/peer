@@ -2,14 +2,15 @@
     <footer class="text-muted">
         <div class="container">
             <b-row align-v="center" align-h="center">
-                <b-col sm="4" align-self="center" class="flexCenterElem">
+                <b-col sm="3" align-self="center" class="flexCenterElem footerElem">
                     <router-link @click.native="scrollToTop" to="/privacy">Privacy Policy</router-link>
+                </b-col>
+                <b-col sm="3" align-self="center" class="flexCenterElem footerElem">
                     <div class="flexCenterElem">
                         For technical support, contact: <a href="mailto:eip-ewi@tudelft.nl">eip-ewi@tudelft.nl</a>
                     </div>
                 </b-col>
-                <b-col sm="4" align-self="center" class="flexCenterElem">{{ timezoneString }}</b-col>
-                <b-col sm="2" align-self="center" class="flexCenterElem">
+                <b-col sm="3" align-self="center" class="d-flex justify-content-center footerElem">
                     <b-img
                         id="logoImg"
                         :src="require('../assets/images/tu_delft_logo_black.png')"
@@ -18,7 +19,7 @@
                         style="position: relative"
                     ></b-img>
                 </b-col>
-                <b-col sm="2" align-self="center" class="flexCenterElem">
+                <b-col sm="3" align-self="center" class="d-flex justify-content-center footerElem">
                     <a href="#">Back to top</a>
                 </b-col>
             </b-row>
@@ -29,13 +30,6 @@
 <script>
 export default {
     name: "Footer",
-    computed: {
-        timezoneString() {
-            const re = /([A-Z]+[+-][0-9]+.*)/
-            const timezone = new Date().toString().match(re)[1]
-            return "Timezone: " + timezone
-        },
-    },
     methods: {
         scrollToTop() {
             window.scrollTo(0, 0)
@@ -52,10 +46,13 @@ export default {
     #logoImg {
         right: 0;
     }
+    .footerElem {
+        margin-bottom: 5px;
+    }
 }
 @media not (max-width: 576px) {
     #logoImg {
-        right: 17px;
+        right: -13px;
     }
 }
 footer {
