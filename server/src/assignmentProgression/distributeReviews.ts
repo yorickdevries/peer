@@ -246,7 +246,7 @@ const distributeReviewsForAssignmentHelper = async function (
       // iterate over fullReviewDistribution
       for (const reviewAssignment of fullReviewDistribution) {
         // make the review
-        const review = new ReviewOfSubmission({
+        const review = new ReviewOfSubmission().init({
           questionnaire: reviewAssignment.submissionQuestionnaire,
           user: reviewAssignment.reviewer,
           flaggedByReviewer: false,

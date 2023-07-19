@@ -38,7 +38,7 @@ const exportJSONToFile = async function (
   const fileBuffer = Buffer.from(result);
   const fileExtension = `.${exportType}`;
   const fileHash = null;
-  const file = new File({
+  const file = new File().init({
     name: fileName,
     extension: fileExtension,
     hash: fileHash,

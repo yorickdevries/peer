@@ -96,7 +96,7 @@ router.get(
       return;
     }
     const assignment = await assignmentVersion.getAssignment();
-    const assignmentExport = new AssignmentExport({
+    const assignmentExport = new AssignmentExport().init({
       user: user,
       assignment: assignment,
       file: null,
@@ -354,14 +354,14 @@ router.post(
       await removePDFMetadata(req.file.path);
     }
     const fileHash = null;
-    const file = new File({
+    const file = new File().init({
       name: fileName,
       extension: fileExtension,
       hash: fileHash,
     });
 
     // create submission
-    const submission = new Submission({
+    const submission = new Submission().init({
       user: user,
       group: group,
       assignmentVersion: assignmentVersion,
@@ -603,7 +603,7 @@ router.post(
     }
     // make export entry without file
     const assignment = await assignmentVersion.getAssignment();
-    const assignmentExport = new AssignmentExport({
+    const assignmentExport = new AssignmentExport().init({
       user: user,
       assignment: assignment,
       file: null,

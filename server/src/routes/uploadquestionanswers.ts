@@ -174,14 +174,14 @@ router.post(
       await removePDFMetadata(req.file.path);
     }
     const fileHash = null;
-    const newFile = new File({
+    const newFile = new File().init({
       name: fileName,
       extension: fileExtension,
       hash: fileHash,
     });
 
     // new Upload Answer
-    const newUploadAnser = new UploadQuestionAnswer({
+    const newUploadAnser = new UploadQuestionAnswer().init({
       question: question,
       review: review,
       answer: newFile,

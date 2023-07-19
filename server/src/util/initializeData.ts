@@ -23,7 +23,9 @@ const initializeData = async function (): Promise<void> {
     const existingFaculties = await Faculty.find();
     if (existingFaculties.length === 0) {
       for (const faculty of faculties) {
-        await new Faculty({ name: faculty[0], longName: faculty[1] }).save();
+        await new Faculty()
+          .init({ name: faculty[0], longName: faculty[1] })
+          .save();
       }
       console.log("Initialized Faculties");
     }
@@ -39,10 +41,12 @@ const initializeData = async function (): Promise<void> {
     const existingAcademicYears = await AcademicYear.find();
     if (existingAcademicYears.length === 0) {
       for (const academicYear of academicYears) {
-        await new AcademicYear({
-          name: academicYear[0],
-          active: academicYear[1],
-        }).save();
+        await new AcademicYear()
+          .init({
+            name: academicYear[0],
+            active: academicYear[1],
+          })
+          .save();
       }
       console.log("Initialized Academic Years");
     }

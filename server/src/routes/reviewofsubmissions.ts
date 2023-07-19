@@ -123,7 +123,7 @@ router.post(
       return;
     }
     const assignment = await assignmentVersion.getAssignment();
-    const assignmentExport = new AssignmentExport({
+    const assignmentExport = new AssignmentExport().init({
       user: user,
       assignment: assignment,
       file: null,
@@ -187,7 +187,7 @@ router.post(
     }
     // make export entry without file
     const assignment = await assignmentVersion.getAssignment();
-    const assignmentExport = new AssignmentExport(user, assignment, null);
+    const assignmentExport = new AssignmentExport().init({user, assignment, null});
     await assignmentExport.save();
 
     // offload a function to a worker
@@ -644,7 +644,7 @@ router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
   }
 
   // create the reviewEvaluation
-  const reviewEvaluation = new ReviewOfReview({
+  const reviewEvaluation = new ReviewOfReview().init({
     questionnaire: reviewQuestionnaire,
     user: user,
     flaggedByReviewer: false,

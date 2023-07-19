@@ -20,11 +20,15 @@ export default class MultipleChoiceQuestionAnswer extends QuestionAnswer {
   })
   multipleChoiceAnswer: MultipleChoiceQuestionOption;
 
-  constructor(init?: MultipleChoiceQuestionAnswerInterface) {
-    if (init !== undefined) {
-      super({ question: init.question, review: init.review });
-      this.multipleChoiceAnswer = init.answer;
-    }
+  constructor() {
+    super();
+  }
+
+  init(init: MultipleChoiceQuestionAnswerInterface) {
+    this.question = init.question;
+    this.review = init.review;
+    this.multipleChoiceAnswer = init.answer;
+    return this;
   }
 
   async validateOrReject(): Promise<void> {

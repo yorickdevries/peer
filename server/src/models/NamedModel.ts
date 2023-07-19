@@ -14,8 +14,7 @@ export default abstract class NamedModel extends BaseModel {
   @IsNotEmpty()
   name: string;
 
-  constructor(name: string) {
-    super();
+  initBase(name: string) {
     this.name = name;
   }
 }

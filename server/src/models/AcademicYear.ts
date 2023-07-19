@@ -14,11 +14,13 @@ export default class AcademicYear extends NamedModel {
   @IsBoolean()
   active: boolean;
 
-  constructor(init?: AcademicYearInterface) {
-    super()
-    if (init !== undefined) {
-      super(init.name);
-      this.active = init.active;
-    }
+  constructor() {
+    super();
+  }
+
+  init(init: AcademicYearInterface) {
+    this.active = init.active;
+    this.name = init.name;
+    return this;
   }
 }

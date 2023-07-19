@@ -14,7 +14,7 @@ define(RangeQuestionAnswer, () => {
   const review = Object.create(Review);
   const answer = 1;
 
-  return new RangeQuestionAnswer({
+  return new RangeQuestionAnswer().init({
     question: question,
     review: review,
     answer: answer,

@@ -190,7 +190,7 @@ router.post("/", validateBody(annotationSchema), async (req, res) => {
         .send("Selector needs to be defined in a commenting annotation");
       return;
     }
-    const commentingPDFAnnotation = new CommentingPDFAnnotation({
+    const commentingPDFAnnotation = new CommentingPDFAnnotation().init({
       id: annotation.id,
       bodyValue: annotation.bodyValue,
       user: user,
@@ -213,7 +213,7 @@ router.post("/", validateBody(annotationSchema), async (req, res) => {
         .send("CommentingPDFAnnotation is not found");
       return;
     }
-    const replyingPDFAnnotation = new ReplyingPDFAnnotation({
+    const replyingPDFAnnotation = new ReplyingPDFAnnotation().init({
       id: annotation.id,
       bodyValue: annotation.bodyValue,
       user: user,

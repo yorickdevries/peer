@@ -16,7 +16,7 @@ define(ReviewOfReview, () => {
   const user = Object.create(User);
   const review = Object.create(Review);
 
-  return new ReviewOfReview({
+  return new ReviewOfReview().init({
     questionnaire: reviewQuestionnaire,
     user: user,
     flaggedByReviewer: false,

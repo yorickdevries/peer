@@ -19,7 +19,7 @@ define(User, (faker: typeof Faker) => {
   })}`;
   const email = faker.internet.email(firstName, lastName, "tudelft.nl");
 
-  return new User({
+  return new User().init({
     netid: parseNetID(netId),
     affiliation: undefined,
     study: undefined,

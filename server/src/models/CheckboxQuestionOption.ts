@@ -22,11 +22,15 @@ export default class CheckboxQuestionOption extends QuestionOption {
   })
   question?: CheckboxQuestion;
 
-  constructor(init?: CheckboxQuestionOptionInterface) {
-    if (init !== undefined) {
-      super({ text: init.text, points: init.points });
-      this.question = init.question;
-    }
+  constructor() {
+    super();
+  }
+
+  init(init: CheckboxQuestionOptionInterface) {
+    this.text = init.text;
+    this.points = init.points;
+    this.question = init.question;
+    return this;
   }
 
   async getQuestion(): Promise<CheckboxQuestion> {

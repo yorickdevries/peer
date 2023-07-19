@@ -105,18 +105,20 @@ export default class AssignmentVersion extends BaseModel {
   @JoinColumn()
   reviewQuestionnaire?: ReviewQuestionnaire | null;
 
-  constructor(init?: AssignmentVersionInterface) {
-    if (init !== undefined) {
-      super();
-      this.name = init.name;
-      this.assignment = init.assignment;
-      this.versionsToReview = init.versionsToReview;
-      this.reviewsPerUserPerAssignmentVersionToReview =
-        init.reviewsPerUserPerAssignmentVersionToReview;
-      this.selfReview = init.selfReview;
-      this.submissionQuestionnaire = init.submissionQuestionnaire;
-      this.reviewQuestionnaire = init.reviewQuestionnaire;
-    }
+  constructor() {
+    super();
+  }
+
+  init(init: AssignmentVersionInterface) {
+    this.name = init.name;
+    this.assignment = init.assignment;
+    this.versionsToReview = init.versionsToReview;
+    this.reviewsPerUserPerAssignmentVersionToReview =
+      init.reviewsPerUserPerAssignmentVersionToReview;
+    this.selfReview = init.selfReview;
+    this.submissionQuestionnaire = init.submissionQuestionnaire;
+    this.reviewQuestionnaire = init.reviewQuestionnaire;
+    return this;
   }
 
   // validation: check whether the group is in the assingment and the user in the group

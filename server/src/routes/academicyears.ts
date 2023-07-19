@@ -48,7 +48,7 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
 });
 
 router.post("/", isAdmin, validateBody(postSchema), async (req, res) => {
-  const year = new AcademicYear({
+  const year = new AcademicYear().init({
     name: req.body.name,
     active: req.body.active,
   });

@@ -31,19 +31,20 @@ export default class ReviewOfSubmission extends Review {
   // can be null as it is in the same table as reviewOfReview
   submission: Submission;
 
-  constructor(init?: ReviewOfSubmissionInterface) {
-    if (init !== undefined) {
-      super({
-        questionnaire: init.questionnaire,
-        reviewer: init.user,
-        flaggedByReviewer: init.flaggedByReviewer,
-        submitted: init.submitted,
-        startedAt: init.startedAt,
-        downloadedAt: init.downloadedAt,
-        submittedAt: init.submittedAt,
-      });
-      this.submission = init.submission;
-    }
+  constructor() {
+    super();
+  }
+
+  init(init: ReviewOfSubmissionInterface) {
+    this.questionnaire = init.questionnaire;
+    this.reviewer = init.user;
+    this.flaggedByReviewer = init.flaggedByReviewer;
+    this.submitted = init.submitted;
+    this.startedAt = init.startedAt;
+    this.downloadedAt = init.downloadedAt;
+    this.submittedAt = init.submittedAt;
+    this.submission = init.submission;
+    return this;
   }
 
   // custom validation which is run before saving

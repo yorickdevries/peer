@@ -33,13 +33,15 @@ export default class Enrollment extends BaseModel {
   @IsEnum(UserRole)
   role: UserRole;
 
-  constructor(init?: EnrollmentInterface) {
-    if (init !== undefined) {
-      super();
-      this.user = init.user;
-      this.course = init.course;
-      this.role = init.role;
-    }
+  constructor() {
+    super();
+  }
+
+  init(init: EnrollmentInterface) {
+    this.user = init.user;
+    this.course = init.course;
+    this.role = init.role;
+    return this;
   }
 
   async getUser(): Promise<User> {

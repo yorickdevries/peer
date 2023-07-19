@@ -36,7 +36,7 @@ const parseAndSaveAffiliation = async function (
                 where: { name: name },
               });
               if (!ssoField) {
-                ssoField = new Affiliation({ name: name });
+                ssoField = new Affiliation().init({ name: name });
                 await ssoField.validateOrReject();
                 await transactionalEntityManager.save(ssoField);
               }
@@ -84,7 +84,7 @@ const parseAndSaveStudy = async function (input: any): Promise<Study[]> {
                 where: { name: name },
               });
               if (!ssoField) {
-                ssoField = new Study({ name: name });
+                ssoField = new Study().init({ name: name });
                 await ssoField.validateOrReject();
                 await transactionalEntityManager.save(ssoField);
               }
@@ -139,7 +139,7 @@ const parseAndSaveOrganisationUnit = async function (
                 }
               );
               if (!ssoField) {
-                ssoField = new OrganisationUnit({ name: name });
+                ssoField = new OrganisationUnit().init({ name: name });
                 await ssoField.validateOrReject();
                 await transactionalEntityManager.save(ssoField);
               }

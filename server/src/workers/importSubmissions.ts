@@ -90,7 +90,7 @@ const importWebLabSubmissions = async function (
       // generate zip file
       const buffer = await zip.generateAsync({ type: "nodebuffer" });
       const fileName = `assignmentversion${assignmentVersion.id}_submission${studentNumber}`;
-      const file = new File({ name: fileName, extension: ".zip", hash: null });
+      const file = new File().init({ name: fileName, extension: ".zip", hash: null });
       submissions.set(studentNumber, { file, buffer });
     }
   } catch (error) {
@@ -158,7 +158,7 @@ const importWebLabSubmissions = async function (
           }
         } else {
           // enroll the user as student in the course
-          enrollment = new Enrollment({
+          enrollment = new Enrollment().init({
             user: user,
             course: course,
             role: UserRole.STUDENT,
@@ -185,7 +185,7 @@ const importWebLabSubmissions = async function (
         });
 
         // make the group
-        const group = new Group({
+        const group = new Group().init({
           name: user.netid,
           course: course,
           users: [user],
@@ -200,7 +200,7 @@ const importWebLabSubmissions = async function (
 
         // make the submission
         // the submission cannot be validated, because the group has not been saved
-        const submission = new Submission({
+        const submission = new Submission().init({
           user: user,
           group: group,
           assignmentVersion: assignmentVersion,

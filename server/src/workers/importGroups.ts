@@ -37,7 +37,7 @@ const importGroupsForAssignment = async function (
           let user = await transactionalEntityManager.findOne(User, netid);
           // in case the user doesnt exists in the database yet, create it
           if (!user) {
-            user = new User({ netid: netid });
+            user = new User().init({ netid: netid });
             await user.validateOrReject();
             await transactionalEntityManager.save(user);
           }
@@ -53,7 +53,7 @@ const importGroupsForAssignment = async function (
             }
           } else {
             // enroll the user as student in the course
-            enrollment = new Enrollment({
+            enrollment = new Enrollment().init({
               user: user,
               course: course,
               role: UserRole.STUDENT,
@@ -99,7 +99,7 @@ const importGroupsForAssignment = async function (
 
         const groupName = groupNameWithNetidList.groupName;
         // make the group
-        const group = new Group({
+        const group = new Group().init({
           name: groupName,
           course: course,
           users: users,

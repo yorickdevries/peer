@@ -30,17 +30,18 @@ export default class ReplyingPDFAnnotation extends PDFAnnotation {
   // can be null as it is in the same table as commentingPDFAnnotation
   commentingPDFAnnotation?: CommentingPDFAnnotation;
 
-  constructor(init?: ReplyingPDFAnnotationInterface) {
-    if (init !== undefined) {
-      super({
-        id: init.id,
-        bodyValue: init.bodyValue,
-        user: init.user,
-        file: init.file,
-        review: init.review,
-      });
-      this.commentingPDFAnnotation = init.commentingPDFAnnotation;
-    }
+  constructor() {
+    super();
+  }
+
+  init(init: ReplyingPDFAnnotationInterface) {
+    this.id = init.id;
+    this.bodyValue = init.bodyValue;
+    this.user = init.user;
+    this.file = init.file;
+    this.review = init.review;
+    this.commentingPDFAnnotation = init.commentingPDFAnnotation;
+    return this;
   }
 
   // custom validation which is run before saving

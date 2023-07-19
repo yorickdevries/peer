@@ -92,7 +92,7 @@ router.post("/", validateBody(questionSchema), async (req, res) => {
       .send("The assignment is already in feedback state");
     return;
   }
-  const question = new UploadQuestion({
+  const question = new UploadQuestion().init({
     text: req.body.text,
     number: req.body.number,
     optional: req.body.optional,

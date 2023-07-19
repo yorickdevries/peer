@@ -33,17 +33,18 @@ export default class CommentingPDFAnnotation extends PDFAnnotation {
   )
   replyingPDFAnnotations?: ReplyingPDFAnnotation[];
 
-  constructor(init?: CommentingPDFAnnotationInterface) {
-    if (init !== undefined) {
-      super({
-        id: init.id,
-        bodyValue: init.bodyValue,
-        user: init.user,
-        file: init.file,
-        review: init.review,
-      });
-      this.selector = init.selector;
-    }
+  constructor() {
+    super();
+  }
+
+  init(init: CommentingPDFAnnotationInterface) {
+    this.id = init.id;
+    this.bodyValue = init.bodyValue;
+    this.user = init.user;
+    this.file = init.file;
+    this.review = init.review;
+    this.selector = init.selector;
+    return this;
   }
 
   // custom validation which is run before saving

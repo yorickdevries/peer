@@ -288,7 +288,7 @@ router.post(
     }
 
     // create asignment and validate
-    const assignment = new Assignment({
+    const assignment = new Assignment().init({
       name: req.body.name,
       course: course,
       enrollable: req.body.enrollable,
@@ -318,7 +318,7 @@ router.post(
       const fileExtension = path.extname(req.file.originalname);
       const fileName = path.basename(req.file.originalname, fileExtension);
       const fileHash = null;
-      file = new File({
+      file = new File().init({
         name: fileName,
         extension: fileExtension,
         hash: fileHash,
@@ -471,7 +471,7 @@ router.patch(
       const fileExtension = path.extname(req.file.originalname);
       const fileName = path.basename(req.file.originalname, fileExtension);
       const fileHash = null;
-      newFile = new File({
+      newFile = new File().init({
         name: fileName,
         extension: fileExtension,
         hash: fileHash,
@@ -696,7 +696,7 @@ router.post("/:id/enroll", validateParams(idSchema), async (req, res) => {
     return;
   }
   const course = await assignment.getCourse();
-  const group = new Group({
+  const group = new Group().init({
     name: user.netid,
     course: course,
     users: [user],

@@ -21,11 +21,16 @@ export default class UploadQuestionAnswer extends QuestionAnswer {
   @IsDefined()
   uploadAnswer: File;
 
-  constructor(init?: UploadQuestionInterface) {
-    if (init !== undefined) {
-      super({ question: init.question, review: init.review });
-      this.uploadAnswer = init.answer;
-    }
+  constructor() {
+    super();
+
+  }
+
+  init(init: UploadQuestionInterface) {
+    this.question = init.question;
+    this.review = init.review;
+    this.uploadAnswer = init.answer;
+    return this;
   }
 
   // validation: file should have the right extension

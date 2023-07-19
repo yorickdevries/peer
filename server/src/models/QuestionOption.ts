@@ -51,12 +51,14 @@ export default abstract class QuestionOption extends BaseModel {
 
   abstract question?: Question;
 
-  constructor(init?: QuestionOptionInterface) {
-    if (init !== undefined) {
-      super();
-      this.text = init.text;
-      this.points = init.points;
-    }
+  constructor() {
+    super();
+  }
+
+  init(init: QuestionOptionInterface) {
+    this.text = init.text;
+    this.points = init.points;
+    return this;
   }
 
   async validateOrReject(): Promise<void> {

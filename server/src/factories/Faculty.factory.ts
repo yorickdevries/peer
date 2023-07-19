@@ -27,7 +27,7 @@ async function createDefaultFaculties(): Promise<Faculty[]> {
 }
 
 define(Faculty, () => {
-  return new Faculty({ name: "name", longName: "longName" });
+  return new Faculty().init({ name: "name", longName: "longName" });
 });
 
 export { createDefaultFaculties };

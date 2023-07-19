@@ -32,7 +32,7 @@ const addDefaultReviewEvaluationQuestions = async function (
       for (const questionToCopy of templateQuestions) {
         switch (questionToCopy.type) {
           case QuestionType.CHECKBOX: {
-            const question = new CheckboxQuestion({
+            const question = new CheckboxQuestion().init({
               text: questionToCopy.text,
               number: questionToCopy.number,
               optional: questionToCopy.optional,
@@ -43,7 +43,7 @@ const addDefaultReviewEvaluationQuestions = async function (
             await transactionalEntityManager.save(question);
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             for (const optionToCopy of questionToCopy.options!) {
-              const option = new CheckboxQuestionOption({
+              const option = new CheckboxQuestionOption().init({
                 text: optionToCopy.text,
                 question: question,
                 points: graded ? optionToCopy.points : null,
@@ -54,7 +54,7 @@ const addDefaultReviewEvaluationQuestions = async function (
             break;
           }
           case QuestionType.MULTIPLE_CHOICE: {
-            const question = new MultipleChoiceQuestion({
+            const question = new MultipleChoiceQuestion().init({
               text: questionToCopy.text,
               number: questionToCopy.number,
               optional: questionToCopy.optional,
@@ -65,7 +65,7 @@ const addDefaultReviewEvaluationQuestions = async function (
             await transactionalEntityManager.save(question);
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             for (const optionToCopy of questionToCopy.options!) {
-              const option = new MultipleChoiceQuestionOption({
+              const option = new MultipleChoiceQuestionOption().init({
                 text: optionToCopy.text,
                 question: question,
                 points: graded ? optionToCopy.points : null,
@@ -76,7 +76,7 @@ const addDefaultReviewEvaluationQuestions = async function (
             break;
           }
           case QuestionType.OPEN: {
-            const question = new OpenQuestion({
+            const question = new OpenQuestion().init({
               text: questionToCopy.text,
               number: questionToCopy.number,
               optional: questionToCopy.optional,
@@ -100,7 +100,7 @@ const addDefaultReviewEvaluationQuestions = async function (
             break;
           }
           case QuestionType.UPLOAD: {
-            const question = new UploadQuestion({
+            const question = new UploadQuestion().init({
               text: questionToCopy.text,
               number: questionToCopy.number,
               optional: questionToCopy.optional,
@@ -142,7 +142,7 @@ const addCopyOfQuestions = async function (
       }
       for (const questionToCopy of questions) {
         if (questionToCopy instanceof CheckboxQuestion) {
-          const question = new CheckboxQuestion({
+          const question = new CheckboxQuestion().init({
             text: questionToCopy.text,
             number: questionToCopy.number,
             optional: questionToCopy.optional,
@@ -153,7 +153,7 @@ const addCopyOfQuestions = async function (
           await transactionalEntityManager.save(question);
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           for (const optionToCopy of questionToCopy.options!) {
-            const option = new CheckboxQuestionOption({
+            const option = new CheckboxQuestionOption().init({
               text: optionToCopy.text,
               question: question,
               points: optionToCopy.points,
@@ -162,7 +162,7 @@ const addCopyOfQuestions = async function (
             await transactionalEntityManager.save(option);
           }
         } else if (questionToCopy instanceof MultipleChoiceQuestion) {
-          const question = new MultipleChoiceQuestion({
+          const question = new MultipleChoiceQuestion().init({
             text: questionToCopy.text,
             number: questionToCopy.number,
             optional: questionToCopy.optional,
@@ -173,7 +173,7 @@ const addCopyOfQuestions = async function (
           await transactionalEntityManager.save(question);
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           for (const optionToCopy of questionToCopy.options!) {
-            const option = new MultipleChoiceQuestionOption({
+            const option = new MultipleChoiceQuestionOption().init({
               text: optionToCopy.text,
               question: question,
               points: optionToCopy.points,
@@ -182,7 +182,7 @@ const addCopyOfQuestions = async function (
             await transactionalEntityManager.save(option);
           }
         } else if (questionToCopy instanceof OpenQuestion) {
-          const question = new OpenQuestion({
+          const question = new OpenQuestion().init({
             text: questionToCopy.text,
             number: questionToCopy.number,
             optional: questionToCopy.optional,
@@ -201,7 +201,7 @@ const addCopyOfQuestions = async function (
           await question.validateOrReject();
           await transactionalEntityManager.save(question);
         } else if (questionToCopy instanceof UploadQuestion) {
-          const question = new UploadQuestion({
+          const question = new UploadQuestion().init({
             text: questionToCopy.text,
             number: questionToCopy.number,
             optional: questionToCopy.optional,

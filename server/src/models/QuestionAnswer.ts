@@ -12,10 +12,10 @@ import Question from "./Question";
 import Review from "./Review";
 import { dataSource } from "../databaseConnection";
 
-interface QuestionAnswerInterface {
-  question: Question;
-  review: Review;
-}
+// interface QuestionAnswerInterface {
+//   question: Question;
+//   review: Review;
+// }
 
 @Entity()
 @TableInheritance({ column: { type: "varchar", name: "type" } })
@@ -51,13 +51,15 @@ export default abstract class QuestionAnswer extends BaseModel {
   // method to get number of points awarded for an answer (if graded)
   abstract getAnswerPoints(): Promise<number | undefined>;
 
-  constructor(init?: QuestionAnswerInterface) {
-    if (init !== undefined) {
-      super();
-      this.question = init.question;
-      this.review = init.review;
-    }
+  constructor() {
+    super();
   }
+
+  // init(init: QuestionAnswerInterface) {
+  //   this.question = init.question;
+  //   this.review = init.review;
+  //   return this;
+  // }
 
   async validateOrReject(): Promise<void> {
     // validation: questions should be part of the questionnaire of the review

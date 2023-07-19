@@ -16,7 +16,7 @@ define(Group, (faker: typeof Faker) => {
   const users = [Object.create(User)];
   const assignments = [Object.create(Assignment)];
 
-  return new Group({
+  return new Group().init({
     name: name,
     course: course,
     users: users,

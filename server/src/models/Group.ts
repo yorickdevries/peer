@@ -49,14 +49,16 @@ export default class Group extends BaseModel {
   @JoinTable()
   assignments?: Assignment[];
 
-  constructor(init?: GroupInterface) {
-    if (init !== undefined) {
-      super();
-      this.name = init.name;
-      this.course = init.course;
-      this.users = init.users;
-      this.assignments = init.assignments;
-    }
+  constructor() {
+    super();
+  }
+
+  init(init: GroupInterface) {
+    this.name = init.name;
+    this.course = init.course;
+    this.users = init.users;
+    this.assignments = init.assignments;
+    return this;
   }
 
   async validateOrReject(): Promise<void> {

@@ -25,16 +25,17 @@ export default class MultipleChoiceQuestion extends Question {
   )
   options!: MultipleChoiceQuestionOption[];
 
-  constructor(init?: MultipleChoiceQuestionInterface) {
-    if (init !== undefined) {
-      super({
-        text: init.text,
-        number: init.number,
-        optional: init.optional,
-        graded: init.graded,
-        questionnaire: init.questionnaire,
-      });
-    }
+  constructor() {
+    super();
+  }
+
+  init(init: MultipleChoiceQuestionInterface) {
+    this.text = init.text;
+    this.number = init.number;
+    this.optional = init.optional;
+    this.graded = init.graded;
+    this.questionnaire = init.questionnaire;
+    return this;
   }
 
   async validateOrReject(): Promise<void> {

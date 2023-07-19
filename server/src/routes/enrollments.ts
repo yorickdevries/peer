@@ -97,12 +97,12 @@ router.post("/", validateBody(enrollmentSchema), async (req, res) => {
       let user = await transactionalEntityManager.findOne(User, userNetid);
       // in case the user doesnt exists in the database yet, create it
       if (!user) {
-        user = new User({ netid: userNetid });
+        user = new User().init({ netid: userNetid });
         await user.validateOrReject();
         await transactionalEntityManager.save(user);
       }
       // enroll user in the course if not already
-      enrollment = new Enrollment({ user: user, course: course, role: role });
+      enrollment = new Enrollment().init({ user: user, course: course, role: role });
       // in case another enrollment is made in the meantime it will error due to primary key constraints
       await enrollment.validateOrReject();
       await transactionalEntityManager.save(enrollment);
@@ -217,12 +217,12 @@ router.post(
                 );
                 // in case the user doesnt exists in the database yet, create it
                 if (!user) {
-                  user = new User({ netid: userNetid });
+                  user = new User().init({ netid: userNetid });
                   await user.validateOrReject();
                   await transactionalEntityManager.save(user);
                 }
                 // enroll user in the course if not already
-                const enrollment = new Enrollment({
+                const enrollment = new Enrollment().init({
                   user: user,
                   course: course,
                   role: role,

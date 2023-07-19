@@ -26,11 +26,15 @@ export default class RangeQuestionAnswer extends QuestionAnswer {
   @Min(rangeconfig.min) //1 star is the minimum, max is set by the questionmaker (needs validation)
   rangeAnswer: number;
 
-  constructor(init?: RangeQuestionInterface) {
-    if (init !== undefined) {
-      super({ question: init.question, review: init.review });
-      this.rangeAnswer = init.answer;
-    }
+  constructor() {
+    super();
+  }
+
+  init(init: RangeQuestionInterface) {
+    this.question = init.question;
+    this.review = init.review;
+    this.rangeAnswer = init.answer;
+    return this;
   }
 
   // validation: answer should be in range of the question

@@ -6,9 +6,11 @@ interface AffiliationInterface {
 }
 @Entity()
 export default class Affiliation extends NamedModel {
-  constructor(init?: AffiliationInterface) {
-    if (init !== undefined) {
-      super(init.name);
-    }
+  constructor() {
+    super();
+  }
+  init(init: AffiliationInterface) {
+    this.name = init.name;
+    return this;
   }
 }

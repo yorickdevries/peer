@@ -41,7 +41,7 @@ define(Assignment, (faker: typeof Faker) => {
   const assignmentType = AssignmentType.DOCUMENT;
   const sendNotificationEmails = true;
 
-  return new Assignment({
+  return new Assignment().init({
     name: assignmentName,
     course: course,
     enrollable: enrollable,

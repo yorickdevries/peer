@@ -11,7 +11,7 @@ define(File, (faker: typeof Faker) => {
   const name = faker.commerce.productName();
   const extension = ".pdf";
 
-  return new File({ name: name, extension: extension, hash: null });
+  return new File().init({ name: name, extension: extension, hash: null });
 });
 
 export { createFile };

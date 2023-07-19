@@ -6,7 +6,7 @@ const runScript = false;
 
 const createData = async function (): Promise<void> {
   // Academic Year
-  await new AcademicYear({ name: "2021/2022", active: true }).save();
+  await new AcademicYear().init({ name: "2021/2022", active: true }).save();
   return;
 };
 

@@ -48,13 +48,15 @@ export default class AssignmentExport extends BaseModel {
   @JoinColumn()
   file: File | null;
 
-  constructor(init?: AssignmentExportInterface) {
-    if (init !== undefined) {
-      super();
-      this.user = init.user;
-      this.assignment = init.assignment;
-      this.file = init.file;
-    }
+  constructor() {
+    super();
+  }
+
+  init(init: AssignmentExportInterface) {
+    this.user = init.user;
+    this.assignment = init.assignment;
+    this.file = init.file;
+    return this;
   }
 
   async getAssignment(): Promise<Assignment> {

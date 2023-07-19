@@ -108,7 +108,7 @@ router.post("/", validateBody(multipleChoiceAnswerSchema), async (req, res) => {
   if (multipleChoiceAnswer) {
     multipleChoiceAnswer.multipleChoiceAnswer = questionOption;
   } else {
-    multipleChoiceAnswer = new MultipleChoiceQuestionAnswer({
+    multipleChoiceAnswer = new MultipleChoiceQuestionAnswer().init({
       question: question,
       review: review,
       answer: questionOption,

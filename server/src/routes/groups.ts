@@ -147,7 +147,7 @@ router.patch(
     let newUser = await User.findOne(newUserNetid);
     // in case the user doesnt exists in the database yet, create it
     if (!newUser) {
-      newUser = new User({ netid: newUserNetid });
+      newUser = new User().init({ netid: newUserNetid });
       await newUser.save();
     }
     if (await group.hasUser(newUser)) {
@@ -187,7 +187,7 @@ router.patch(
       }
     } else {
       // enroll the user as student in the course
-      enrollment = new Enrollment({
+      enrollment = new Enrollment().init({
         user: newUser,
         course: course,
         role: UserRole.STUDENT,
@@ -413,7 +413,7 @@ router.post("/", validateBody(groupSchema), async (req, res) => {
     return;
   }
   const course = await assignment.getCourse();
-  const group = new Group({
+  const group = new Group().init({
     name: req.body.name,
     course: course,
     users: [],

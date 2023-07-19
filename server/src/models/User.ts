@@ -124,29 +124,31 @@ export default class User extends BaseModel {
   @JoinColumn()
   preferences!: Preferences;
 
-  constructor(init?: UserInterface) {
-    if (init !== undefined) {
-      super();
-      this.netid = init.netid;
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.studentNumber = init.studentNumber!;
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.firstName = init.firstName!;
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.prefix = init.prefix!;
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.lastName = init.lastName!;
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.email = init.email!;
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.displayName = init.displayName!;
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.affiliation = init.affiliation!;
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.study = init.study!;
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      this.organisationUnit = init.organisationUnit!;
-    }
+  constructor() {
+    super();
+  }
+
+  init(init: UserInterface) {
+    this.netid = init.netid;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    this.studentNumber = init.studentNumber!;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    this.firstName = init.firstName!;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    this.prefix = init.prefix!;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    this.lastName = init.lastName!;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    this.email = init.email!;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    this.displayName = init.displayName!;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    this.affiliation = init.affiliation!;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    this.study = init.study!;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    this.organisationUnit = init.organisationUnit!;
+    return this;
   }
 
   async validateOrReject(): Promise<void> {

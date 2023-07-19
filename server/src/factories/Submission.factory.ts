@@ -19,7 +19,7 @@ define(Submission, () => {
   const file = Object.create(File);
   const final = true;
 
-  return new Submission({
+  return new Submission().init({
     user: user,
     group: group,
     assignmentVersion: assignmentVersion,

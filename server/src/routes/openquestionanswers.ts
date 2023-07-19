@@ -93,7 +93,7 @@ router.post("/", validateBody(openAnswerSchema), async (req, res) => {
   if (openAnswer) {
     openAnswer.openAnswer = req.body.openAnswer;
   } else {
-    openAnswer = new OpenQuestionAnswer({
+    openAnswer = new OpenQuestionAnswer().init({
       question: question,
       review: review,
       answer: req.body.openAnswer,

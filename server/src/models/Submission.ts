@@ -118,21 +118,23 @@ export default class Submission extends BaseModel {
   @IsEnum(ServerFlagReason)
   commentByServer: ServerFlagReason | null;
 
-  constructor(init?: SubmissionInterface) {
-    if (init !== undefined) {
-      super();
-      this.user = init.user;
-      this.group = init.group;
-      this.assignmentVersion = init.assignmentVersion;
-      this.file = init.file;
-      this.final = init.final;
-      // set default on null
-      this.approvalByTA = null;
-      this.commentByTA = null;
-      this.approvingTA = null;
-      this.flaggedByServer = null;
-      this.commentByServer = null;
-    }
+  constructor() {
+    super();
+  }
+
+  init(init: SubmissionInterface) {
+    this.user = init.user;
+    this.group = init.group;
+    this.assignmentVersion = init.assignmentVersion;
+    this.file = init.file;
+    this.final = init.final;
+    // set default on null
+    this.approvalByTA = null;
+    this.commentByTA = null;
+    this.approvingTA = null;
+    this.flaggedByServer = null;
+    this.commentByServer = null;
+    return this;
   }
 
   // validation: check whether the group is in the assingment and the user in the group

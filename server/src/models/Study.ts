@@ -7,9 +7,12 @@ interface StudyInterface {
 
 @Entity()
 export default class Study extends NamedModel {
-  constructor(init?: StudyInterface) {
-    if (init !== undefined) {
-      super(init.name);
-    }
+  constructor() {
+    super();
+  }
+
+  init(init: StudyInterface) {
+    this.name = init.name;
+    return this;
   }
 }

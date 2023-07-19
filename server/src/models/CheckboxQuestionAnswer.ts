@@ -18,11 +18,15 @@ export default class CheckboxQuestionAnswer extends QuestionAnswer {
   @JoinTable()
   checkboxAnswer: CheckboxQuestionOption[];
 
-  constructor(init?: CheckboxQuestionAnswerInterface) {
-    if (init !== undefined) {
-      super({ question: init.question, review: init.review });
-      this.checkboxAnswer = init.answer;
-    }
+  constructor() {
+    super();
+  }
+
+  init(init: CheckboxQuestionAnswerInterface) {
+    this.question = init.question;
+    this.review = init.review;
+    this.checkboxAnswer = init.answer;
+    return this;
   }
 
   async validateOrReject(): Promise<void> {

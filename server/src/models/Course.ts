@@ -78,16 +78,18 @@ export default class Course extends BaseModel {
   @OneToMany((_type) => Assignment, (assignment) => assignment.course)
   assignments?: Assignment[];
 
-  constructor(init?: CourseInterface) {
-    if (init !== undefined) {
-      super();
-      this.name = init.name;
-      this.courseCode = init.courseCode;
-      this.enrollable = init.enrollable;
-      this.faculty = init.faculty;
-      this.academicYear = init.academicYear;
-      this.description = init.description;
-    }
+  constructor() {
+    super();
+  }
+
+  init(init: CourseInterface) {
+    this.name = init.name;
+    this.courseCode = init.courseCode;
+    this.enrollable = init.enrollable;
+    this.faculty = init.faculty;
+    this.academicYear = init.academicYear;
+    this.description = init.description;
+    return this;
   }
 
   async getAssignments(): Promise<Assignment[]> {

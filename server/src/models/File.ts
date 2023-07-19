@@ -36,20 +36,22 @@ export default class File extends BaseModel {
   @IsNotEmpty()
   hash: string;
 
-  constructor(init?: FileInterface) {
-    if (init !== undefined) {
-      super();
-      this.name = init.name;
-      this.extension = init.extension;
-      if (init.hash === null) {
-        // placeholder untill it's calculated
-        // future: const fileHash = hasha(fileBuffer, { algorithm: "sha256" });
-        this.hash =
-          "0000000000000000000000000000000000000000000000000000000000000000";
-      } else {
-        this.hash = init.hash;
-      }
+  constructor() {
+    super();
+  }
+
+  init(init: FileInterface) {
+    this.name = init.name;
+    this.extension = init.extension;
+    if (init.hash === null) {
+      // placeholder untill it's calculated
+      // future: const fileHash = hasha(fileBuffer, { algorithm: "sha256" });
+      this.hash =
+        "0000000000000000000000000000000000000000000000000000000000000000";
+    } else {
+      this.hash = init.hash;
     }
+    return this;
   }
 
   getFileNamewithExtension(): string {

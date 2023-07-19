@@ -16,7 +16,7 @@ define(OpenQuestionAnswer, (faker: typeof Faker) => {
   const review = Object.create(Review);
   const answer = faker.lorem.sentence();
 
-  return new OpenQuestionAnswer({
+  return new OpenQuestionAnswer().init({
     question: question,
     review: review,
     answer: answer,

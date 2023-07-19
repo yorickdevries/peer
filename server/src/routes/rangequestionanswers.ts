@@ -93,7 +93,7 @@ router.post("/", validateBody(rangeAnswerSchema), async (req, res) => {
   if (rangeAnswer) {
     rangeAnswer.rangeAnswer = req.body.rangeAnswer;
   } else {
-    rangeAnswer = new RangeQuestionAnswer({
+    rangeAnswer = new RangeQuestionAnswer().init({
       question: question,
       review: review,
       answer: req.body.rangeAnswer,

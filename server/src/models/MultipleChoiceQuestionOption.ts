@@ -26,11 +26,15 @@ export default class MultipleChoiceQuestionOption extends QuestionOption {
   )
   question?: MultipleChoiceQuestion;
 
-  constructor(init?: MultipleChoiceQuestionOptionInterface) {
-    if (init !== undefined) {
-      super({ text: init.text, points: init.points });
-      this.question = init.question;
-    }
+  constructor() {
+    super();
+  }
+
+  init(init: MultipleChoiceQuestionOptionInterface) {
+    this.text = init.text;
+    this.points = init.points;
+    this.question = init.question;
+    return this;
   }
 
   async getQuestion(): Promise<MultipleChoiceQuestion> {

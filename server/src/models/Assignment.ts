@@ -222,31 +222,32 @@ export default class Assignment extends BaseModel {
   )
   assignmentExports?: AssignmentExport[];
 
-  constructor(init?: AssignmentInterface) {
-    if (init !== undefined) {
-      super();
-      this.name = init.name;
-      this.course = init.course;
-      this.enrollable = init.enrollable;
-      this.reviewEvaluation = init.reviewEvaluation;
-      this.state = AssignmentState.UNPUBLISHED; // initial state
-      this.publishDate = init.publishDate;
-      this.dueDate = init.dueDate;
-      this.reviewPublishDate = init.reviewPublishDate;
-      this.reviewDueDate = init.reviewDueDate;
-      this.reviewEvaluationDueDate = init.reviewEvaluationDueDate;
-      this.description = init.description;
-      this.file = init.file;
-      this.externalLink = init.externalLink;
-      this.submissionExtensions = init.submissionExtensions;
-      this.blockFeedback = init.blockFeedback;
-      this.lateSubmissions = init.lateSubmissions;
-      this.lateSubmissionReviews = init.lateSubmissionReviews;
-      this.lateReviewEvaluations = init.lateReviewEvaluations;
-      this.automaticStateProgression = init.automaticStateProgression;
-      this.assignmentType = init.assignmentType;
-      this.sendNotificationEmails = init.sendNotifcationEmails;
-    }
+  constructor() {
+    super();
+  }
+  init(init: AssignmentInterface) {
+    this.name = init.name;
+    this.course = init.course;
+    this.enrollable = init.enrollable;
+    this.reviewEvaluation = init.reviewEvaluation;
+    this.state = AssignmentState.UNPUBLISHED; // initial state
+    this.publishDate = init.publishDate;
+    this.dueDate = init.dueDate;
+    this.reviewPublishDate = init.reviewPublishDate;
+    this.reviewDueDate = init.reviewDueDate;
+    this.reviewEvaluationDueDate = init.reviewEvaluationDueDate;
+    this.description = init.description;
+    this.file = init.file;
+    this.externalLink = init.externalLink;
+    this.submissionExtensions = init.submissionExtensions;
+    this.blockFeedback = init.blockFeedback;
+    this.lateSubmissions = init.lateSubmissions;
+    this.lateSubmissionReviews = init.lateSubmissionReviews;
+    this.lateReviewEvaluations = init.lateReviewEvaluations;
+    this.automaticStateProgression = init.automaticStateProgression;
+    this.assignmentType = init.assignmentType;
+    this.sendNotificationEmails = init.sendNotifcationEmails;
+    return this;
   }
 
   // custom validation which is run before saving

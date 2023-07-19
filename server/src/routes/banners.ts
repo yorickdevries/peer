@@ -34,7 +34,7 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
 });
 
 router.post("/", validateBody(schema), async (req, res) => {
-  const banner = new Banner({
+  const banner = new Banner().init({
     title: req.body.title,
     text: req.body.text,
     active: req.body.active,

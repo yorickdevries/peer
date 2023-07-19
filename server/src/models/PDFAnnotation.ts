@@ -13,13 +13,13 @@ import File from "./File";
 import ReviewOfSubmission from "./ReviewOfSubmission";
 import PDFAnnotationMotivation from "../enum/PDFAnnotationMotivation";
 
-interface PDFAnnotationInterface {
-  id: string;
-  bodyValue: string;
-  user: User;
-  file: File;
-  review: ReviewOfSubmission;
-}
+// interface PDFAnnotationInterface {
+//   id: string;
+//   bodyValue: string;
+//   user: User;
+//   file: File;
+//   review: ReviewOfSubmission;
+// }
 
 @Entity()
 @TableInheritance({ column: { type: "varchar", name: "motivation" } })
@@ -67,16 +67,18 @@ export default abstract class PDFAnnotation extends BaseModel {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   abstract getWebAnnotationVersion(): any;
 
-  constructor(init?: PDFAnnotationInterface) {
-    if (init !== undefined) {
-      super();
-      this.id = init.id;
-      this.bodyValue = init.bodyValue;
-      this.user = init.user;
-      this.file = init.file;
-      this.review = init.review;
-    }
+  constructor() {
+    super();
   }
+
+  // init(init: PDFAnnotationInterface) {
+  //   this.id = init.id;
+  //   this.bodyValue = init.bodyValue;
+  //   this.user = init.user;
+  //   this.file = init.file;
+  //   this.review = init.review;
+  //   return this;
+  // }
 
   // custom validation which is run before saving
   async validateOrReject(): Promise<void> {

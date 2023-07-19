@@ -25,7 +25,7 @@ const exportToZip = async function (
   const content = await zip.generateAsync({ type: "nodebuffer" });
 
   const uploadFolder = config.get("uploadFolder") as string;
-  const file = new File({ name: `${fileName}`, extension: ".zip", hash: null });
+  const file = new File().init({ name: `${fileName}`, extension: ".zip", hash: null });
 
   await getManager().transaction(
     "READ COMMITTED",

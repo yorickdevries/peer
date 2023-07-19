@@ -15,10 +15,13 @@ export default class Faculty extends NamedModel {
   @IsNotEmpty()
   longName: string;
 
-  constructor(init?: FacultyInterface) {
-    if (init !== undefined) {
-      super(init.name);
-      this.longName = init.longName;
-    }
+  constructor() {
+    super();
+  }
+
+  init(init: FacultyInterface) {
+    this.name = init.name;
+    this.longName = init.longName;
+    return this;
   }
 }

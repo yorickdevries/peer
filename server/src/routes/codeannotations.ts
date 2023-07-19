@@ -125,7 +125,7 @@ router.post("/", validateBody(annotationSchema), async (req, res) => {
       );
     return;
   }
-  const codeAnnotation = new CodeAnnotation({
+  const codeAnnotation = new CodeAnnotation().init({
     review: review,
     annotationText: req.body.annotationText,
     startLineNumber: req.body.startLineNumber,

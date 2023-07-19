@@ -59,15 +59,17 @@ export default class CodeAnnotation extends BaseModel {
   @IsNotEmpty()
   selectedFile: string;
 
-  constructor(init?: CodeAnnotationInterface) {
-    if (init !== undefined) {
-      super();
-      this.review = init.review;
-      this.annotationText = init.annotationText;
-      this.startLineNumber = init.startLineNumber;
-      this.endLineNumber = init.endLineNumber;
-      this.selectedFile = init.selectedFile;
-    }
+  constructor() {
+    super();
+  }
+
+  init(init: CodeAnnotationInterface) {
+    this.review = init.review;
+    this.annotationText = init.annotationText;
+    this.startLineNumber = init.startLineNumber;
+    this.endLineNumber = init.endLineNumber;
+    this.selectedFile = init.selectedFile;
+    return this;
   }
 
   // custom validation which is run before saving

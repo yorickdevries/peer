@@ -24,16 +24,17 @@ export default class UploadQuestion extends Question {
   // needs later to be revised to a list of strings
   extensions: Extensions;
 
-  constructor(init?: UploadQuestionInterface) {
-    if (init !== undefined) {
-      super({
-        text: init.text,
-        number: init.number,
-        optional: init.optional,
-        graded: false,
-        questionnaire: init.questionnaire,
-      });
-      this.extensions = init.extensions;
-    }
+  constructor() {
+    super();
+  }
+
+  init(init: UploadQuestionInterface) {
+    this.text = init.text;
+    this.number = init.number;
+    this.optional = init.optional;
+    this.graded = false;
+    this.questionnaire = init.questionnaire;
+    this.extensions = init.extensions
+    return this;
   }
 }

@@ -12,15 +12,16 @@ interface OpenQuestionInterface {
 
 @ChildEntity(QuestionType.OPEN)
 export default class OpenQuestion extends Question {
-  constructor(init?: OpenQuestionInterface) {
-    if (init !== undefined) {
-      super({
-        text: init.text,
-        number: init.number,
-        optional: init.optional,
-        graded: false,
-        questionnaire: init.questionnaire,
-      });
-    }
+  constructor() {
+    super();
+  }
+
+  init(init: OpenQuestionInterface) {
+    this.text = init.text;
+    this.number = init.number;
+    this.optional = init.optional;
+    this.graded = false;
+    this.questionnaire = init.questionnaire;
+    return this;
   }
 }

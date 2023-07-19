@@ -20,11 +20,15 @@ export default class OpenQuestionAnswer extends QuestionAnswer {
   @IsNotEmpty()
   openAnswer: string;
 
-  constructor(init?: OpenQuestionAnswerInterface) {
-    if (init !== undefined) {
-      super({ question: init.question, review: init.review });
-      this.openAnswer = init.answer;
-    }
+  constructor() {
+    super();
+  }
+
+  init(init: OpenQuestionAnswerInterface) {
+    this.question = init.question;
+    this.review = init.review;
+    this.openAnswer = init.answer;
+    return this;
   }
 
   async getQuestion(): Promise<OpenQuestion> {

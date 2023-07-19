@@ -45,7 +45,7 @@ const copyGroupsForAssignment = async function (
         const users = groupWithUsers.users!;
         const groupName = groupWithUsers.name;
         // make the new group
-        const group = new Group({
+        const group = new Group().init({
           name: groupName,
           course: course,
           users: users,

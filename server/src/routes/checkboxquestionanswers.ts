@@ -115,7 +115,7 @@ router.post("/", validateBody(checkboxAnswerSchema), async (req, res) => {
   if (checkboxAnswer) {
     checkboxAnswer.checkboxAnswer = checkboxQuestionOptions;
   } else {
-    checkboxAnswer = new CheckboxQuestionAnswer({
+    checkboxAnswer = new CheckboxQuestionAnswer().init({
       question: question,
       review: review,
       answer: checkboxQuestionOptions,

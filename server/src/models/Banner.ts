@@ -35,13 +35,15 @@ export default class Banner extends BaseModel {
   @IsBoolean()
   active: boolean;
 
-  constructor(init?: BannerInterface) {
-    if (init !== undefined) {
-      super();
-      this.title = init.title;
-      this.text = init.text;
-      this.active = init.active;
-    }
+  constructor() {
+    super();
+  }
+
+  init(init: BannerInterface) {
+    this.title = init.title;
+    this.text = init.text;
+    this.active = init.active;
+    return this;
   }
 
   async validateOrReject(): Promise<void> {

@@ -19,7 +19,7 @@ define(AssignmentVersion, (faker: typeof Faker) => {
   const submissionQuestionnaire = null;
   const reviewQuestionnaire = null;
 
-  return new AssignmentVersion({
+  return new AssignmentVersion().init({
     name: name,
     assignment: assignment,
     versionsToReview: versionsToReview,
