@@ -34,7 +34,7 @@ export default class UploadQuestion extends Question {
     this.optional = init.optional;
     this.graded = false;
     this.questionnaire = init.questionnaire;
-    this.extensions = init.extensions
+    this.extensions = init.extensions;
     return this;
   }
 }

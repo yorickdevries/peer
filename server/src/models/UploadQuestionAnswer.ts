@@ -23,7 +23,6 @@ export default class UploadQuestionAnswer extends QuestionAnswer {
 
   constructor() {
     super();
-
   }
 
   init(init: UploadQuestionInterface) {

@@ -48,7 +48,9 @@ router.patch(
   validateParams(idSchema),
   validateBody(schema),
   async (req, res) => {
-    const banner = await Banner.findOne({ where: { id: Number(req.params.id) } });
+    const banner = await Banner.findOne({
+      where: { id: Number(req.params.id) },
+    });
     if (!banner) {
       res.status(HttpStatusCode.NOT_FOUND).send();
       return;
