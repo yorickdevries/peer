@@ -1,15 +1,20 @@
-import { define, factory } from "typeorm-seeding";
 import { ContainsKey } from "../util/seedData";
 import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
+import { FactorizedAttrs, Factory } from "@jorgebodega/typeorm-factory";
+import { dataSource } from "../databaseConnection";
 
 async function createSubmissionQuestionnaire(
   override: ContainsKey<SubmissionQuestionnaire>
 ): Promise<SubmissionQuestionnaire> {
-  return await factory(SubmissionQuestionnaire)().create(override);
+  return await new SubmissionQuestionnaireFactory().create(override);
 }
 
-define(SubmissionQuestionnaire, () => {
-  return new SubmissionQuestionnaire();
-});
-
 export { createSubmissionQuestionnaire };
+
+export class SubmissionQuestionnaireFactory extends Factory<SubmissionQuestionnaire> {
+  protected entity = SubmissionQuestionnaire;
+  protected dataSource = dataSource;
+  protected attrs(): FactorizedAttrs<SubmissionQuestionnaire> {
+    return new SubmissionQuestionnaire();
+  }
+}

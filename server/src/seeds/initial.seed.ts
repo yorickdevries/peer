@@ -1,4 +1,4 @@
-import { Seeder } from "typeorm-seeding";
+import { Seeder } from "@jorgebodega/typeorm-seeding";
 import { createUser } from "../factories/User.factory";
 import { createDefaultFaculties } from "../factories/Faculty.factory";
 import { createDefaultAcademicYears } from "../factories/AcademicYear.factory";
@@ -45,6 +45,7 @@ import RangeQuestion from "../models/RangeQuestion";
 import Submission from "../models/Submission";
 import ReviewOfSubmission from "../models/ReviewOfSubmission";
 import { createReviewOfReview } from "../factories/ReviewOfReview.factory";
+import { DataSource } from "typeorm";
 
 const uploadFolder = path.resolve(config.get("uploadFolder") as string);
 const exampleFile = path.join(
@@ -222,8 +223,9 @@ function getStagePlan(userCourse: Course, groupCourse: Course): StagePlan[] {
   ];
 }
 
-export default class InitialDatabaseSeed implements Seeder {
-  public async run(): Promise<void> {
+export default class InitialDatabaseSeed extends Seeder {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async run(dataSource: DataSource): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const exportJSON: any = {};
 
@@ -274,7 +276,7 @@ export default class InitialDatabaseSeed implements Seeder {
         netid,
       });
       admin.admin = true;
-      await User.save(admin);
+      await dataSource.createEntityManager().save<User>(admin);
     }
 
     const studentTeacher = teachers[0];
@@ -391,7 +393,9 @@ export default class InitialDatabaseSeed implements Seeder {
 
       assignmentVersion.submissionQuestionnaire = submissionQuestionnaire;
       assignmentVersion.versionsToReview = [assignmentVersion];
-      assignmentVersion = await AssignmentVersion.save(assignmentVersion);
+      assignmentVersion = await dataSource
+        .createEntityManager()
+        .save<AssignmentVersion>(assignmentVersion);
 
       //Publish assignment
       await publishAssignment(assignment.id);
@@ -423,7 +427,7 @@ export default class InitialDatabaseSeed implements Seeder {
         );
 
         submission.createdAt = submissionMoment.toDate();
-        await Submission.save(submission);
+        await dataSource.createEntityManager().save<Submission>(submission);
       }
 
       if (
@@ -474,7 +478,7 @@ export default class InitialDatabaseSeed implements Seeder {
             await review.reload();
             review.submittedAt = submissionMoment.toDate();
             review.startedAt = startMoment.toDate();
-            await Review.save(review);
+            await dataSource.createEntityManager().save<Review>(review);
           }
         }
       }
@@ -500,15 +504,15 @@ export default class InitialDatabaseSeed implements Seeder {
           //Find submission made by group
           const submission = await Submission.find({
             where: {
-              group: userGroups[i],
-              assignmentVersion: assignmentVersion,
+              group: { id: userGroups[i].id },
+              assignmentVersion: { id: assignmentVersion.id },
             },
           });
 
           //Find all reviews reviewing this group's submission
           const submissionReviews = await ReviewOfSubmission.find({
             where: {
-              submission: submission[0],
+              submission: { id: submission[0].id },
             },
           });
 

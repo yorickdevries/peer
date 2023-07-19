@@ -1,5 +1,6 @@
-import { define, factory } from "typeorm-seeding";
 import Faculty from "../models/Faculty";
+import { FactorizedAttrs, Factory } from "@jorgebodega/typeorm-factory";
+import { dataSource } from "../databaseConnection";
 
 const facultyList: [string, string][] = [
   ["ABE", "Architecture and the Built Environment"],
@@ -14,20 +15,26 @@ const facultyList: [string, string][] = [
 const listLength = facultyList.length;
 
 async function createDefaultFaculties(): Promise<Faculty[]> {
-  return await factory(Faculty)()
-    .map(async (faculty: Faculty) => {
-      const tempFaculty = facultyList.pop();
-      if (tempFaculty) {
-        faculty.name = tempFaculty[0];
-        faculty.longName = tempFaculty[1];
-      }
-      return faculty;
-    })
-    .createMany(listLength);
+  const entities = await new FacultyFactory().makeMany(listLength);
+
+  entities.map(async (faculty: Faculty) => {
+    const tempFaculty = facultyList.pop();
+    if (tempFaculty) {
+      faculty.name = tempFaculty[0];
+      faculty.longName = tempFaculty[1];
+    }
+    return faculty;
+  });
+
+  return await Faculty.save(entities);
 }
 
-define(Faculty, () => {
-  return new Faculty().init({ name: "name", longName: "longName" });
-});
-
 export { createDefaultFaculties };
+
+export class FacultyFactory extends Factory<Faculty> {
+  protected entity = Faculty;
+  protected dataSource = dataSource;
+  protected attrs(): FactorizedAttrs<Faculty> {
+    return new Faculty().init({ name: "name", longName: "longName" });
+  }
+}

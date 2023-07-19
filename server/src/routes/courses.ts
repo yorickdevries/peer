@@ -72,14 +72,18 @@ router.post(
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const user = req.user!;
     // find the faculty and academic year in the database
-    const faculty = await Faculty.findOne(req.body.facultyId);
+    const faculty = await Faculty.findOneBy({
+      id: Number(req.body.facultyId),
+    });
     if (!faculty) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
         .send("The specified faculty is not found");
       return;
     }
-    const academicYear = await AcademicYear.findOne(req.body.academicYearId);
+    const academicYear = await AcademicYear.findOneBy({
+      id: Number(req.body.academicYearId),
+    });
     if (!academicYear) {
       res
         .status(HttpStatusCode.BAD_REQUEST)
