@@ -93,7 +93,7 @@ export default class Course extends BaseModel {
   }
 
   async getAssignments(): Promise<Assignment[]> {
-    return await Assignment.find({ where: { courseId: this.id } });
+    return await Assignment.find({ where: { course: { id: this.id } } });
   }
 
   async getEnrollableAssignments(user: User): Promise<Assignment[]> {
@@ -147,7 +147,7 @@ export default class Course extends BaseModel {
 
   async getTeacherEnrollments(): Promise<Enrollment[]> {
     return await Enrollment.find({
-      where: { courseId: this.id, role: UserRole.TEACHER },
+      where: { course: { id: this.id }, role: UserRole.TEACHER },
     });
   }
 

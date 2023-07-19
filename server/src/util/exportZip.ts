@@ -1,11 +1,11 @@
 import AssignmentExport from "../models/AssignmentExport";
 import File from "../models/File";
-import { getManager } from "typeorm";
 import Submission from "../models/Submission";
 import JSZip from "jszip";
 import fs from "fs";
 import config from "config";
 import path from "path";
+import { dataSource } from "../databaseConnection";
 const exportToZip = async function (
   assignmentExport: AssignmentExport,
   sortedSubmissions: Submission[],
@@ -25,9 +25,13 @@ const exportToZip = async function (
   const content = await zip.generateAsync({ type: "nodebuffer" });
 
   const uploadFolder = config.get("uploadFolder") as string;
-  const file = new File().init({ name: `${fileName}`, extension: ".zip", hash: null });
+  const file = new File().init({
+    name: `${fileName}`,
+    extension: ".zip",
+    hash: null,
+  });
 
-  await getManager().transaction(
+  await dataSource.manager.transaction(
     "READ COMMITTED",
     async (transactionalEntityManager) => {
       // save file entry to database

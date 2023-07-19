@@ -1,4 +1,3 @@
-import { getManager } from "typeorm";
 import QuestionType from "../enum/QuestionType";
 import CheckboxQuestion from "../models/CheckboxQuestion";
 import CheckboxQuestionOption from "../models/CheckboxQuestionOption";
@@ -11,17 +10,18 @@ import ReviewQuestionnaire from "../models/ReviewQuestionnaire";
 import Questionnaire from "../models/Questionnaire";
 import Question from "../models/Question";
 import { templateQuestions } from "./templateQuestions";
+import { dataSource } from "../databaseConnection";
 
 const addDefaultReviewEvaluationQuestions = async function (
   reviewQuestionnaire: ReviewQuestionnaire,
   graded: boolean
 ): Promise<void> {
-  await getManager().transaction(
+  await dataSource.manager.transaction(
     "SERIALIZABLE", // serializable is the only way to make sure not questions exist prior to adding questions
     async (transactionalEntityManager) => {
-      const questionnaire = await transactionalEntityManager.findOne(
+      const questionnaire = await transactionalEntityManager.findOneBy(
         ReviewQuestionnaire,
-        reviewQuestionnaire.id
+        { id: reviewQuestionnaire.id }
       );
       if (!questionnaire) {
         throw Error("Questionnaire not found");
@@ -87,7 +87,7 @@ const addDefaultReviewEvaluationQuestions = async function (
             break;
           }
           case QuestionType.RANGE: {
-            const question = new RangeQuestion({
+            const question = new RangeQuestion().init({
               text: questionToCopy.text,
               number: questionToCopy.number,
               optional: questionToCopy.optional,
@@ -127,12 +127,12 @@ const addCopyOfQuestions = async function (
   questionnaireToCopyTo: Questionnaire,
   questions: Question[]
 ): Promise<void> {
-  await getManager().transaction(
+  await dataSource.manager.transaction(
     "SERIALIZABLE", // serializable is the only way to make sure not questions exist prior to adding questions
     async (transactionalEntityManager) => {
-      const questionnaire = await transactionalEntityManager.findOne(
+      const questionnaire = await transactionalEntityManager.findOneBy(
         Questionnaire,
-        questionnaireToCopyTo.id
+        { id: questionnaireToCopyTo.id }
       );
       if (!questionnaire) {
         throw Error("Questionnaire not found");
@@ -191,7 +191,7 @@ const addCopyOfQuestions = async function (
           await question.validateOrReject();
           await transactionalEntityManager.save(question);
         } else if (questionToCopy instanceof RangeQuestion) {
-          const question = new RangeQuestion({
+          const question = new RangeQuestion().init({
             text: questionToCopy.text,
             number: questionToCopy.number,
             optional: questionToCopy.optional,

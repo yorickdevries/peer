@@ -69,7 +69,10 @@ export default abstract class Questionnaire extends BaseModel {
 
   async getReviewsWhereUserIsReviewer(user: User): Promise<Review[]> {
     return dataSource.getRepository(Review).find({
-      where: { questionnaireId: this.id, reviewer: { netid: user.netid } },
+      where: {
+        questionnaire: { id: this.id },
+        reviewer: { netid: user.netid },
+      },
     });
   }
 
@@ -81,7 +84,7 @@ export default abstract class Questionnaire extends BaseModel {
   async hasUnsubmittedReviewsWhereUserIsReviewer(user: User): Promise<boolean> {
     const reviews = await dataSource.getRepository(Review).find({
       where: {
-        questionnaireId: this.id,
+        questionnaire: { id: this.id },
         reviewer: { netid: user.netid },
         submitted: false,
       },

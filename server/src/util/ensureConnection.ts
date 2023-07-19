@@ -1,12 +1,9 @@
-import { getConnection } from "typeorm";
-import createDatabaseConnection from "../databaseConnection";
+import { dataSource } from "../databaseConnection";
 
 // makes sure a connection is established as functions might run in a separate process
 const ensureConnection = async function (): Promise<void> {
-  try {
-    getConnection();
-  } catch (error) {
-    await createDatabaseConnection();
+  if (!dataSource.isInitialized) {
+    await dataSource.initialize();
   }
 };
 

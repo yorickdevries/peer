@@ -19,7 +19,9 @@ const publishAssignment = async function (
   assignmentId: number
 ): Promise<string> {
   await ensureConnection();
-  const assignment = await Assignment.findOneOrFail(assignmentId);
+  const assignment = await Assignment.findOneByOrFail({
+    id: assignmentId,
+  });
   try {
     const result = await publishAssignmentHelper(assignment);
     await sendMailToTeachersOfAssignment(

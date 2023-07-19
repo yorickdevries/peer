@@ -53,7 +53,9 @@ const submissionFlagging = async function (
 ): Promise<string> {
   await ensureConnection();
 
-  const submission = await Submission.findOneOrFail(submissionId);
+  const submission = await Submission.findOneByOrFail({
+    id: submissionId,
+  });
 
   const filePath = submission.file.getPath();
   const fileExtension = submission.file.extension;

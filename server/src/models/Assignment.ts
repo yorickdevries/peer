@@ -8,7 +8,6 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
   RelationId,
-  getManager,
 } from "typeorm";
 import {
   IsBoolean,
@@ -33,6 +32,7 @@ import AssignmentExport from "./AssignmentExport";
 import AssignmentVersion from "./AssignmentVersion";
 import Review from "./Review";
 import Submission from "./Submission";
+import { dataSource } from "../databaseConnection";
 
 interface AssignmentInterface {
   name: string;
@@ -339,7 +339,7 @@ export default class Assignment extends BaseModel {
   }
 
   async getGroups(): Promise<Group[]> {
-    const groups = await getManager()
+    const groups = await dataSource.manager
       .createQueryBuilder(Group, "group")
       .leftJoin("group.assignments", "assignment")
       .where("assignment.id = :id", { id: this.id })
@@ -352,7 +352,7 @@ export default class Assignment extends BaseModel {
   }
 
   async getGroup(user: User): Promise<Group | undefined> {
-    const group = await getManager()
+    const group = await dataSource.manager
       .createQueryBuilder(Group, "group")
       .leftJoin("group.assignments", "assignment")
       .leftJoin("group.users", "user")
@@ -385,7 +385,7 @@ export default class Assignment extends BaseModel {
   }
 
   async getAssignmentExports(): Promise<AssignmentExport[]> {
-    return AssignmentExport.find({ where: { assignmentId: this.id } });
+    return AssignmentExport.find({ where: { assignment: { id: this.id } } });
   }
 
   // check whether the assignment contains groups
@@ -465,9 +465,9 @@ export default class Assignment extends BaseModel {
         for (const version of this.versions) {
           const versionSubmissions = await Submission.find({
             where: {
-              groupId: group.id,
+              group: { id: group.id },
               final: true,
-              assignmentVersionId: version.id,
+              assignmentVersion: { id: version.id },
             },
           });
           submissions.push(...versionSubmissions);

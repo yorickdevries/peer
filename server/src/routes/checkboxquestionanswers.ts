@@ -112,8 +112,8 @@ router.post("/", validateBody(checkboxAnswerSchema), async (req, res) => {
   // make or overwrite checkboxAnswer;
   let checkboxAnswer = await CheckboxQuestionAnswer.findOne({
     where: {
-      reviewId: review.id,
-      questionId: question.id,
+      review: { id: review.id },
+      question: { id: question.id },
     },
   });
   if (checkboxAnswer) {

@@ -105,7 +105,7 @@ router.post("/", validateBody(multipleChoiceAnswerSchema), async (req, res) => {
   }
   // make or overwrite multipleChoiceAnswer;
   let multipleChoiceAnswer = await MultipleChoiceQuestionAnswer.findOne({
-    where: { reviewId: review.id, questionId: question.id },
+    where: { review: { id: review.id }, question: { id: question.id } },
   });
   if (multipleChoiceAnswer) {
     multipleChoiceAnswer.multipleChoiceAnswer = questionOption;

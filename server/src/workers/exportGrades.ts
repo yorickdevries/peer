@@ -11,9 +11,9 @@ const exportGradesForAssignmentVersion = async function (
 ): Promise<string> {
   await ensureConnection();
 
-  const assignmentVersion = await AssignmentVersion.findOneOrFail(
-    assignmentVersionId
-  );
+  const assignmentVersion = await AssignmentVersion.findOneByOrFail({
+    id: assignmentVersionId,
+  });
   const questionnaire = await assignmentVersion.getSubmissionQuestionnaire();
   if (!questionnaire) {
     throw new Error("Questionnaire not found");
@@ -21,9 +21,9 @@ const exportGradesForAssignmentVersion = async function (
   const submitted = true;
   const reviews = await questionnaire.getReviews(submitted);
 
-  const assignmentExport = await AssignmentExport.findOneOrFail(
-    assignmentExportId
-  );
+  const assignmentExport = await AssignmentExport.findOneByOrFail({
+    id: assignmentExportId,
+  });
 
   // asynchronically make export
   const gradeSummaries = makeGradeSummaries(reviews);

@@ -9,10 +9,10 @@ import Submission from "../models/Submission";
 import { EmailTemplate, templates } from "../enum/EmailTemplate";
 import Course from "../models/Course";
 import ReviewOfReview from "../models/ReviewOfReview";
-import { getManager } from "typeorm";
 import AssignmentVersion from "../models/AssignmentVersion";
 import ReviewOfSubmission from "../models/ReviewOfSubmission";
 import Group from "../models/Group";
+import { dataSource } from "../databaseConnection";
 
 const mailConfig: {
   host: string;
@@ -93,19 +93,23 @@ const genMailForLateReview = async function (
   submission: Submission
 ): Promise<Mail.Options[]> {
   const mailsToSend: Mail.Options[] = [];
-  const group = await Group.findOneOrFail(submission.groupId);
+  const group = await Group.findOneByOrFail({
+    id: submission.groupId,
+  });
   const members = await group.getUsers();
   const membersWithDetails = members.filter(
     (m) => m.email !== null && m.firstName !== null
   );
 
-  const assignmentVersion = await AssignmentVersion.findOneOrFail(
-    submission.assignmentVersionId
-  );
-  const assignment = await Assignment.findOneOrFail(
-    assignmentVersion.assignmentId
-  );
-  const course = await Course.findOneOrFail(assignment.courseId);
+  const assignmentVersion = await AssignmentVersion.findOneByOrFail({
+    id: submission.assignmentVersionId,
+  });
+  const assignment = await Assignment.findOneByOrFail({
+    id: assignmentVersion.assignmentId,
+  });
+  const course = await Course.findOneByOrFail({
+    id: assignment.courseId,
+  });
 
   for (const member of membersWithDetails) {
     if (member.preferences.stRemLateSubmission) {
@@ -133,7 +137,9 @@ const genMailForLateEvaluation = async function (
   reviewOfSubmissionId: number
 ): Promise<Mail.Options[]> {
   const mailsToSend: Mail.Options[] = [];
-  const review = await ReviewOfSubmission.findOneOrFail(reviewOfSubmissionId);
+  const review = await ReviewOfSubmission.findOneByOrFail({
+    id: reviewOfSubmissionId,
+  });
   const reviewUser = review.reviewer;
   const submission = review.submission;
 
@@ -141,13 +147,15 @@ const genMailForLateEvaluation = async function (
     return mailsToSend;
   }
 
-  const assignmentVersion = await AssignmentVersion.findOneOrFail(
-    submission.assignmentVersionId
-  );
-  const assignment = await Assignment.findOneOrFail(
-    assignmentVersion.assignmentId
-  );
-  const course = await Course.findOneOrFail(assignment.courseId);
+  const assignmentVersion = await AssignmentVersion.findOneByOrFail({
+    id: submission.assignmentVersionId,
+  });
+  const assignment = await Assignment.findOneByOrFail({
+    id: assignmentVersion.assignmentId,
+  });
+  const course = await Course.findOneByOrFail({
+    id: assignment.courseId,
+  });
 
   if (reviewUser.preferences.stRemLateSubmission) {
     const { subject, text } = templates[
@@ -187,7 +195,9 @@ const genMailForMissingStageSubmission = async function (): Promise<
   const runDate = today.clone().startOf("day");
   for (const assignment of assignments) {
     const curState = assignment.state;
-    const course = await Course.findOneOrFail(assignment.courseId);
+    const course = await Course.findOneByOrFail({
+      id: assignment.courseId,
+    });
 
     switch (curState) {
       case AssignmentState.SUBMISSION: {
@@ -309,7 +319,7 @@ const genMailForMissingStageSubmission = async function (): Promise<
 
           for (const review of reviews) {
             //Check if received review has an associated feedback review (made by the user(s) in question)
-            const feedbackReview = await getManager()
+            const feedbackReview = await dataSource.manager
               .createQueryBuilder(ReviewOfReview, "review")
               .where("review.reviewOfSubmission = :rid", { rid: review.id })
               .andWhere("review.reviewer IN (:...reviewers)", {

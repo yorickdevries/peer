@@ -23,7 +23,9 @@ const closeSubmissionHelper = async function (assignment: Assignment) {
 
 const closeSubmission = async function (assignmentId: number): Promise<string> {
   await ensureConnection();
-  const assignment = await Assignment.findOneOrFail(assignmentId);
+  const assignment = await Assignment.findOneByOrFail({
+    id: assignmentId,
+  });
   try {
     const result = await closeSubmissionHelper(assignment);
     await sendMailToTeachersOfAssignment(

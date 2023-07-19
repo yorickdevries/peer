@@ -160,8 +160,8 @@ export default class AssignmentVersion extends BaseModel {
   private async getSubmissionsOfGroup(group: Group): Promise<Submission[]> {
     return Submission.find({
       where: {
-        assignmentVersionId: this.id,
-        groupId: group.id,
+        assignmentVersion: { id: this.id },
+        group: { id: group.id },
       },
     });
   }
@@ -170,7 +170,7 @@ export default class AssignmentVersion extends BaseModel {
     if (group) {
       return this.getSubmissionsOfGroup(group);
     } else {
-      return Submission.find({ where: { assignmentVersionId: this.id } });
+      return Submission.find({ where: { assignmentVersion: { id: this.id } } });
     }
   }
 
@@ -221,13 +221,17 @@ export default class AssignmentVersion extends BaseModel {
 
   async getFinalSubmissionsOfEachGroup(): Promise<Submission[]> {
     return await Submission.find({
-      where: { assignmentVersionId: this.id, final: true },
+      where: { assignmentVersion: { id: this.id }, final: true },
     });
   }
 
   async getFinalSubmission(group: Group): Promise<Submission | undefined> {
     const finalSubmissions = await Submission.find({
-      where: { assignmentVersionId: this.id, groupId: group.id, final: true },
+      where: {
+        assignmentVersion: { id: this.id },
+        group: { id: group.id },
+        final: true,
+      },
     });
     if (finalSubmissions.length === 0) {
       return undefined;

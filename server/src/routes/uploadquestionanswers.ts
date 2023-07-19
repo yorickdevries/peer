@@ -206,8 +206,8 @@ router.post(
           UploadQuestionAnswer,
           {
             where: {
-              reviewId: review.id,
-              questionId: question.id,
+              review: { id: review.id },
+              question: { id: question.id },
             },
           }
         );

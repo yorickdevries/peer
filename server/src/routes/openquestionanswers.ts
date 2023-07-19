@@ -90,8 +90,8 @@ router.post("/", validateBody(openAnswerSchema), async (req, res) => {
   // make or overwrite openAnswer;
   let openAnswer = await OpenQuestionAnswer.findOne({
     where: {
-      reviewId: review.id,
-      questionId: question.id,
+      review: { id: review.id },
+      question: { id: question.id },
     },
   });
   if (openAnswer) {

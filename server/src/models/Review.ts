@@ -243,7 +243,7 @@ export default abstract class Review extends BaseModel {
   async getQuestionAnswers(): Promise<QuestionAnswer[]> {
     return dataSource
       .getRepository(QuestionAnswer)
-      .find({ where: { reviewId: this.id } });
+      .find({ where: { review: { id: this.id } } });
   }
 
   // checks whether the user is teacher
@@ -287,7 +287,7 @@ export default abstract class Review extends BaseModel {
 
   async getAnswer(question: Question): Promise<QuestionAnswer | null> {
     return dataSource.getRepository(QuestionAnswer).findOne({
-      where: { reviewId: this.id, questionId: question.id },
+      where: { review: { id: this.id }, question: { id: question.id } },
     });
   }
 }

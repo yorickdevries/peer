@@ -6,7 +6,6 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   RelationId,
-  getManager,
 } from "typeorm";
 import { IsDefined, IsNotEmpty, IsString } from "class-validator";
 import BaseModel from "./BaseModel";
@@ -14,6 +13,7 @@ import User from "./User";
 import Assignment from "./Assignment";
 import UserRole from "../enum/UserRole";
 import Course from "./Course";
+import { dataSource } from "../databaseConnection";
 
 interface GroupInterface {
   name: string;
@@ -92,7 +92,7 @@ export default class Group extends BaseModel {
   }
 
   async getUsers(): Promise<User[]> {
-    const users = await getManager()
+    const users = await dataSource.manager
       .createQueryBuilder(User, "user")
       .leftJoin("user.groups", "group")
       .where("group.id = :id", { id: this.id })
@@ -105,7 +105,7 @@ export default class Group extends BaseModel {
   }
 
   async getAssignments(): Promise<Assignment[]> {
-    const assignments = await getManager()
+    const assignments = await dataSource.manager
       .createQueryBuilder(Assignment, "assignment")
       .leftJoin("assignment.groups", "group")
       .where("group.id = :id", { id: this.id })
@@ -118,7 +118,7 @@ export default class Group extends BaseModel {
   }
 
   async hasUser(user: User): Promise<boolean> {
-    const groupUser = await getManager()
+    const groupUser = await dataSource.manager
       .createQueryBuilder(User, "user")
       .leftJoin("user.groups", "group")
       .where("group.id = :id", { id: this.id })
@@ -128,7 +128,7 @@ export default class Group extends BaseModel {
   }
 
   async hasAssignment(assignment: Assignment): Promise<boolean> {
-    const groupAssignment = await getManager()
+    const groupAssignment = await dataSource.manager
       .createQueryBuilder(Assignment, "assignment")
       .leftJoin("assignment.groups", "group")
       .where("group.id = :gid", { gid: this.id })

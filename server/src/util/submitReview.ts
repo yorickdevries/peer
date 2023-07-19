@@ -1,22 +1,21 @@
 import _ from "lodash";
-import { getManager } from "typeorm";
 import QuestionAnswer from "../models/QuestionAnswer";
 import Questionnaire from "../models/Questionnaire";
 import Review from "../models/Review";
+import { dataSource } from "../databaseConnection";
 
 // submit review if fully filled in
 const submitReview = async function (
   review: Review,
   flaggedByReviewer?: boolean
 ): Promise<Review> {
-  await getManager().transaction(
+  await dataSource.manager.transaction(
     "REPEATABLE READ",
     async (transactionalEntityManager) => {
       // reload the review in transaction
-      review = await transactionalEntityManager.findOneOrFail(
-        Review,
-        review.id
-      );
+      review = await transactionalEntityManager.findOneByOrFail(Review, {
+        id: review.id,
+      });
       // change flagged by review if its passed in the method
       if (flaggedByReviewer !== undefined) {
         review.flaggedByReviewer = flaggedByReviewer;
@@ -29,9 +28,9 @@ const submitReview = async function (
           .setLock("pessimistic_write")
           .where("reviewId = :rid", { rid: review.id })
           .getMany();
-        const questionnaire = await transactionalEntityManager.findOneOrFail(
+        const questionnaire = await transactionalEntityManager.findOneByOrFail(
           Questionnaire,
-          review.questionnaireId
+          { id: review.questionnaireId }
         );
         for (const question of questionnaire.questions) {
           // only check question if not optional

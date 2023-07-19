@@ -11,12 +11,12 @@ const exportSubmissionsForAssignmentVersion = async function (
 ): Promise<string> {
   await ensureConnection();
 
-  const assignmentVersion = await AssignmentVersion.findOneOrFail(
-    assignmentVersionId
-  );
-  const assignmentExport = await AssignmentExport.findOneOrFail(
-    assignmentExportId
-  );
+  const assignmentVersion = await AssignmentVersion.findOneByOrFail({
+    id: assignmentVersionId,
+  });
+  const assignmentExport = await AssignmentExport.findOneByOrFail({
+    id: assignmentExportId,
+  });
   // asynchronically make export
   const parsedSubmissions = await parseSubmissionsForExport(assignmentVersion);
   const filename = `assignmentversion${assignmentVersion.id}_submissions`;

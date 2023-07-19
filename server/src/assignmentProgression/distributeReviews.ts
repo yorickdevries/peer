@@ -4,7 +4,6 @@ import Submission from "../models/Submission";
 import User from "../models/User";
 import Assignment from "../models/Assignment";
 import ReviewOfSubmission from "../models/ReviewOfSubmission";
-import { getManager } from "typeorm";
 import Review from "../models/Review";
 import { AssignmentState } from "../enum/AssignmentState";
 import ensureConnection from "../util/ensureConnection";
@@ -12,6 +11,7 @@ import SubmissionQuestionnaire from "../models/SubmissionQuestionnaire";
 import { sendMailToTeachersOfAssignment } from "../util/mailer";
 import CheckboxQuestion from "../models/CheckboxQuestion";
 import MultipleChoiceQuestion from "../models/MultipleChoiceQuestion";
+import { dataSource } from "../databaseConnection";
 
 interface reviewAssignment {
   reviewer: User;
@@ -225,7 +225,7 @@ const distributeReviewsForAssignmentHelper = async function (
   }
 
   // create all reviews in an transaction
-  await getManager().transaction(
+  await dataSource.manager.transaction(
     "SERIALIZABLE", // serializable is the only way to make sure to reviews exist before creating them
     async (transactionalEntityManager) => {
       for (const assignmentVersion of assignment.versions) {
@@ -236,7 +236,7 @@ const distributeReviewsForAssignmentHelper = async function (
         }
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const existingReviews = await transactionalEntityManager.find(Review, {
-          where: { questionnaire: questionnaire },
+          where: { questionnaire: { id: questionnaire.id } },
         });
         if (existingReviews.length > 0) {
           throw new Error("There are already reviews for this assignment");
@@ -535,7 +535,9 @@ const distributeReviewsForAssignment = async function (
   assignmentId: number
 ): Promise<string> {
   await ensureConnection();
-  const assignment = await Assignment.findOneOrFail(assignmentId);
+  const assignment = await Assignment.findOneByOrFail({
+    id: assignmentId,
+  });
   try {
     const result = await distributeReviewsForAssignmentHelper(assignment);
     await sendMailToTeachersOfAssignment(

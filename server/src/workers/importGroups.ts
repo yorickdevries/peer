@@ -1,4 +1,3 @@
-import { getManager } from "typeorm";
 import UserRole from "../enum/UserRole";
 import Assignment from "../models/Assignment";
 import Course from "../models/Course";
@@ -6,6 +5,7 @@ import Enrollment from "../models/Enrollment";
 import Group from "../models/Group";
 import User from "../models/User";
 import ensureConnection from "../util/ensureConnection";
+import { dataSource } from "../databaseConnection";
 
 interface groupNameWithNetidList {
   groupName: string;
@@ -18,23 +18,26 @@ const importGroupsForAssignment = async function (
 ): Promise<string> {
   await ensureConnection();
 
-  const assignment = await Assignment.findOneOrFail(assignmentId);
+  const assignment = await Assignment.findOneByOrFail({
+    id: assignmentId,
+  });
 
   // save the users and enroll them in the course
-  await getManager().transaction(
+  await dataSource.manager.transaction(
     "REPEATABLE READ", // make sure the role isnt changed while importing
     async (transactionalEntityManager) => {
-      const course = await transactionalEntityManager.findOneOrFail(
-        Course,
-        assignment.courseId
-      );
+      const course = await transactionalEntityManager.findOneOrFail(Course, {
+        where: { id: assignment.courseId },
+      });
 
       // iterate over all groups
       for (const groupNameWithNetidList of groupNameWithNetidLists) {
         const netids = groupNameWithNetidList.netids;
         // get or make users
         for (const netid of netids) {
-          let user = await transactionalEntityManager.findOne(User, netid);
+          let user = await transactionalEntityManager.findOne(User, {
+            where: { netid: netid },
+          });
           // in case the user doesnt exists in the database yet, create it
           if (!user) {
             user = new User().init({ netid: netid });
@@ -67,7 +70,7 @@ const importGroupsForAssignment = async function (
   );
   // save the users of the groups in the course
   const groups: Group[] = [];
-  await getManager().transaction(
+  await dataSource.manager.transaction(
     "SERIALIZABLE", // serializable is the only way to make sure to groups exist before import
     async (transactionalEntityManager) => {
       const existingGroups = await transactionalEntityManager
@@ -79,10 +82,9 @@ const importGroupsForAssignment = async function (
         throw new Error("There are already groups for this assignment");
       }
 
-      const course = await transactionalEntityManager.findOneOrFail(
-        Course,
-        assignment.courseId
-      );
+      const course = await transactionalEntityManager.findOneOrFail(Course, {
+        where: { id: assignment.courseId },
+      });
 
       // iterate over all groups
       for (const groupNameWithNetidList of groupNameWithNetidLists) {
@@ -90,10 +92,9 @@ const importGroupsForAssignment = async function (
         // get or make users
         const users = [];
         for (const netid of netids) {
-          const user = await transactionalEntityManager.findOneOrFail(
-            User,
-            netid
-          );
+          const user = await transactionalEntityManager.findOneOrFail(User, {
+            where: { netid: netid },
+          });
           users.push(user);
         }
 

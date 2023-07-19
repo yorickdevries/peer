@@ -86,7 +86,7 @@ router.post("/", validateBody(enrollmentSchema), async (req, res) => {
     return;
   }
   const existingEnrollment = await Enrollment.findOne({
-    where: { userNetid: userNetid, courseId: course.id },
+    where: { userNetid: userNetid, course: { id: course.id } },
   });
   if (existingEnrollment) {
     res
@@ -179,7 +179,7 @@ router.post(
 
           for (const t of listOfPeople) {
             const existingEnrollment = await Enrollment.findOne({
-              where: { userNetid: t.netId, courseId: req.body.courseId },
+              where: { userNetid: t.netId, course: { id: req.body.courseId } },
             });
             if (existingEnrollment) {
               res

@@ -3,11 +3,11 @@ import File from "../models/File";
 import path from "path";
 import config from "config";
 import fsPromises from "fs/promises";
-import { getManager } from "typeorm";
 
 // parse libraries
 import { AsyncParser } from "@json2csv/node";
 import exportFromJSON from "export-from-json";
+import { dataSource } from "../databaseConnection";
 
 const uploadFolder = config.get("uploadFolder") as string;
 
@@ -44,7 +44,7 @@ const exportJSONToFile = async function (
     hash: fileHash,
   });
 
-  await getManager().transaction(
+  await dataSource.manager.transaction(
     "READ COMMITTED",
     async (transactionalEntityManager) => {
       // save file entry to database

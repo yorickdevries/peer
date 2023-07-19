@@ -251,7 +251,7 @@ router.get("/:id/enrollment", validateParams(idSchema), async (req, res) => {
     return;
   }
   const enrollment = await Enrollment.findOne({
-    where: { courseId: Number(courseId), userNetid: user.netid },
+    where: { course: { id: Number(courseId) }, userNetid: user.netid },
   });
   if (!enrollment) {
     res.status(HttpStatusCode.NOT_FOUND).send(ResponseMessage.NOT_FOUND);

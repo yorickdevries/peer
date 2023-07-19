@@ -77,7 +77,7 @@ export default class ReviewOfSubmission extends Review {
   async getReviewOfThisReview(): Promise<ReviewOfReview | null> {
     const reviewOfReview = await ReviewOfReview.findOne({
       where: {
-        reviewOfSubmissionId: this.id,
+        reviewOfSubmission: { id: this.id },
       },
     });
     return reviewOfReview;
@@ -86,12 +86,12 @@ export default class ReviewOfSubmission extends Review {
   async getPDFAnnotations(): Promise<PDFAnnotation[]> {
     return await dataSource
       .getRepository(PDFAnnotation)
-      .find({ where: { reviewId: this.id } });
+      .find({ where: { review: { id: this.id } } });
   }
 
   async getCodeAnnotations(): Promise<CodeAnnotation[]> {
     return dataSource
       .getRepository(CodeAnnotation)
-      .find({ where: { reviewId: this.id } });
+      .find({ where: { review: { id: this.id } } });
   }
 }

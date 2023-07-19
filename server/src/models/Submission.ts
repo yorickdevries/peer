@@ -7,7 +7,6 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
   RelationId,
-  getManager,
 } from "typeorm";
 import {
   IsBoolean,
@@ -240,7 +239,9 @@ export default class Submission extends BaseModel {
     const reviewIds = ids.map((idObject: { rid: any }) => idObject.rid);
 
     if (reviewIds.length > 0) {
-      await dataSource.getRepository(QuestionAnswer).createQueryBuilder()
+      await dataSource
+        .getRepository(QuestionAnswer)
+        .createQueryBuilder()
         .delete()
         .where("reviewId IN (:...idValues)", { idValues: reviewIds })
         .execute();
@@ -278,7 +279,9 @@ export default class Submission extends BaseModel {
       );
 
       if (feedbackReviewIds.length > 0) {
-        await dataSource.getRepository(QuestionAnswer).createQueryBuilder()
+        await dataSource
+          .getRepository(QuestionAnswer)
+          .createQueryBuilder()
           .delete()
           .where("reviewId IN (:...idValues)", { idValues: feedbackReviewIds })
           .execute();
@@ -300,7 +303,7 @@ export default class Submission extends BaseModel {
    * @returns whether the group has made a submission
    */
   static async hasGroupMadeSubmission(groupId: number): Promise<boolean> {
-    const group = await getManager()
+    const group = await dataSource.manager
       .createQueryBuilder(Submission, "submission")
       .leftJoin("submission.group", "group")
       .where("group.id = :id", { id: groupId })

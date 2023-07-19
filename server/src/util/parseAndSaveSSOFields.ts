@@ -1,7 +1,7 @@
-import { getManager } from "typeorm";
 import Affiliation from "../models/Affiliation";
 import Study from "../models/Study";
 import OrganisationUnit from "../models/OrganisationUnit";
+import { dataSource } from "../databaseConnection";
 
 // Quite some duplication here, but I don't know how to make it shorter in a good way
 
@@ -28,7 +28,7 @@ const parseAndSaveAffiliation = async function (
         }
         let ssoField = await Affiliation.findOne({ where: { name: name } });
         if (!ssoField) {
-          await getManager().transaction(
+          await dataSource.manager.transaction(
             "SERIALIZABLE", // serializable is the only way double entries can be prevented
             async (transactionalEntityManager) => {
               // fetch existing answer if present
@@ -76,7 +76,7 @@ const parseAndSaveStudy = async function (input: any): Promise<Study[]> {
         }
         let ssoField = await Study.findOne({ where: { name: name } });
         if (!ssoField) {
-          await getManager().transaction(
+          await dataSource.manager.transaction(
             "SERIALIZABLE", // serializable is the only way double entries can be prevented
             async (transactionalEntityManager) => {
               // fetch existing answer if present
@@ -128,7 +128,7 @@ const parseAndSaveOrganisationUnit = async function (
           where: { name: name },
         });
         if (!ssoField) {
-          await getManager().transaction(
+          await dataSource.manager.transaction(
             "SERIALIZABLE", // serializable is the only way double entries can be prevented
             async (transactionalEntityManager) => {
               // fetch existing answer if present

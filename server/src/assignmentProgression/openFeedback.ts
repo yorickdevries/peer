@@ -78,7 +78,9 @@ const openFeedbackForAssignment = async function (
   assignmentId: number
 ): Promise<string> {
   await ensureConnection();
-  const assignment = await Assignment.findOneOrFail(assignmentId);
+  const assignment = await Assignment.findOneByOrFail({
+    id: assignmentId,
+  });
   try {
     const result = await openFeedbackForAssignmentHelper(assignment);
     await sendMailToTeachersOfAssignment(

@@ -10,12 +10,12 @@ const exportSubmissionsForZip = async function (
 ): Promise<string> {
   await ensureConnection();
 
-  const assignmentVersion = await AssignmentVersion.findOneOrFail(
-    assignmentVersionId
-  );
-  const assignmentExport = await AssignmentExport.findOneOrFail(
-    assignmentExportId
-  );
+  const assignmentVersion = await AssignmentVersion.findOneByOrFail({
+    id: assignmentVersionId,
+  });
+  const assignmentExport = await AssignmentExport.findOneByOrFail({
+    id: assignmentExportId,
+  });
   // asynchronically make export
   const submissions = await assignmentVersion.getSubmissions();
   const sortedSubmissions = _.sortBy(submissions, "id");

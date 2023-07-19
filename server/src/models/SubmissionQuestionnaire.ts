@@ -22,7 +22,7 @@ export default class SubmissionQuestionnaire extends Questionnaire {
 
   async getAssignmentVersion(): Promise<AssignmentVersion> {
     return AssignmentVersion.findOneOrFail({
-      where: { submissionQuestionnaireId: this.id },
+      where: { submissionQuestionnaire: { id: this.id } },
     });
   }
 
@@ -36,7 +36,10 @@ export default class SubmissionQuestionnaire extends Questionnaire {
     submission: Submission
   ): Promise<Review[]> {
     return ReviewOfSubmission.find({
-      where: { questionnaireId: this.id, submission: { id: submission.id } },
+      where: {
+        questionnaire: { id: this.id },
+        submission: { id: submission.id },
+      },
     });
   }
 }

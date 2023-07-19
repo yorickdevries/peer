@@ -1,4 +1,3 @@
-import { getManager } from "typeorm";
 import UserRole from "../enum/UserRole";
 import AssignmentVersion from "../models/AssignmentVersion";
 import Course from "../models/Course";
@@ -13,6 +12,7 @@ import File from "../models/File";
 import config from "config";
 import path from "path";
 import { sendMailToTeachersOfAssignment } from "../util/mailer";
+import { dataSource } from "../databaseConnection";
 
 // config value
 const uploadFolder = config.get("uploadFolder") as string;
@@ -23,9 +23,9 @@ const importWebLabSubmissions = async function (
 ): Promise<string> {
   await ensureConnection();
 
-  const assignmentVersion = await AssignmentVersion.findOne(
-    assignmentVersionId
-  );
+  const assignmentVersion = await AssignmentVersion.findOneBy({
+    id: assignmentVersionId,
+  });
   // this should realistically never happen
   if (!assignmentVersion) {
     throw new Error("Invalid assignment version");
@@ -90,7 +90,11 @@ const importWebLabSubmissions = async function (
       // generate zip file
       const buffer = await zip.generateAsync({ type: "nodebuffer" });
       const fileName = `assignmentversion${assignmentVersion.id}_submission${studentNumber}`;
-      const file = new File().init({ name: fileName, extension: ".zip", hash: null });
+      const file = new File().init({
+        name: fileName,
+        extension: ".zip",
+        hash: null,
+      });
       submissions.set(studentNumber, { file, buffer });
     }
   } catch (error) {
@@ -103,7 +107,7 @@ const importWebLabSubmissions = async function (
 
   const skippedStudents: Array<string> = [];
   // Enroll students in in the course
-  await getManager().transaction(
+  await dataSource.manager.transaction(
     "REPEATABLE READ", // make sure the role isnt changed while importing
     async (transactionalEntityManager) => {
       // groups and submissions should only rarely exist if groups or submissions were created during the processing of the zip file
@@ -126,14 +130,13 @@ const importWebLabSubmissions = async function (
         throw new Error("There are already submissions for this assignment");
       }
 
-      const course = await transactionalEntityManager.findOneOrFail(
-        Course,
-        assignment.courseId
-      );
+      const course = await transactionalEntityManager.findOneOrFail(Course, {
+        where: { id: assignment.courseId },
+      });
 
       for (const studentNumber of submissions.keys()) {
         // get user from directory names
-        const user = await transactionalEntityManager.findOne(User, {
+        const user = await transactionalEntityManager.findOneBy(User, {
           studentNumber: parseInt(studentNumber),
         });
 
@@ -147,7 +150,7 @@ const importWebLabSubmissions = async function (
 
         // enroll user in the course if not already
         let enrollment = await transactionalEntityManager.findOne(Enrollment, {
-          where: { userNetid: user.netid, courseId: course.id },
+          where: { userNetid: user.netid, course: { id: course.id } },
         });
 
         if (enrollment) {
@@ -170,17 +173,16 @@ const importWebLabSubmissions = async function (
     }
   );
 
-  await getManager().transaction(
+  await dataSource.manager.transaction(
     "SERIALIZABLE", // serializable is the only way to make sure groups and submissions exist before import
     async (transactionalEntityManager) => {
-      const course = await transactionalEntityManager.findOneOrFail(
-        Course,
-        assignment.courseId
-      );
+      const course = await transactionalEntityManager.findOneOrFail(Course, {
+        where: { id: assignment.courseId },
+      });
 
       for (const [studentNumber, { file, buffer }] of submissions) {
         // get user from directory names
-        const user = await transactionalEntityManager.findOneOrFail(User, {
+        const user = await transactionalEntityManager.findOneByOrFail(User, {
           studentNumber: parseInt(studentNumber),
         });
 
