@@ -319,21 +319,13 @@ export default {
             )
         },
         aggregateCheckbox(question) {
-            let ret = {
-                options: {
-                    question: "",
-                    answers: [],
-                },
-            }.options
-
             // Option ids don't necessarily start at 1
             let optionMap = {}
             for (let i = 0; i < question.options.length; i++) {
-                optionMap[question.options[i].id] = i
-                ret.answers.push({
+                optionMap[question.options[i].id] = {
                     text: question.options[i].text,
                     votes: 0,
-                })
+                }
             }
 
             for (let i = 0; i < this.answers[question.id].length; i++) {
@@ -345,42 +337,34 @@ export default {
                         continue
                     }
                     let optionId = this.answers[question.id][i][k].id
-                    let index = optionMap[optionId]
-                    if (index !== undefined) {
-                        ret.answers[index].votes++
+                    let currAnswer = optionMap[optionId]
+                    if (currAnswer !== undefined) {
+                        currAnswer.votes++
                     }
                 }
             }
-            return ret
+            return { answers: Object.values(optionMap) }
         },
         aggregateMultipleChoice(question) {
-            let ret = {
-                options: {
-                    question: "",
-                    answers: [],
-                },
-            }.options
-
             // Option ids don't necessarily start at 1
             let optionMap = {}
 
             for (let i = 0; i < question.options.length; i++) {
-                optionMap[question.options[i].id] = i
-                ret.answers.push({
+                optionMap[question.options[i].id] = {
                     text: question.options[i].text,
                     votes: 0,
-                })
+                }
             }
 
             for (let i = 0; i < this.answers[question.id].length; i++) {
                 let optionId = this.answers[question.id][i].id
-                let index = optionMap[optionId]
-                if (index !== undefined) {
-                    ret.answers[index].votes++
+                let currAnswer = optionMap[optionId]
+                if (currAnswer !== undefined) {
+                    currAnswer.votes++
                 }
             }
 
-            return ret
+            return { answers: Object.values(optionMap) }
         },
         async fetchData() {
             await this.fetchAssignment()
