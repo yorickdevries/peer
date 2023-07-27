@@ -21,15 +21,6 @@ import QuestionType from "../enum/QuestionType";
 import Questionnaire from "./Questionnaire";
 import { dataSource } from "../databaseConnection";
 import User from "./User";
-
-// interface QuestionInterface {
-//   text: string;
-//   number: number;
-//   optional: boolean;
-//   graded: boolean;
-//   questionnaire: Questionnaire;
-// }
-
 @Entity()
 @TableInheritance({ column: { type: "varchar", name: "type" } })
 export default abstract class Question extends BaseModel {

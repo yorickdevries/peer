@@ -12,15 +12,6 @@ import User from "./User";
 import File from "./File";
 import ReviewOfSubmission from "./ReviewOfSubmission";
 import PDFAnnotationMotivation from "../enum/PDFAnnotationMotivation";
-
-// interface PDFAnnotationInterface {
-//   id: string;
-//   bodyValue: string;
-//   user: User;
-//   file: File;
-//   review: ReviewOfSubmission;
-// }
-
 @Entity()
 @TableInheritance({ column: { type: "varchar", name: "motivation" } })
 export default abstract class PDFAnnotation extends BaseModel {
@@ -70,15 +61,6 @@ export default abstract class PDFAnnotation extends BaseModel {
   constructor() {
     super();
   }
-
-  // init(init: PDFAnnotationInterface) {
-  //   this.id = init.id;
-  //   this.bodyValue = init.bodyValue;
-  //   this.user = init.user;
-  //   this.file = init.file;
-  //   this.review = init.review;
-  //   return this;
-  // }
 
   // custom validation which is run before saving
   async validateOrReject(): Promise<void> {

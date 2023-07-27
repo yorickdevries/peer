@@ -86,7 +86,7 @@ router.post("/", validateBody(enrollmentSchema), async (req, res) => {
     return;
   }
   const existingEnrollment = await Enrollment.findOne({
-    where: { userNetid: userNetid, course: { id: course.id } },
+    where: { user: { netid: userNetid }, course: { id: course.id } },
   });
   if (existingEnrollment) {
     res
@@ -129,7 +129,7 @@ router.get("/enrolled", async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
   const enrollments = await Enrollment.find({
-    where: { userNetid: user.netid },
+    where: { user: { netid: user.netid } },
     relations: { course: true },
     order: { courseId: "ASC" },
   });
@@ -179,7 +179,7 @@ router.post(
 
           for (const t of listOfPeople) {
             const existingEnrollment = await Enrollment.findOne({
-              where: { userNetid: t.netId, course: { id: req.body.courseId } },
+              where: { user: { netid: t.netId }, course: { id: req.body.courseId } },
             });
             if (existingEnrollment) {
               res

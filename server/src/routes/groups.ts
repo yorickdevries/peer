@@ -186,7 +186,7 @@ router.patch(
     const course = await group.getCourse();
     // enroll user in the course if not already
     let enrollment = await Enrollment.findOne({
-      where: { userNetid: newUser.netid, course: { id: course.id } },
+      where: { user: { netid: newUser.netid }, course: { id: course.id } },
     });
     if (enrollment) {
       if (enrollment.role !== UserRole.STUDENT) {

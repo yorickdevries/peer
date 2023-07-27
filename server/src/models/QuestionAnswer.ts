@@ -11,12 +11,6 @@ import QuestionAnswerType from "../enum/QuestionAnswerType";
 import Question from "./Question";
 import Review from "./Review";
 import { dataSource } from "../databaseConnection";
-
-// interface QuestionAnswerInterface {
-//   question: Question;
-//   review: Review;
-// }
-
 @Entity()
 @TableInheritance({ column: { type: "varchar", name: "type" } })
 export default abstract class QuestionAnswer extends BaseModel {
@@ -54,12 +48,6 @@ export default abstract class QuestionAnswer extends BaseModel {
   constructor() {
     super();
   }
-
-  // init(init: QuestionAnswerInterface) {
-  //   this.question = init.question;
-  //   this.review = init.review;
-  //   return this;
-  // }
 
   async validateOrReject(): Promise<void> {
     // validation: questions should be part of the questionnaire of the review

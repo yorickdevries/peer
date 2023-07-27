@@ -38,16 +38,6 @@ interface AnonymousReviewWithReviewer extends AnonymousReview {
   reviewerNetid: string;
 }
 
-// interface ReviewInterface {
-//   questionnaire: Questionnaire;
-//   reviewer: User;
-//   flaggedByReviewer: boolean;
-//   submitted: boolean;
-//   startedAt: Date | null;
-//   downloadedAt: Date | null;
-//   submittedAt: Date | null;
-// }
-
 // formely called rubric
 @Entity()
 @TableInheritance({ column: { type: "varchar", name: "type" } })
@@ -146,24 +136,6 @@ export default abstract class Review extends BaseModel {
   questionAnswers?: QuestionAnswer[];
 
   abstract isReviewed(user: User): Promise<boolean>;
-
-  // constructor(init?: ReviewInterface) {
-  //   if (init !== undefined) {
-  //     super();
-  //     this.questionnaire = init.questionnaire;
-  //     this.reviewer = init.reviewer;
-  //     this.flaggedByReviewer = init.flaggedByReviewer;
-  //     this.submitted = init.submitted;
-  //     this.startedAt = init.startedAt;
-  //     this.downloadedAt = init.downloadedAt;
-  //     this.submittedAt = init.submittedAt;
-  //     // set default on null
-  //     this.approvalByTA = null;
-  //     this.commentByTA = null;
-  //     this.approvingTA = null;
-  //   }
-  // }
-
   constructor() {
     super();
   }
