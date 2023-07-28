@@ -141,7 +141,7 @@ async function genExpectedEvaluations(
   return emails;
 }
 
-describe.skip("Email notifications", () => {
+describe("Email notifications", () => {
   jest.setTimeout(600000);
 
   let group_submission: Assignment;
