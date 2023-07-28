@@ -44,6 +44,9 @@ export default class ReviewOfSubmission extends Review {
     this.downloadedAt = init.downloadedAt;
     this.submittedAt = init.submittedAt;
     this.submission = init.submission;
+    this.approvalByTA = null;
+    this.commentByTA = null;
+    this.approvingTA = null;
     return this;
   }
 

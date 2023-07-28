@@ -45,7 +45,7 @@ import RangeQuestion from "../models/RangeQuestion";
 import Submission from "../models/Submission";
 import ReviewOfSubmission from "../models/ReviewOfSubmission";
 import { createReviewOfReview } from "../factories/ReviewOfReview.factory";
-import { DataSource, In } from "typeorm";
+import { DataSource } from "typeorm";
 
 const uploadFolder = path.resolve(config.get("uploadFolder") as string);
 const exampleFile = path.join(
@@ -446,20 +446,6 @@ export default class InitialDatabaseSeed extends Seeder {
       if (!isBeforeState(AssignmentState.REVIEW, schema.assignmentState)) {
         continue;
       }
-
-      // const aVersions = await AssignmentVersion.findBy({
-      //   assignment: { id: assignment.id },
-      // });
-      // const mappedVersions = aVersions.map((a) => a.id);
-      // const aSubmissions = await Submission.findBy({
-      //   assignmentVersion: { id: In(mappedVersions) },
-      // });
-      //
-      // for (const aSubmission of aSubmissions) {
-      //   console.log("NEW SUBMISSION");
-      //   console.log(aSubmission.approvalByTA);
-      //   console.log(aSubmission.commentByTA);
-      // }
 
       await distributeReviewsForAssignment(assignment.id);
 
