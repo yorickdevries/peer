@@ -46,7 +46,7 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
   }
   if (!(await questionnaire.isTeacherInCourse(user))) {
     question.options.map((option) => {
-      delete option.points;
+      option.points = null;
       return option;
     });
   }

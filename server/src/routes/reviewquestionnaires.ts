@@ -54,7 +54,7 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
     if (question instanceof CheckboxQuestion) {
       if (!(await questionnaire.isTeacherInCourse(user))) {
         question.options.map((option) => {
-          delete option.points;
+          option.points = null;
           return option;
         });
       }
@@ -63,7 +63,7 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
     } else if (question instanceof MultipleChoiceQuestion) {
       if (!(await questionnaire.isTeacherInCourse(user))) {
         question.options.map((option) => {
-          delete option.points;
+          option.points = null;
           return option;
         });
       }
