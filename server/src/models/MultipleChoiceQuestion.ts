@@ -49,4 +49,18 @@ export default class MultipleChoiceQuestion extends Question {
   containsOption(option: MultipleChoiceQuestionOption): boolean {
     return this.id === option.questionId;
   }
+
+  getMaxPointsFromQuestion(): number | null {
+    const optionPoints: number[] | null = this.options.every(
+      (points) => points !== null
+    )
+      ? this.options.map(
+          (multipleChoiceAnswer) => multipleChoiceAnswer.points as number
+        )
+      : null;
+    if (optionPoints) {
+      return Math.max(...optionPoints);
+    }
+    return null;
+  }
 }

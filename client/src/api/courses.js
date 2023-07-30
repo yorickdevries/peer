@@ -16,6 +16,9 @@ export default {
     enroll(id) {
         return client.post(`courses/${id}/enroll`)
     },
+    enrollAsAdmin(id) {
+        return client.post(`courses/${id}/adminEnroll`)
+    },
     enrollment(id) {
         return client.get(`courses/${id}/enrollment`)
     },
@@ -32,5 +35,5 @@ export default {
         }
         const course = { name, courseCode, enrollable, facultyId, academicYearId, description }
         return client.patch(`courses/${id}`, course)
-    }
+    },
 }

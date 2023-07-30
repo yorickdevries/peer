@@ -1,6 +1,6 @@
 import express from "express";
 import { getManager } from "typeorm";
-import Joi from "@hapi/joi";
+import Joi from "joi";
 import checkEmployee from "../middleware/authentication/checkEmployee";
 import Course from "../models/Course";
 import HttpStatusCode from "../enum/HttpStatusCode";
@@ -9,12 +9,13 @@ import AcademicYear from "../models/AcademicYear";
 import Enrollment from "../models/Enrollment";
 import UserRole from "../enum/UserRole";
 import {
+  idSchema,
   validateBody,
   validateParams,
-  idSchema,
 } from "../middleware/validation";
 import _ from "lodash";
 import ResponseMessage from "../enum/ResponseMessage";
+import isAdmin from "../middleware/authentication/isAdmin";
 
 const router = express.Router();
 
@@ -22,7 +23,9 @@ const router = express.Router();
 router.get("/enrollable", async (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const user = req.user!;
-  const courses = await Course.getEnrollable(user);
+  const courses = user.admin
+    ? await Course.getAdminEnrollable(user)
+    : await Course.getEnrollable(user);
   const sortedCourses = _.sortBy(courses, "id");
   res.send(sortedCourses);
 });
@@ -178,6 +181,36 @@ router.post("/:id/enroll", validateParams(idSchema), async (req, res) => {
   await enrollment.save();
   res.send(enrollment);
 });
+
+// post an admin enrollment (enroll in a course as teacher)
+router.post(
+  "/:id/adminEnroll",
+  isAdmin,
+  validateParams(idSchema),
+  async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const user = req.user!;
+    const courseId = req.params.id;
+    const course = await Course.findOne(courseId);
+
+    if (!course) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.COURSE_NOT_FOUND);
+      return;
+    }
+
+    if (await course.isEnrolled(user)) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send("This course is not enrollable");
+      return;
+    }
+    const enrollment = new Enrollment(user, course, UserRole.TEACHER);
+    await enrollment.save();
+    res.send(enrollment);
+  }
+);
 
 // get your enrollment for a course
 router.get("/:id/enrollment", validateParams(idSchema), async (req, res) => {

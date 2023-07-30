@@ -96,6 +96,18 @@ const startOpenFeedbackForAssignmentWorker = function (
   }
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const startSubmissionFlaggingWorker = function (submissionId: number): void {
+  if (isTSNode) {
+    workerFunctions
+      .submissionFlagging(submissionId)
+      .then((result) => console.log(result))
+      .catch((err) => console.error(err));
+  } else {
+    startWorker("submissionFlagging", [submissionId]);
+  }
+};
+
 interface groupNameWithNetidList {
   groupName: string;
   netids: string[];
@@ -204,7 +216,29 @@ const startExportReviewsForAssignmentVersionWorker = function (
     ]);
   }
 };
-
+const startExportSubmissionsForZipWorker = function (
+  assignmentVersionId: number,
+  assignmentExportId: number
+): void {
+  if (isTSNode) {
+    // run the function directly in this process (TS Node/development)
+    workerFunctions
+      .exportSubmissionsForZip(assignmentVersionId, assignmentExportId)
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  } else {
+    // run worker in a seperate process (Node.js/production)
+    startWorker("exportSubmissionsForZip", [
+      assignmentVersionId,
+      assignmentExportId,
+      //exportType,
+    ]);
+  }
+};
 const startExportSubmissionsForAssignmentVersionWorker = function (
   assignmentVersionId: number,
   assignmentExportId: number,
@@ -234,6 +268,28 @@ const startExportSubmissionsForAssignmentVersionWorker = function (
   }
 };
 
+/*
+const startImportWebLabSubmissionsWorker = function (
+  assignmentVersionId: number,
+  file: Express.Multer.File
+): void {
+  if (isTSNode) {
+    // run the function directly in this process (TS Node/development)
+    workerFunctions
+      .importWebLabSubmissions(assignmentVersionId, file)
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  } else {
+    // run worker in a seperate process (Node.js/production)
+    startWorker("importWebLabSubmissions", [assignmentVersionId, file]);
+  }
+};
+*/
+
 export {
   startPublishAssignmentWorker,
   startCloseSubmissionForAssignmentWorker,
@@ -244,4 +300,7 @@ export {
   startExportGradesForAssignmentVersionWorker,
   startExportReviewsForAssignmentVersionWorker,
   startExportSubmissionsForAssignmentVersionWorker,
+  startSubmissionFlaggingWorker,
+  startExportSubmissionsForZipWorker,
+  //startImportWebLabSubmissionsWorker,
 };

@@ -1,138 +1,226 @@
-image: node:14
-
+# You can override the included template(s) by including variable overrides
+# SAST customization: https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings
+# Secret Detection customization: https://docs.gitlab.com/ee/user/application_security/secret_detection/#customizing-settings
+# Dependency Scanning customization: https://docs.gitlab.com/ee/user/application_security/dependency_scanning/#customizing-the-dependency-scanning-settings
+# Container Scanning customization: https://docs.gitlab.com/ee/user/application_security/container_scanning/#customizing-the-container-scanning-settings
+# Note that environment variables can be set in several places
+# See https://docs.gitlab.com/ee/ci/variables/#cicd-variable-precedence
+include:
+- template: SAST.gitlab-ci.yml
+- template: Security/Dependency-Scanning.gitlab-ci.yml
+image: node:18
+cache:
+  key:
+    files:
+    - server/package-lock.json
+    - client/package-lock.json
+  paths:
+  - server/.npm/
+  - client/.npm/
 variables:
   MYSQL_ROOT_PASSWORD: password
   MYSQL_DATABASE: peer
   MYSQL_USER: peer
   MYSQL_PASSWORD: password
   MYSQL_HOST: mariadb
-
+  SAST_EXCLUDED_ANALYZERS: bandit, brakeman, gosec, spotbugs, flawfinder, phpcs-security-audit,
+    security-code-scan, sobelow, pmd-apex, kubesec, mobsf
 stages:
-    - static-analysis
-    - build
-    - test
-    - migration
-    - start
-    - sast
-
+- build
+- test
+- migration
+- start
+- sast
+- deploy
 lint-server:
-  stage: static-analysis
+  stage: test
+  needs: []
   variables:
     NODE_ENV: development
   script:
-  - cd server && npm install
+  - cd server && npm ci --cache .npm --prefer-offline
   - npm run lint
-  only:
-  - merge_requests
-  - pushes
-
 lint-client:
-  stage: static-analysis
+  stage: test
+  needs: []
   variables:
     NODE_ENV: development
   script:
-  - cd client && npm install
+  - cd client && npm ci --cache .npm --prefer-offline
   - npm run lint
-  only:
-  - merge_requests
-  - pushes
-
 build-server:
   stage: build
   variables:
     NODE_ENV: production
   script:
-  - cd server && npm install
+  - cd server && npm ci --cache .npm --prefer-offline
   - npm run build
-  only:
-  - merge_requests
-  - pushes
-
+  artifacts:
+    paths:
+    - server/dist
+    - server/files
+    expire_in: 30 minutes
+  except:
+  - schedule
 build-client:
   stage: build
   variables:
     NODE_ENV: production
   script:
-  - cd client && npm install
+  - cd client && npm ci --cache .npm --prefer-offline
   - npm run build
-  only:
-  - merge_requests
-  - pushes
-
+  except:
+  - schedule
 test:
   stage: test
+  needs:
+  - build-server
   variables:
     NODE_ENV: test
   services:
   - mariadb:10.1
   script:
-  - cd server && npm install
+  - cd server && npm ci --cache .npm --prefer-offline
   - npm run test
-  only:
-  - merge_requests
-  - pushes
-
+  except:
+  - schedule
 coverage:
   stage: test
+  needs:
+  - build-server
   variables:
     NODE_ENV: test
   allow_failure: true
   services:
   - mariadb:10.1
   script:
-  - cd server && npm install
+  - cd server && npm ci --cache .npm --prefer-offline
   - npm run coverage
-  only:
-  - merge_requests
-  - pushes
-
+  coverage: "/All files[^|]*\\|[^|]*\\s+([\\d\\.]+)/"
+  artifacts:
+    when: always
+    reports:
+      junit:
+      - junit.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura-coverage.xml
+  except:
+  - schedule
 migration:
   stage: migration
+  needs:
+  - build-server
   variables:
     NODE_ENV: production
   services:
   - mariadb:10.1
   script:
-  - cd server && npm install
-  - npm run build
+  - cd server && npm ci --cache .npm --prefer-offline
   - npm run typeorm:migration:run
-  only:
-  - merge_requests
-  - pushes
-
+  except:
+  - schedule
 start-server:
   stage: start
+  needs:
+  - build-server
   variables:
     NODE_ENV: production
   services:
   - mariadb:10.1
   script:
-  - cd server && npm install
-  - npm run build
+  - cd server && npm ci --cache .npm --prefer-offline
   - npm run typeorm:migration:run
-  - timeout 60s npm run start || if [ $? -eq 124 ]; then (exit 0); else (exit 1); fi
-  only:
-  - merge_requests
-  - pushes
-
-sast:
+  - timeout 60s npm run start || if [ $? -eq 124 ]; then (exit 0); else (exit 1);
+    fi
+  except:
+  - schedule
+eslint-sast:
   stage: sast
-  image: docker:stable
+  rules:
+  - if: $CI_PIPELINE_SOURCE == "schedule"
+nodejs-scan-sast:
+  stage: sast
+  rules:
+  - if: $CI_PIPELINE_SOURCE == "schedule"
+semgrep-sast:
+  stage: sast
+  rules:
+  - if: $CI_PIPELINE_SOURCE == "schedule"
+deploy-staging:
+  stage: deploy
   variables:
-    DOCKER_DRIVER: overlay2
-  allow_failure: true
-  services:
-    - docker:stable-dind
+    DEPLOY_PATH: "/var/www/peer"
+  needs:
+  - test
+  - migration
+  - start-server
+  cache: []
+  before_script:
+  - apt-get update -y
+  - apt-get install rsync -y
+  - which ssh-agent || ( apt-get install openssh-client -y )
+  - eval $(ssh-agent -s)
+  - ssh-add <(echo "$SSH_PRIVATE_KEY_STAGING" | base64 -d)
+  - mkdir -p ~/.ssh
+  - ssh-keyscan eiptest.ewi.tudelft.nl >> ~/.ssh/known_hosts
+  - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
-    - export SP_VERSION=$(echo "$CI_SERVER_VERSION" | sed 's/^\([0-9]*\)\.\([0-9]*\).*/\1-\2-stable/')
-    - docker run
-        --env SAST_CONFIDENCE_LEVEL="${SAST_CONFIDENCE_LEVEL:-3}"
-        --volume "$PWD:/code"
-        --volume /var/run/docker.sock:/var/run/docker.sock
-        "registry.gitlab.com/gitlab-org/security-products/sast:$SP_VERSION" /app/bin/run /code
-  artifacts:
-    reports:
-      sast: gl-sast-report.json
+  - export TIMESTAMP="$(date '+%Y%m%d%H%M%S')"
+  - rsync -rtvh --exclude .git --exclude 'server/.npm' --exclude 'client/.npm' -e
+    ssh . deployer-peer@$CI_ENVIRONMENT_URL:$DEPLOY_PATH/releases/$TIMESTAMP
+  - ssh deployer-peer@$CI_ENVIRONMENT_URL "cd $DEPLOY_PATH && ./deploy.sh $TIMESTAMP"
+  environment:
+    name: staging
+    url: peer.eiptest.ewi.tudelft.nl
   only:
-  - merge_requests
-  - pushes
+  - dev
+deploy-production:
+  stage: deploy
+  variables:
+    DEPLOY_PATH: "/var/www/peer"
+  needs:
+  - test
+  - migration
+  - start-server
+  cache: []
+  before_script:
+  - apt-get update -y
+  - apt-get install rsync -y
+  - which ssh-agent || ( apt-get install openssh-client -y )
+  - eval $(ssh-agent -s)
+  - ssh-add <(echo "$SSH_PRIVATE_KEY_PRODUCTION" | base64 -d)
+  - mkdir -p ~/.ssh
+  - ssh-keyscan peer.tudelft.nl >> ~/.ssh/known_hosts
+  - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+  script:
+  - export TIMESTAMP="$(date '+%Y%m%d%H%M%S')"
+  - rsync -rtvh --exclude .git --exclude 'server/.npm' --exclude 'client/.npm' -e
+    ssh . deploy@$CI_ENVIRONMENT_URL:$DEPLOY_PATH/releases/$TIMESTAMP
+  - ssh deploy@$CI_ENVIRONMENT_URL "cd $DEPLOY_PATH && ./deploy.sh $TIMESTAMP"
+  environment:
+    name: production
+    url: peer.tudelft.nl
+  only:
+  - master
+pages:
+  image: python:3
+  stage: deploy
+  before_script:
+    - pip install mkdocs
+    - pip install mkdocs-material
+  script:
+    - cd docs
+    - mkdocs build
+    - mv site ../public
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "trigger" ||
+        $CI_MERGE_REQUEST_EVENT_TYPE == "merge_train"
+      when: never
+    - if: $CI_COMMIT_BRANCH == "dev"
+      when: manual
+    - if: $CI_COMMIT_BRANCH == "master"
+

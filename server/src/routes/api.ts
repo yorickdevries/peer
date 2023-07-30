@@ -32,6 +32,13 @@ import multiplechoicequestionanswers from "./multiplechoicequestionanswers";
 import checkboxquestionanswers from "./checkboxquestionanswers";
 import pdfannotations from "./pdfannotations";
 import assignmentexports from "./assignmentexports";
+import codeannotations from "./codeannotations";
+import statistics from "./statistics";
+import banners from "./banners";
+import Banner from "../models/Banner";
+import deadlines from "./deadlines";
+import isAdmin from "../middleware/authentication/isAdmin";
+import preferences from "./preferences";
 
 const router = express.Router();
 router.use(eventLogger);
@@ -42,6 +49,19 @@ authenticationRoutes(router);
 // Check authentication route
 router.get("/authenticated", (req, res) => {
   res.send({ authenticated: req.isAuthenticated() });
+});
+
+// get active banner (allowed for unauthenticated users)
+router.get("/banners/active", async (_req, res) => {
+  // send active banner or empty object
+  const banner = await Banner.findOne({
+    where: { active: true },
+  });
+
+  const bannerToSend =
+    banner !== undefined ? banner.getAnonymousBanner() : null;
+
+  res.send(bannerToSend);
 });
 
 // Check always whether someone is logged in before accessing the other routes below
@@ -62,6 +82,7 @@ router.use("/academicyears", academicyears);
 router.use("/courses", courses);
 router.use("/enrollments", enrollments);
 router.use("/assignments", assignments);
+router.use("/deadlines", isAdmin, deadlines);
 router.use("/assignmentversions", assignmentversions);
 router.use("/groups", groups);
 router.use("/submissions", submissions);
@@ -83,6 +104,10 @@ router.use("/multiplechoicequestionanswers", multiplechoicequestionanswers);
 router.use("/checkboxquestionanswers", checkboxquestionanswers);
 router.use("/pdfannotations", pdfannotations);
 router.use("/assignmentexports", assignmentexports);
+router.use("/codeannotations", codeannotations);
+router.use("/statistics", statistics);
+router.use("/banners", isAdmin, banners);
+router.use("/preferences", preferences);
 
 // If no other routes apply, send a 404
 router.use((_req, res) => {

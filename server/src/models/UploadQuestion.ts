@@ -2,7 +2,7 @@ import Questionnaire from "./Questionnaire";
 import Question from "./Question";
 import { ChildEntity, Column } from "typeorm";
 import QuestionType from "../enum/QuestionType";
-import { IsDefined, IsString, IsNotEmpty, IsEnum } from "class-validator";
+import { IsDefined, IsEnum, IsNotEmpty, IsString } from "class-validator";
 import Extensions from "../enum/Extensions";
 
 @ChildEntity(QuestionType.UPLOAD)

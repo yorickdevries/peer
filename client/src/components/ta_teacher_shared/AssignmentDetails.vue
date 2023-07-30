@@ -4,6 +4,9 @@
             <dt>Description</dt>
             <dd>{{ assignment.description }}</dd>
 
+            <dt>Assignment type</dt>
+            <dd>{{ assignment.assignmentType }}</dd>
+
             <dt>Enrollable</dt>
             <dd>{{ assignment.enrollable }}</dd>
 
@@ -69,7 +72,7 @@ export default {
         assignmentFilePath() {
             // Get the assignment file path.
             return `/api/assignments/${this.assignment.id}/file`
-        }
-    }
+        },
+    },
 }
 </script>

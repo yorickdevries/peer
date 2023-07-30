@@ -1,16 +1,16 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
+  Entity,
   ManyToOne,
   OneToMany,
+  PrimaryGeneratedColumn,
 } from "typeorm";
 import {
+  IsBoolean,
   IsDefined,
+  IsNotEmpty,
   IsOptional,
   IsString,
-  IsNotEmpty,
-  IsBoolean,
 } from "class-validator";
 import BaseModel from "./BaseModel";
 import User from "./User";
@@ -154,6 +154,24 @@ export default class Course extends BaseModel {
       (await this.isEnrolled(user, UserRole.TEACHER)) ||
       (await this.isEnrolled(user, UserRole.TEACHING_ASSISTANT))
     );
+  }
+
+  /**
+   * Returns the list of courses that a user is not yet enrolled in.
+   *
+   * @param user
+   * @returns list of courses
+   */
+  static async getAdminEnrollable(user: User): Promise<Course[]> {
+    // all courses
+    const allCourses = await Course.find();
+    const enrollableCourses = [];
+    for (const course of allCourses) {
+      if (!(await course.isEnrolled(user))) {
+        enrollableCourses.push(course);
+      }
+    }
+    return enrollableCourses;
   }
 
   // get all enrollable courses for a certain user

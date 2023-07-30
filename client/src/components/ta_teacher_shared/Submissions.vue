@@ -24,6 +24,60 @@
                 >
                     Export submissions .xls
                 </b-button>
+                <b-button
+                    :disabled="disableSubmissionExportButton"
+                    size="sm"
+                    variant="primary"
+                    @click="exportAllSubmissions()"
+                    class="mb-3 mr-2"
+                >
+                    Export all submissions .zip
+                </b-button>
+            </b-col>
+            <b-col v-if="assignment.assignmentType === 'code'">
+                <template v-if="assignment.enrollable">
+                    <dt>Import submissions from WebLab</dt>
+                    <dd>
+                        Not available. On creation of the assignment, this assignment has been set as self-enrollable.
+                    </dd>
+                </template>
+                <template v-else-if="assignment.state !== 'unpublished' && assignment.state !== 'submission'">
+                    <dt>Import submissions from WebLab</dt>
+                    <dd>Not available. The assignment is already past the submission state.</dd>
+                </template>
+                <template v-else-if="!/\.zip($|[\s,])/.test(assignment.submissionExtensions)">
+                    <dt>Import submissions from WebLab</dt>
+                    <dd>Not available. On creation of the assignment, .zip extensions have not been allowed.</dd>
+                </template>
+                <template v-else>
+                    <!--Importing Submissions-->
+                    <dt>Import submissions from WebLab</dt>
+                    <dd>This action will import the submissions from WebLab in this assignment version.</dd>
+                    <b-button
+                        v-b-modal="`importSubmissions${assignmentVersionId}`"
+                        variant="primary"
+                        size="sm"
+                        class="mb-3"
+                    >
+                        Import WebLab submissions .zip
+                    </b-button>
+
+                    <!--Import Sumbissions Modal-->
+                    <b-modal
+                        :id="`importSubmissions${assignmentVersionId}`"
+                        :assignmentVersionId="assignmentVersionId"
+                        centered
+                        hide-header
+                        hide-footer
+                        class="p-0 m-0"
+                        size="lg"
+                    >
+                        <ImportSubmissionsWizard
+                            :modalId="`importSubmissions${assignmentVersionId}`"
+                            :assignmentVersionId="assignmentVersionId"
+                        ></ImportSubmissionsWizard>
+                    </b-modal>
+                </template>
             </b-col>
         </b-row>
         <hr />
@@ -44,7 +98,7 @@
                             :class="{
                                 'bg-primary': !onlyFinalSubmissions,
                                 'btn-outline-primary': onlyFinalSubmissions,
-                                'text-white': !onlyFinalSubmissions
+                                'text-white': !onlyFinalSubmissions,
                             }"
                             class="btn btn-sm"
                             size="sm"
@@ -56,7 +110,7 @@
                             :class="{
                                 'bg-primary': onlyFinalSubmissions,
                                 'btn-outline-primary': !onlyFinalSubmissions,
-                                'text-white': onlyFinalSubmissions
+                                'text-white': onlyFinalSubmissions,
                             }"
                             class="btn btn-sm"
                             size="sm"
@@ -72,6 +126,7 @@
                 </b-form-group>
             </b-col>
         </b-row>
+        <b-alert show> Number of submissions: {{ numberOfSubmissions }}</b-alert>
         <!--Table-->
         <b-table
             striped
@@ -83,6 +138,7 @@
             :current-page="currentPage"
             :per-page="Number(perPage)"
             :filter="filter"
+            class="table-responsive"
         >
             <template v-slot:cell(file)="data">
                 <a :href="submissionFilePath(data.item.id)" target="_blank">
@@ -95,7 +151,7 @@
             </template>
 
             <template v-slot:cell(date)="data">
-                {{ data.item.createdAt | formatDate }}
+                {{ data.item.createdAt | formatDateCompact }}
             </template>
 
             <template v-slot:cell(approvalByTA)="data">
@@ -118,7 +174,7 @@
                         name: $router.currentRoute.name.includes('teacher')
                             ? 'teacher-dashboard.assignments.assignment.submission'
                             : 'teaching-assistant-dashboard.course.assignment.submission',
-                        params: { submissionId: data.item.id }
+                        params: { submissionId: data.item.id },
                     }"
                     >Show submission</b-button
                 >
@@ -139,39 +195,48 @@
 import api from "../../api/api"
 import _ from "lodash"
 import notifications from "../../mixins/notifications"
+import ImportSubmissionsWizard from "../teacher-dashboard/ImportSubmissionsWizard"
 
 export default {
     props: ["assignmentVersionId"],
     mixins: [notifications],
+    components: {
+        ImportSubmissionsWizard,
+    },
     data() {
         return {
             allSubmissions: null,
+            numberOfSubmissions: 0,
             // groups to get groupName from
             groups: null,
             // boolean to show all or only final submissions
             onlyFinalSubmissions: true,
             // for navigation
             fields: [
-                { key: "id", label: "ID", sortable: true },
+                { key: "action", label: "Action" },
                 { key: "file", label: "File" },
-                { key: "groupId", label: "Group ID" },
-                { key: "groupName", label: "Group name" },
-                { key: "userNetid", label: "Submitted by" },
-                { key: "date", label: "​​​Date" },
-                { key: "final", label: "Final" },
-                { key: "approvalByTA", label: "Approval by TA" },
+                { key: "groupName", label: "Group name", sortable: true },
+                { key: "date", label: "Date" },
+                { key: "final", label: "Final", sortable: true },
+                { key: "reportedByReview", label: "Reported by Review", sortable: true },
+                { key: "approvalByTA", label: "Approval by TA", sortable: true },
                 { key: "approvingTA", label: "Approving TA" },
-                { key: "action", label: "Action" }
+                { key: "flaggedByServer", label: "Flagged by server", sortable: true },
+                { key: "commentByServer", label: "Comment by server" },
             ],
             currentPage: 1,
             perPage: 10,
             filter: "",
-            disableSubmissionExportButton: false
+            disableSubmissionExportButton: false,
+            assignment: null,
+            reviews: null,
         }
     },
     async created() {
-        await this.fetchSubmissions()
+        await this.fetchReviews()
         await this.fetchGroups()
+        await this.fetchSubmissions()
+        await this.fetchAssignment()
     },
     computed: {
         selectedSubmissions() {
@@ -182,23 +247,65 @@ export default {
             }
         },
         finalSubmissions() {
-            return _.filter(this.allSubmissions, function(submission) {
+            return _.filter(this.allSubmissions, function (submission) {
                 return submission.final
             })
-        }
+        },
     },
     methods: {
+        flagSubmissions() {
+            const flaggedReviews = new Map()
+            for (const review of this.reviews) {
+                if (review.flaggedByReviewer) {
+                    flaggedReviews.set(review.submission.id, true)
+                }
+            }
+            return flaggedReviews
+        },
+        parseGroups() {
+            const parsedGroups = new Map()
+            for (const group of this.groups) {
+                parsedGroups.set(group.id, group.name)
+            }
+            return parsedGroups
+        },
+        addSubmissionDetails(submissions) {
+            const parsedGroups = this.parseGroups()
+            const flaggedSubmissions = this.flagSubmissions()
+
+            submissions.forEach((s) => {
+                s.reportedByReview = flaggedSubmissions.has(s.id)
+                s.groupName = parsedGroups.get(s.id)
+            })
+
+            return submissions
+        },
         async fetchSubmissions() {
             // all submissions
             const res1 = await api.submissions.getAllForAssignmentVersion(this.assignmentVersionId)
-            this.allSubmissions = res1.data
+
+            const submissions = res1.data
+
+            //this.allSubmissions = submissions
+            this.allSubmissions = this.addSubmissionDetails(submissions)
+
+            let count = await api.submissions.getSubmissionCount(this.assignmentVersionId)
+            this.numberOfSubmissions = count.data
         },
         async fetchGroups() {
             const res = await api.groups.getAllForAssignment(this.$route.params.assignmentId)
             this.groups = res.data
         },
+        async fetchAssignment() {
+            const res = await api.assignments.get(this.$route.params.assignmentId)
+            this.assignment = res.data
+        },
+        async fetchReviews() {
+            const res = await api.reviewofsubmissions.getAllForAssignmentVersion(this.assignmentVersionId, true)
+            this.reviews = res.data
+        },
         getGroup(id) {
-            return _.find(this.groups, group => {
+            return _.find(this.groups, (group) => {
                 return group.id === id
             })
         },
@@ -210,9 +317,15 @@ export default {
             this.disableSubmissionExportButton = true
             await api.submissions.export(this.assignmentVersionId, exportType)
             this.showSuccessMessage({
-                message: "Export is being generated, you can download it in the exports tab when ready"
+                message: "Export is being generated, you can download it in the exports tab when ready",
             })
-        }
-    }
+        },
+        async exportAllSubmissions() {
+            await api.submissions.getZipExport(this.assignmentVersionId)
+            this.showSuccessMessage({
+                message: "Export is being generated, you can download it in the exports tab when ready",
+            })
+        },
+    },
 }
 </script>

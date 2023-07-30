@@ -46,6 +46,24 @@ export default class CheckboxQuestion extends Question {
     return super.validateOrReject();
   }
 
+  getMaxPointsFromQuestion(): number | null {
+    const optionPoints: number[] | null = this.options.every(
+      (points) => points !== null
+    )
+      ? this.options.map(
+          (multipleChoiceAnswer) => multipleChoiceAnswer.points as number
+        )
+      : null;
+    if (optionPoints) {
+      return optionPoints
+        .filter((a) => {
+          return a > 0;
+        })
+        .reduce((partialSum, a) => partialSum + a, 0);
+    }
+    return null;
+  }
+
   containsOption(option: CheckboxQuestionOption): boolean {
     return this.id === option.questionId;
   }

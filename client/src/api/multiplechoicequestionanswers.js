@@ -8,5 +8,5 @@ export default {
     delete(multipleChoiceQuestionId, reviewId) {
         const params = { multipleChoiceQuestionId, reviewId }
         return client.delete("multiplechoicequestionanswers", { params: params })
-    }
+    },
 }

@@ -1,10 +1,10 @@
 import express from "express";
-import Joi from "@hapi/joi";
+import Joi from "joi";
 import {
-  validateBody,
-  validateQuery,
-  validateParams,
   idSchema,
+  validateBody,
+  validateParams,
+  validateQuery,
 } from "../middleware/validation";
 import Assignment from "../models/Assignment";
 import HttpStatusCode from "../enum/HttpStatusCode";
@@ -336,11 +336,34 @@ router.post(
         .send("The submission state has passed");
       return;
     }
+
+    const groups = await assignment.getGroups();
+
+    //Check if submissions have already been made
     if (await assignment.hasGroups()) {
-      res
-        .status(HttpStatusCode.FORBIDDEN)
-        .send("There are already groups for this assignment");
-      return;
+      for (const group of groups) {
+        const assignmentVersions = assignment.versions;
+        for (const assignmentVersion of assignmentVersions) {
+          const submissions = await assignmentVersion.getSubmissions(group);
+          if (submissions.length > 0) {
+            res
+              .status(HttpStatusCode.FORBIDDEN)
+              .send(
+                "A group you are trying to delete already has already made a submision."
+              );
+            return;
+          }
+        }
+      }
+
+      //Delete all users from their groups
+      for (const group of groups) {
+        group.users = [];
+        await group.save();
+      }
+
+      const groupsIds = (await assignment.getGroups()).map((g) => g.id);
+      await Group.delete(groupsIds);
     }
 
     // offload a function to a worker

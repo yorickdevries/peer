@@ -1,41 +1,41 @@
-import VueNotifications from "vue-notifications/src/main"
+import VueNotifications from "vue-notifications"
 
 export default {
     notifications: {
         showErrorMessage: {
             type: VueNotifications.types.error,
             title: "Error",
-            message: "An error has occurred."
+            message: "An error has occurred.",
         },
         showSuccessMessage: {
             type: VueNotifications.types.success,
             title: "Success",
-            message: "Action was successful."
+            message: "Action was successful.",
         },
         showInfoMessage: {
             type: VueNotifications.types.info,
             title: "Info",
-            message: "Info."
+            message: "Info.",
         },
         showWarningMessage: {
             type: VueNotifications.types.warn,
             title: "Warning",
-            message: "Warning."
+            message: "Warning.",
         },
         showSaveMessage: {
             type: VueNotifications.types.success,
             title: "Saved",
-            message: "The item has successfully been saved."
+            message: "The item has successfully been saved.",
         },
         showSubmitMessage: {
             type: VueNotifications.types.success,
             title: "Submitted",
-            message: "The item has successfully been submitted."
+            message: "The item has successfully been submitted.",
         },
         showUnSubmitMessage: {
             type: VueNotifications.types.success,
             title: "Unsubmitted",
-            message: "The item has successfully been unsubmitted."
-        }
-    }
+            message: "The item has successfully been unsubmitted.",
+        },
+    },
 }

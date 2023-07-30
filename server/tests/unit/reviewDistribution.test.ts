@@ -1,6 +1,6 @@
 import createDatabaseConnection from "../../src/databaseConnection";
 import initializeData from "../../src/util/initializeData";
-import { Connection } from "typeorm";
+import { Connection, getManager } from "typeorm";
 import User from "../../src/models/User";
 import Group from "../../src/models/Group";
 import Submission from "../../src/models/Submission";
@@ -16,6 +16,13 @@ import AssignmentVersion from "../../src/models/AssignmentVersion";
 import { AssignmentState } from "../../src/enum/AssignmentState";
 import Extensions from "../../src/enum/Extensions";
 import SubmissionQuestionnaire from "../../src/models/SubmissionQuestionnaire";
+import AssignmentType from "../../src/enum/AssignmentType";
+import AssignmentExport from "../../src/models/AssignmentExport";
+import exportToZip from "../../src/util/exportZip";
+import fs from "fs";
+import JSZip from "jszip";
+import path from "path";
+import config from "config";
 
 describe("Review distribution", () => {
   // will be initialized and closed in beforeAll / afterAll
@@ -67,7 +74,9 @@ describe("Review distribution", () => {
       true,
       true,
       null,
-      false
+      false,
+      AssignmentType.DOCUMENT,
+      true
     );
     await assignment.save();
     assignment.state = AssignmentState.SUBMISSION;
@@ -96,6 +105,7 @@ describe("Review distribution", () => {
     const numStudents = numGroups * numStudentPerGroup;
 
     const students = [];
+    const expectedResult: any[] = ["pdfs/"];
     for (let i = 0; i < numStudents; i++) {
       const student = new User(`student${i}`);
       await student.save();
@@ -122,8 +132,19 @@ describe("Review distribution", () => {
       ]);
       await group.save();
       // make submission
+      const exampleSubmissionFile = path.resolve(
+        __dirname,
+        "../../exampleData/submissions/submission1.c"
+      );
       const file = new File("filename", ".pdf", null);
       await file.save();
+      const uploadFolder = config.get("uploadFolder") as string;
+      const fp = path.resolve(uploadFolder, file.id.toString());
+      await fs.writeFile(fp, fs.readFileSync(exampleSubmissionFile), () => {
+        console.log(file.getFileNamewithExtension());
+      });
+
+      expectedResult.push(`pdfs/${student.netid + "_" + j}.pdf`);
 
       const submission = new Submission(
         student,
@@ -135,13 +156,54 @@ describe("Review distribution", () => {
       await submission.save();
       submissions.push(submission);
     }
+    //make export of submissions
+    const assignmentExport: AssignmentExport = new AssignmentExport(
+      students[0],
+      assignment,
+      null
+    );
+    const file = new File("a", "ads", null);
+    await getManager().transaction(
+      "READ COMMITTED",
+      async (transactionalEntityManager) => {
+        // save file entry to database
+        await file.validateOrReject();
+        await transactionalEntityManager.save(file);
+
+        // add to assignmentExport
+        assignmentExport.file = file;
+        await assignmentExport.validateOrReject();
+        await transactionalEntityManager.save(assignmentExport);
+      }
+    );
+    const zipFileName = "subZip";
+    await exportToZip(assignmentExport, submissions, zipFileName);
+    const uploadFolder = config.get("uploadFolder") as string;
+    const zipFilePath = path.resolve(
+      uploadFolder,
+      path.resolve(uploadFolder, (file.id + 1).toString())
+    );
+    let files: any[] = [];
+    // read a zip file
+    await fs.readFile(zipFilePath, (err: any, data: any) => {
+      if (err) throw err;
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      JSZip.loadAsync(data).then((zip: any) => {
+        files = Object.keys(zip.files);
+        expect(files).toStrictEqual(expectedResult);
+      });
+    });
 
     const reviewsPerUser = 3;
+    const studentNumbers: [User, number][] = [];
+    for (const student of students) {
+      studentNumbers.push([student, reviewsPerUser]);
+    }
+
     // need to be made into an object
     const reviewAssignments = await generateReviewDistribution(
       submissions,
-      students,
-      reviewsPerUser
+      studentNumbers
     );
     expect(reviewAssignments.length).toBe(reviewsPerUser * numStudents);
     for (const reviewAssignment of reviewAssignments) {
@@ -188,7 +250,9 @@ describe("Review distribution", () => {
       true,
       true,
       null,
-      false
+      false,
+      AssignmentType.DOCUMENT,
+      true
     );
     await assignment.save();
     assignment.state = AssignmentState.SUBMISSION;
@@ -263,11 +327,15 @@ describe("Review distribution", () => {
     // however for the group with 4 students, thre are only 6 other students whcih can review
     // so the algorithm should find a less fair solution
     const reviewsPerUser = 3;
+    const studentNumbers: [User, number][] = [];
+    for (const student of students) {
+      studentNumbers.push([student, reviewsPerUser]);
+    }
+
     // need to be made into an object
     const reviewAssignments = await generateReviewDistribution(
       submissions,
-      students,
-      reviewsPerUser
+      studentNumbers
     );
     expect(reviewAssignments.length).toBe(reviewsPerUser * numStudents);
     // check whether the solution is valid
@@ -315,7 +383,9 @@ describe("Review distribution", () => {
       true,
       true,
       null,
-      false
+      false,
+      AssignmentType.DOCUMENT,
+      true
     );
     await assignment.save();
     assignment.state = AssignmentState.SUBMISSION;
@@ -396,8 +466,10 @@ describe("Review distribution", () => {
     // need to be made into an object
     const generateDistributionPromise = generateReviewDistribution(
       submissions,
-      [student2, student3],
-      reviewsPerUser
+      [
+        [student2, reviewsPerUser],
+        [student3, reviewsPerUser],
+      ]
     );
     expect.assertions(1);
     await expect(generateDistributionPromise).rejects.toThrow();

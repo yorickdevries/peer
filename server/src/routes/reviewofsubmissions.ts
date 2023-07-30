@@ -1,10 +1,10 @@
 import express from "express";
-import Joi from "@hapi/joi";
+import Joi from "joi";
 import {
-  validateQuery,
-  validateParams,
   idSchema,
   validateBody,
+  validateParams,
+  validateQuery,
 } from "../middleware/validation";
 import Assignment from "../models/Assignment";
 import HttpStatusCode from "../enum/HttpStatusCode";
@@ -18,12 +18,13 @@ import ReviewOfReview from "../models/ReviewOfReview";
 import AssignmentExport from "../models/AssignmentExport";
 import {
   startDistributeReviewsForAssignmentWorker,
-  startOpenFeedbackForAssignmentWorker,
   startExportGradesForAssignmentVersionWorker,
   startExportReviewsForAssignmentVersionWorker,
+  startOpenFeedbackForAssignmentWorker,
 } from "../workers/pool";
 import submitReview from "../util/submitReview";
 import AssignmentVersion from "../models/AssignmentVersion";
+import { genMailForLateReview, sendMessageBatch } from "../util/mailer";
 
 const router = express.Router();
 
@@ -464,6 +465,11 @@ router.patch(
       // submit review in transaction
       await submitReview(review, flaggedByReviewer);
       await review.reload();
+
+      if (moment().isAfter(assignment.reviewDueDate)) {
+        const mailsToSend = await genMailForLateReview(review.submission);
+        await sendMessageBatch(mailsToSend);
+      }
     } else {
       // just set the fields
       review.flaggedByReviewer = flaggedByReviewer;
@@ -517,9 +523,11 @@ router.patch(
         .send("The assignment is not in feedback state");
       return;
     }
+    // Only teachers and the TA giving the approval can modify the approval.
     if (
       review.approvingTA !== null &&
-      review.approvingTA.netid !== user.netid
+      review.approvingTA.netid !== user.netid &&
+      !(await review.isTeacherInCourse(user))
     ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
@@ -547,7 +555,8 @@ router.get("/:id/evaluation", validateParams(idSchema), async (req, res) => {
   }
   // get assignmentstate
   const submissionQuestionnaire = await review.getQuestionnaire();
-  const assignmentVersion = await submissionQuestionnaire.getAssignmentVersion();
+  const assignmentVersion =
+    await submissionQuestionnaire.getAssignmentVersion();
   const assignment = await assignmentVersion.getAssignment();
   const reviewEvaluation = await ReviewOfReview.findOne({
     where: { reviewOfSubmission: review.id },
@@ -589,7 +598,8 @@ router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
   }
   // get assignmentstate
   const submissionQuestionnaire = await review.getQuestionnaire();
-  const assignmentVersion = await submissionQuestionnaire.getAssignmentVersion();
+  const assignmentVersion =
+    await submissionQuestionnaire.getAssignmentVersion();
   const assignment = await assignmentVersion.getAssignment();
   if (
     !(
@@ -658,7 +668,8 @@ router.post("/:id/evaluation", validateParams(idSchema), async (req, res) => {
   );
   await reviewEvaluation.reload();
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const anonymousReview = reviewEvaluation.getAnonymousVersionWithReviewerNetid();
+  const anonymousReview =
+    reviewEvaluation.getAnonymousVersionWithReviewerNetid();
   res.send(anonymousReview);
 });
 
@@ -686,6 +697,15 @@ router.post(
       res
         .status(HttpStatusCode.FORBIDDEN)
         .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+      return;
+    }
+    if (
+      // missing submission questionnaires
+      !(await assignment.hasSubmissionQuestionnaires())
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("An assignmentversion is missing a submissionquestionnaire");
       return;
     }
     // offload a function to a worker

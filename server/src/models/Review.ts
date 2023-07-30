@@ -1,19 +1,19 @@
 import {
-  PrimaryGeneratedColumn,
-  Entity,
-  TableInheritance,
   Column,
+  Entity,
   ManyToOne,
-  RelationId,
   OneToMany,
+  PrimaryGeneratedColumn,
+  RelationId,
+  TableInheritance,
 } from "typeorm";
 import {
-  IsOptional,
-  IsDefined,
   IsBoolean,
   IsDate,
-  IsString,
+  IsDefined,
   IsNotEmpty,
+  IsOptional,
+  IsString,
 } from "class-validator";
 import BaseModel from "./BaseModel";
 import User from "./User";
@@ -23,6 +23,7 @@ import UserRole from "../enum/UserRole";
 import QuestionAnswer from "./QuestionAnswer";
 import Question from "./Question";
 import _ from "lodash";
+import OpenQuestionAnswer from "./OpenQuestionAnswer";
 
 interface AnonymousReview {
   id: number;
@@ -129,7 +130,8 @@ export default abstract class Review extends BaseModel {
   @OneToMany(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (_type) => QuestionAnswer,
-    (questionAnswer) => questionAnswer.review
+    (questionAnswer) => questionAnswer.review,
+    { cascade: true }
   )
   questionAnswers?: QuestionAnswer[];
 
@@ -191,6 +193,9 @@ export default abstract class Review extends BaseModel {
     if (this.submitted && !(await this.canBeSubmitted())) {
       throw new Error("A non-optional question isn't answered yet.");
     }
+    if (this.submitted && (await this.isNotInWordCountRange())) {
+      throw new Error("An open question answer is not in the word range.");
+    }
     // submitted and submittedAt
     if (this.submitted && !this.submittedAt) {
       throw new Error("submittedAt needs to be defined");
@@ -222,6 +227,22 @@ export default abstract class Review extends BaseModel {
       }
     }
     return true;
+  }
+
+  async isNotInWordCountRange(): Promise<boolean> {
+    const answers = await this.getQuestionAnswers();
+    if (answers !== undefined) {
+      for (const answer of answers) {
+        if (
+          answer instanceof OpenQuestionAnswer &&
+          !(await answer.isInWordRange())
+        ) {
+          return true;
+        }
+      }
+      return false;
+    }
+    return false;
   }
 
   async getQuestionnaire(): Promise<Questionnaire> {

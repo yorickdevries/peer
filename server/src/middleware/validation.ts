@@ -1,5 +1,5 @@
-import Joi from "@hapi/joi";
-import { Request, Response, NextFunction, RequestHandler } from "express";
+import Joi from "joi";
+import { NextFunction, Request, RequestHandler, Response } from "express";
 import HttpStatusCode from "../enum/HttpStatusCode";
 import _ from "lodash";
 

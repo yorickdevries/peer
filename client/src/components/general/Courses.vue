@@ -49,6 +49,7 @@
                                 <b-form-group label="" description="Select the academic year">
                                     <b-form-select v-model="filterOptions.academicYear">
                                         <b-form-select-option :value="null">All</b-form-select-option>
+                                        <b-form-select-option value="active">Active</b-form-select-option>
                                         <b-form-select-option
                                             v-for="academicYear in academicYears"
                                             :key="academicYear.id"
@@ -105,7 +106,7 @@
                                                 size="sm"
                                                 :to="{
                                                     name: 'student-dashboard.course.home',
-                                                    params: { courseId: enrollment.course.id }
+                                                    params: { courseId: enrollment.course.id },
                                                 }"
                                             >
                                                 Enter Course
@@ -116,7 +117,7 @@
                                                 size="sm"
                                                 :to="{
                                                     name: 'teaching-assistant-dashboard.course.home',
-                                                    params: { courseId: enrollment.course.id }
+                                                    params: { courseId: enrollment.course.id },
                                                 }"
                                             >
                                                 Enter Course
@@ -127,7 +128,7 @@
                                                 size="sm"
                                                 :to="{
                                                     name: 'teacher-dashboard.course',
-                                                    params: { courseId: enrollment.course.id }
+                                                    params: { courseId: enrollment.course.id },
                                                 }"
                                             >
                                                 Enter Course
@@ -164,7 +165,7 @@
                             <b-col class="mb-3" cols="3">
                                 <b-form-group label="" description="Select the academic year">
                                     <b-form-select v-model="filterOptions.academicYear">
-                                        <b-form-select-option :value="null">All</b-form-select-option>
+                                        <b-form-select-option value="active">Active</b-form-select-option>
                                         <b-form-select-option
                                             v-for="academicYear in academicYears"
                                             :key="academicYear.id"
@@ -234,6 +235,36 @@
                                                     Enroll in Course
                                                 </b-button>
                                             </b-modal>
+                                            <template v-if="user && user.admin">
+                                                <b-button
+                                                    class="ml-1"
+                                                    variant="outline-warning"
+                                                    v-b-modal="`enrollAdmin-${course.id}`"
+                                                    >Admin Enrol</b-button
+                                                >
+                                                <b-modal
+                                                    :id="`enrollAdmin-${course.id}`"
+                                                    :title="`Enroll in ${course.name} as a admin?`"
+                                                    centered
+                                                    hide-footer
+                                                >
+                                                    Are you sure you want to enroll in the course "{{ course.name }}" as
+                                                    <b>teacher</b>? You can later delete yourself.
+                                                    <b-alert show
+                                                        >Enrolling as an admin will give you the same rights as a
+                                                        teacher of this course. Remember to delete yourself afterwards
+                                                        if you don't want to be visible on the course staff
+                                                        page.</b-alert
+                                                    >
+                                                    <b-button
+                                                        variant="warning"
+                                                        size="sm"
+                                                        @click="enrollInCourseAsAdmin(course.id)"
+                                                    >
+                                                        Enroll in course as admin
+                                                    </b-button>
+                                                </b-modal>
+                                            </template>
                                         </div>
                                     </b-card-body>
                                 </b-card>
@@ -254,7 +285,7 @@ import CreateCourse from "./CreateCourse"
 export default {
     mixins: [notifications],
     components: {
-        CreateCourse
+        CreateCourse,
     },
     data() {
         return {
@@ -267,8 +298,8 @@ export default {
             filterOptions: {
                 name: "",
                 faculty: null,
-                academicYear: null
-            }
+                academicYear: "active",
+            },
         }
     },
     computed: {
@@ -292,26 +323,28 @@ export default {
             return this.enrollableCourses.length === 0
         },
         filteredEnrollments() {
-            return this.enrollments.filter(enrollment => {
+            return this.enrollments.filter((enrollment) => {
                 const course = enrollment.course
                 return (
                     (course.name.toLowerCase().includes(this.filterOptions.name.toLowerCase()) || this.filter === "") &&
                     (this.filterOptions.faculty == null || course.faculty.id === this.filterOptions.faculty.id) &&
                     (this.filterOptions.academicYear == null ||
+                        (this.filterOptions.academicYear === "active" && course.academicYear.active) ||
                         course.academicYear.id === this.filterOptions.academicYear.id)
                 )
             })
         },
         filteredEnrollableCourses() {
-            return this.enrollableCourses.filter(course => {
+            return this.enrollableCourses.filter((course) => {
                 return (
                     (course.name.toLowerCase().includes(this.filterOptions.name.toLowerCase()) || this.filter === "") &&
                     (this.filterOptions.faculty == null || course.faculty.id === this.filterOptions.faculty.id) &&
                     (this.filterOptions.academicYear == null ||
+                        (this.filterOptions.academicYear === "active" && course.academicYear.active) ||
                         course.academicYear.id === this.filterOptions.academicYear.id)
                 )
             })
-        }
+        },
     },
     async created() {
         await this.fetchFaculties()
@@ -354,9 +387,15 @@ export default {
             this.showSuccessMessage({ message: "Successfully enrolled in course." })
             // reload the data from the server
             await this.fetchEnrollableCourses()
+            await this.fetchEnrollments()
+        },
+        async enrollInCourseAsAdmin(courseId) {
+            await api.courses.enrollAsAdmin(courseId)
+            this.showSuccessMessage({ message: "Successfully enrolled in course as admin." })
+            // reload the data from the server
             await this.fetchEnrollableCourses()
             await this.fetchEnrollments()
-        }
-    }
+        },
+    },
 }
 </script>

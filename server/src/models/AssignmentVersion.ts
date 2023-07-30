@@ -1,22 +1,22 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  RelationId,
   Column,
-  ManyToMany,
-  OneToMany,
-  JoinTable,
-  OneToOne,
+  Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  RelationId,
 } from "typeorm";
 import {
+  IsBoolean,
   IsDefined,
   IsInt,
+  IsNotEmpty,
   IsPositive,
   IsString,
-  IsNotEmpty,
-  IsBoolean,
 } from "class-validator";
 import BaseModel from "./BaseModel";
 import Assignment from "../models/Assignment";
@@ -25,6 +25,7 @@ import SubmissionQuestionnaire from "./SubmissionQuestionnaire";
 import ReviewQuestionnaire from "./ReviewQuestionnaire";
 import Group from "./Group";
 import User from "./User";
+import File from "../models/File";
 
 @Entity()
 export default class AssignmentVersion extends BaseModel {
@@ -107,7 +108,8 @@ export default class AssignmentVersion extends BaseModel {
     this.name = name;
     this.assignment = assignment;
     this.versionsToReview = versionsToReview;
-    this.reviewsPerUserPerAssignmentVersionToReview = reviewsPerUserPerAssignmentVersionToReview;
+    this.reviewsPerUserPerAssignmentVersionToReview =
+      reviewsPerUserPerAssignmentVersionToReview;
     this.selfReview = selfReview;
     this.submissionQuestionnaire = submissionQuestionnaire;
     this.reviewQuestionnaire = reviewQuestionnaire;
@@ -163,6 +165,51 @@ export default class AssignmentVersion extends BaseModel {
       return this.getSubmissionsOfGroup(group);
     } else {
       return Submission.find({ where: { assignmentVersion: this } });
+    }
+  }
+
+  async deleteAllSubmissions(): Promise<void> {
+    const ids = await Submission.createQueryBuilder("submissions")
+      .select("fileId")
+      .where("assignmentVersionId = :assignmentVersionId", {
+        assignmentVersionId: this.id,
+      })
+      .execute();
+    const fileIds = ids.map((idObject: { fileId: any }) => idObject.fileId);
+
+    // delete submissions
+    await Submission.createQueryBuilder("submissions")
+      .delete()
+      .from(Submission)
+      .where("assignmentVersionId = :assignmentVersionId", {
+        assignmentVersionId: this.id,
+      })
+      .execute();
+
+    // delete associated files
+    if (fileIds.length > 0) {
+      await File.delete(fileIds);
+    }
+  }
+
+  async deleteAllReviews(): Promise<void> {
+    const subs = await Submission.createQueryBuilder("submissions")
+      .where("assignmentVersionId = :assignmentVersionId", {
+        assignmentVersionId: this.id,
+      })
+      .getMany();
+    for (let i = 0; i < subs.length; i++) {
+      await subs[i].deleteAllReviews();
+    }
+  }
+  async deleteAllReviewEvals(): Promise<void> {
+    const subs = await Submission.createQueryBuilder("submissions")
+      .where("assignmentVersionId = :assignmentVersionId", {
+        assignmentVersionId: this.id,
+      })
+      .getMany();
+    for (let i = 0; i < subs.length; i++) {
+      await subs[i].deleteAllReviewEvals();
     }
   }
 

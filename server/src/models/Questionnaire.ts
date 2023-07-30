@@ -1,9 +1,9 @@
 import {
-  PrimaryGeneratedColumn,
-  Entity,
-  TableInheritance,
-  OneToMany,
   Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  TableInheritance,
 } from "typeorm";
 import BaseModel from "./BaseModel";
 import AssignmentVersion from "./AssignmentVersion";

@@ -33,5 +33,5 @@ export default {
     copy(assignmentId, copyFromAssignmentId) {
         const body = { assignmentId, copyFromAssignmentId }
         return client.post("groups/copy", body)
-    }
+    },
 }

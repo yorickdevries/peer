@@ -1,24 +1,24 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
-  OneToOne,
-  ManyToOne,
-  ManyToMany,
+  Entity,
   JoinColumn,
+  ManyToMany,
+  ManyToOne,
   OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
   RelationId,
   getManager,
 } from "typeorm";
 import {
-  IsDefined,
-  IsOptional,
-  IsString,
-  IsNotEmpty,
   IsBoolean,
   IsDate,
-  IsUrl,
+  IsDefined,
   IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUrl,
 } from "class-validator";
 import BaseModel from "./BaseModel";
 import Group from "./Group";
@@ -28,9 +28,11 @@ import File from "./File";
 import moment from "moment";
 import UserRole from "../enum/UserRole";
 import { AssignmentState, assignmentStateOrder } from "../enum/AssignmentState";
-import Extensions from "../enum/Extensions";
+import AssignmentType from "../enum/AssignmentType";
 import AssignmentExport from "./AssignmentExport";
 import AssignmentVersion from "./AssignmentVersion";
+import Review from "./Review";
+import Submission from "./Submission";
 
 @Entity()
 export default class Assignment extends BaseModel {
@@ -128,10 +130,9 @@ export default class Assignment extends BaseModel {
   @IsDefined()
   @IsString()
   @IsNotEmpty()
-  @IsEnum(Extensions)
   // can be in the form: ".pdf,.zip,.doc,.docx"
   // needs later to be revised to a list of strings
-  submissionExtensions: Extensions;
+  submissionExtensions: string;
 
   @Column()
   @IsDefined()
@@ -162,6 +163,20 @@ export default class Assignment extends BaseModel {
   @IsBoolean()
   // lets the teacher set the possibillity to automatically progress to the next states of assignments
   automaticStateProgression: boolean;
+
+  @Column({ default: true })
+  @IsDefined()
+  @IsBoolean()
+  // lets the teacher disable notification emails
+  sendNotificationEmails: boolean;
+
+  @Column()
+  @IsDefined()
+  @IsString()
+  @IsNotEmpty()
+  @IsEnum(AssignmentType)
+  // lets the teacher choose the assignment type
+  assignmentType: AssignmentType;
 
   @RelationId((assignment: Assignment) => assignment.course)
   courseId!: number;
@@ -197,12 +212,14 @@ export default class Assignment extends BaseModel {
     description: string | null,
     file: File | null,
     externalLink: string | null,
-    submissionExtensions: Extensions,
+    submissionExtensions: string,
     blockFeedback: boolean,
     lateSubmissions: boolean,
     lateSubmissionReviews: boolean,
     lateReviewEvaluations: boolean | null,
-    automaticStateProgression: boolean
+    automaticStateProgression: boolean,
+    assignmentType: AssignmentType,
+    sendNotifcationEmails: boolean
   ) {
     super();
     this.name = name;
@@ -224,6 +241,8 @@ export default class Assignment extends BaseModel {
     this.lateSubmissionReviews = lateSubmissionReviews;
     this.lateReviewEvaluations = lateReviewEvaluations;
     this.automaticStateProgression = automaticStateProgression;
+    this.assignmentType = assignmentType;
+    this.sendNotificationEmails = sendNotifcationEmails;
   }
 
   // custom validation which is run before saving
@@ -283,6 +302,17 @@ export default class Assignment extends BaseModel {
 
   isAtState(otherState: AssignmentState): boolean {
     return this.state === otherState;
+  }
+
+  revertState(): void {
+    const currStateIndex = assignmentStateOrder.indexOf(this.state);
+    if (currStateIndex > 0) {
+      this.state = assignmentStateOrder[currStateIndex - 1];
+    } else {
+      throw new Error(
+        "State cannot be reversed as there are no previous states"
+      );
+    }
   }
 
   isAtOrAfterState(otherState: AssignmentState): boolean {
@@ -373,11 +403,32 @@ export default class Assignment extends BaseModel {
     return await course.isTeacherOrTeachingAssistant(user);
   }
 
+  async deleteAllSubmissions(): Promise<void> {
+    for (const assignmentVersion of this.versions) {
+      await assignmentVersion.deleteAllSubmissions();
+    }
+    return;
+  }
+
+  async deleteAllReviews(): Promise<void> {
+    for (const assignmentVersion of this.versions) {
+      await assignmentVersion.deleteAllReviews();
+    }
+    return;
+  }
+
+  async deleteAllReviewEvals(): Promise<void> {
+    for (const assignmentVersion of this.versions) {
+      await assignmentVersion.deleteAllReviewEvals();
+    }
+    return;
+  }
   async hasUnsubmittedSubmissionReviewsWhereUserIsReviewer(
     user: User
   ): Promise<boolean> {
     for (const assignmentVersion of this.versions) {
-      const submissionQuestionnaire = await assignmentVersion.getSubmissionQuestionnaire();
+      const submissionQuestionnaire =
+        await assignmentVersion.getSubmissionQuestionnaire();
       if (submissionQuestionnaire) {
         if (
           await submissionQuestionnaire.hasUnsubmittedReviewsWhereUserIsReviewer(
@@ -389,5 +440,55 @@ export default class Assignment extends BaseModel {
       }
     }
     return false;
+  }
+
+  /**
+   * Returns the list of submitted reviews that reviewed this group/user
+   *
+   * @param group the group of the user(s) that were reviewed
+   * @returns the list of reviews
+   */
+  async getSubmittedReviewsWhereUserIsReviewed(
+    group: Group
+  ): Promise<Review[]> {
+    const reviews: Review[] = [];
+    for (const assignmentVersion of this.versions) {
+      const submissionQuestionnaire =
+        await assignmentVersion.getSubmissionQuestionnaire();
+      if (submissionQuestionnaire) {
+        const submissions: Submission[] = [];
+        for (const version of this.versions) {
+          const versionSubmissions = await Submission.find({
+            where: {
+              group: group,
+              final: true,
+              assignmentVersion: version,
+            },
+          });
+          submissions.push(...versionSubmissions);
+        }
+        for (const submission of submissions) {
+          const submittedReviews = (
+            await submissionQuestionnaire.getReviewsWhereUserIsReviewed(
+              submission
+            )
+          ).filter((r) => r.submitted);
+          reviews.push(...submittedReviews);
+        }
+      }
+    }
+    return reviews;
+  }
+
+  async hasSubmissionQuestionnaires(): Promise<boolean> {
+    for (const assignmentVersion of this.versions) {
+      const submissionQuestionnaire =
+        await assignmentVersion.getSubmissionQuestionnaire();
+      if (!submissionQuestionnaire) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }

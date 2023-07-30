@@ -138,7 +138,7 @@ export default {
     components: {
         CreateDefaultAssignmentVersionWizard,
         CreateCustomAssignmentVersionWizard,
-        EditAssignmentVersionWizard
+        EditAssignmentVersionWizard,
     },
     data() {
         return {
@@ -151,11 +151,11 @@ export default {
                 { key: "reviewsPerUserPerAssignmentVersionToReview", label: "Reviews per user per version to review" },
                 { key: "versionsToReview", label: "Versions to review" },
                 { key: "selfReview", label: "Self review" },
-                { key: "actions", label: "Actions" }
+                { key: "actions", label: "Actions" },
             ],
             currentPage: 1,
             perPage: 10,
-            filter: ""
+            filter: "",
         }
     },
     async created() {
@@ -180,7 +180,7 @@ export default {
                 versions.push(res.data)
             }
             this.assignmentVersions = versions
-        }
-    }
+        },
+    },
 }
 </script>

@@ -61,7 +61,7 @@ export default {
         MultipleChoiceQuestion,
         CheckboxQuestion,
         RangeQuestion,
-        UploadQuestion
+        UploadQuestion,
     },
     props: ["questionnaireId", "questionNumber"],
     data() {
@@ -72,8 +72,8 @@ export default {
                 { value: "multiplechoice", text: "Multiple Choice" },
                 { value: "checkbox", text: "Checkbox" },
                 { value: "range", text: "Range" },
-                { value: "upload", text: "Upload" }
-            ]
+                { value: "upload", text: "Upload" },
+            ],
         }
     },
     methods: {
@@ -81,7 +81,7 @@ export default {
             // reset fields and emit so the questionnaire is reloaded
             this.selectedType = ""
             this.$emit("questionSaved")
-        }
-    }
+        },
+    },
 }
 </script>

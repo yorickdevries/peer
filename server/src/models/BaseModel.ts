@@ -1,10 +1,10 @@
 import {
   BaseEntity,
   CreateDateColumn,
-  UpdateDateColumn,
   SaveOptions,
+  UpdateDateColumn,
 } from "typeorm";
-import { validateOrReject, IsDate, IsOptional } from "class-validator";
+import { IsDate, IsOptional, validateOrReject } from "class-validator";
 
 // Adds the basic fields of @CreateDateColumn and UpdateDateColumn
 export default abstract class BaseModel extends BaseEntity {

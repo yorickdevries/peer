@@ -12,7 +12,7 @@
                 <b-card-header class="d-flex justify-content-between align-items-center">
                     <div>Review information</div>
                     <div>
-                        <b-button size="sm" variant="secondary" @click="goToReviewList" class="mr-2"
+                        <b-button size="sm" variant="secondary" @click="$router.back()" class="mr-2"
                             >Back to Assignment</b-button
                         >
                         <b-button size="sm" variant="primary" @click="goToNextReviewWithoutApproval"
@@ -27,7 +27,6 @@
                             <div>
                                 <dl>
                                     <dt>Download</dt>
-                                    <dd>The download for the submission this review is about.</dd>
                                     <a target="_blank" :href="reviewFilePath">
                                         <button
                                             type="button"
@@ -86,24 +85,26 @@
                     </b-row>
                     <br />
                     <b-row>
-                        <b-col
-                            v-if="viewPDF && fileMetadata.extension === '.pdf'"
-                            :cols="columnWidthPDFAndQuestionnaire"
-                        >
+                        <b-col :cols="columnWidthFileAndQuestionnaire" v-if="viewFile">
                             <!--Toggle side by side view-->
-                            <b-button @click="toggleViewPDFNextToQuestionnaire()">
-                                {{ viewPDFNextToQuestionnaire ? "Stop viewing" : "View" }} PDF next to questionnaire
+                            <b-button @click="toggleViewFileNextToQuestionnaire()">
+                                {{ viewFileNextToQuestionnaire ? "Stop viewing" : "View" }} submission next to
+                                questionnaire
                             </b-button>
                             <br />
                             <br />
-                            <PDFAnnotator :reviewId="review.id" :readOnly="true"></PDFAnnotator>
+                            <FileAnnotator
+                                :reviewId="review.id"
+                                :assignmentType="assignment.assignmentType"
+                                :readOnly="true"
+                            />
                         </b-col>
-                        <b-col :cols="columnWidthPDFAndQuestionnaire">
+                        <b-col :cols="columnWidthFileAndQuestionnaire">
                             <b-card
                                 v-if="answers"
                                 no-body
                                 class="mt-3"
-                                :style="viewPDFNextToQuestionnaire ? 'max-height: 1000px; overflow-y: auto' : ''"
+                                :style="viewFileNextToQuestionnaire ? 'max-height: 1000px; overflow-y: auto' : ''"
                             >
                                 <!--Form-->
                                 <b-list-group flush>
@@ -140,14 +141,10 @@
                                             <h4>{{ question.text }}</h4>
 
                                             <!-- OPEN QUESTION -->
-                                            <b-form-textarea
+                                            <MarkdownEditorViewer
                                                 v-if="question.type === 'open'"
-                                                placeholder="Enter your answer"
-                                                :rows="10"
-                                                :max-rows="15"
-                                                v-model="answers[question.id].answer"
-                                                readonly
-                                                required
+                                                :answer-object="answers[question.id]"
+                                                :displayeditor="false"
                                             />
 
                                             <!-- MULTIPLE CHOICE QUESTION -->
@@ -299,7 +296,7 @@
                                             name: $router.currentRoute.name.includes('teacher')
                                                 ? 'teacher-dashboard.assignments.assignment.submission'
                                                 : 'teaching-assistant-dashboard.course.assignment.submission',
-                                            params: { submissionId: review.submission.id }
+                                            params: { submissionId: review.submission.id },
                                         }"
                                         >Show submission approval</b-button
                                     >
@@ -320,12 +317,14 @@ import notifications from "../../mixins/notifications"
 import BreadcrumbTitle from "../BreadcrumbTitle"
 import { StarRating } from "vue-rate-it"
 import ReviewEvaluation from "../student-dashboard/assignment/ReviewEvaluation"
-import PDFAnnotator from "../student-dashboard/assignment/PDFAnnotator"
+import FileAnnotator from "../student-dashboard/assignment/FileAnnotator"
 import PDFViewer from "../general/PDFViewer"
+import "@toast-ui/editor/dist/toastui-editor-viewer.css"
+import MarkdownEditorViewer from "@/components/general/MarkdownEditorViewer"
 
 export default {
     mixins: [notifications],
-    components: { BreadcrumbTitle, StarRating, ReviewEvaluation, PDFAnnotator, PDFViewer },
+    components: { BreadcrumbTitle, StarRating, ReviewEvaluation, FileAnnotator, PDFViewer, MarkdownEditorViewer },
     data() {
         return {
             assignment: {},
@@ -333,18 +332,18 @@ export default {
             fileMetadata: {},
             review: {},
             commentChanged: false,
-            // dont view pdf until data is fetched
-            viewPDF: false,
+            // dont view file until data is fetched
+            viewFile: false,
             reviewEvaluation: null,
             // all answers will be saved in this object
             answers: null,
-            // View PDF next to questionnaire
-            viewPDFNextToQuestionnaire: false
+            // View file next to questionnaire
+            viewFileNextToQuestionnaire: false,
         }
     },
     computed: {
-        columnWidthPDFAndQuestionnaire() {
-            if (this.viewPDFNextToQuestionnaire) {
+        columnWidthFileAndQuestionnaire() {
+            if (this.viewFileNextToQuestionnaire) {
                 // columns are half width
                 return 6
             } else {
@@ -362,7 +361,7 @@ export default {
             } else {
                 return ""
             }
-        }
+        },
     },
     async created() {
         await this.fetchData()
@@ -370,10 +369,10 @@ export default {
     methods: {
         async fetchData() {
             await this.fetchAssignment()
-            this.viewPDF = false
+            this.viewFile = false
             await this.fetchReview()
             await this.fetchFileMetadata()
-            this.viewPDF = true
+            this.viewFile = true
             await this.fetchSubmissionQuestionnaire()
             await this.fetchAnswers()
             await this.fetchReviewEvaluation()
@@ -395,7 +394,7 @@ export default {
         async fetchReviewEvaluation() {
             // Retrieve the review evaluation.
             try {
-                const res = await api.reviewofsubmissions.getEvaluation(this.$route.params.reviewId)
+                const res = await api.reviewofsubmissions.getEvaluation(this.$route.params.reviewId, true)
                 this.reviewEvaluation = res.data
             } catch (error) {
                 this.reviewEvaluation = null
@@ -416,7 +415,7 @@ export default {
                 // answer variable which gets replaced if an answer is present
                 let answer = null
                 // find existing answer
-                const existingAnswer = _.find(existingAnswers, answer => {
+                const existingAnswer = _.find(existingAnswers, (answer) => {
                     return answer.questionId === question.id
                 })
                 if (existingAnswer) {
@@ -452,24 +451,13 @@ export default {
             this.showSuccessMessage({ message: "Review approval status changed" })
             await this.fetchReview()
         },
-        goToReviewList() {
-            if (this.$router.currentRoute.name.includes("teacher")) {
-                this.$router.push({
-                    name: "teacher-dashboard.assignments.assignment"
-                })
-            } else {
-                this.$router.push({
-                    name: "teaching-assistant-dashboard.course.assignment"
-                })
-            }
-        },
         async goToNextReviewWithoutApproval() {
             const reviews = []
             for (const assignmentVersion of this.assignment.versions) {
                 const res = await api.reviewofsubmissions.getAllForAssignmentVersion(assignmentVersion.id, true)
                 reviews.push(...res.data)
             }
-            const reviewsWithoutApproval = _.filter(reviews, review => {
+            const reviewsWithoutApproval = _.filter(reviews, (review) => {
                 return review.approvalByTA === null
             })
             if (reviewsWithoutApproval.length === 0) {
@@ -478,7 +466,7 @@ export default {
                 const randomReviewWithoutApproval = _.sample(reviewsWithoutApproval)
                 this.$router.push({
                     name: this.$router.currentRoute.name,
-                    params: { reviewId: randomReviewWithoutApproval.id }
+                    params: { reviewId: randomReviewWithoutApproval.id },
                 })
                 location.reload()
             }
@@ -486,9 +474,9 @@ export default {
         uploadAnswerFilePath(reviewId, questionId) {
             return `/api/uploadquestionanswers/file?reviewId=${reviewId}&questionId=${questionId}`
         },
-        toggleViewPDFNextToQuestionnaire() {
-            this.viewPDFNextToQuestionnaire = !this.viewPDFNextToQuestionnaire
-        }
-    }
+        toggleViewFileNextToQuestionnaire() {
+            this.viewFileNextToQuestionnaire = !this.viewFileNextToQuestionnaire
+        },
+    },
 }
 </script>

@@ -2,7 +2,7 @@ module.exports = {
   root: true,
   parser: "@typescript-eslint/parser",
   parserOptions: {
-    project: ["./tsconfig.json", "./tests/tsconfig.json"],
+    project: ["./tsconfig.json", "./tests/tsconfig.json", "./src/factories/tsconfig.json", "./src/seeds/tsconfig.json"],
     tsconfigRootDir: __dirname,
   },
   plugins: ["@typescript-eslint"],
@@ -14,7 +14,8 @@ module.exports = {
   ],
   rules: {
     "prefer-arrow-callback": "error",
-    "@typescript-eslint/no-misused-promises": "error",
+    "@typescript-eslint/no-misused-promises": "off",
     "@typescript-eslint/no-floating-promises": "error",
+    "sort-imports": "off"
   },
 };

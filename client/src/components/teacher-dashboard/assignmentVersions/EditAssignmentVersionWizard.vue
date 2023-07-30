@@ -26,7 +26,7 @@
             <b-form-group
                 label="Assignment versions that students need to review when they made a submission for this assignment version"
             >
-                <b-alert show>You can select multiple versions with CTRL</b-alert>
+                <b-alert show>You can select multiple versions by holding CTRL (Windows) or CMD (Mac)</b-alert>
                 <b-form-select
                     v-model="assignmentVersion.versionsToReview"
                     :options="assignmentVersionOptions"
@@ -55,7 +55,7 @@ export default {
     data() {
         return {
             assignment: null,
-            assignmentVersion: null
+            assignmentVersion: null,
         }
     },
     async created() {
@@ -85,12 +85,12 @@ export default {
                 for (const assignmentVersion of this.assignment.versions) {
                     options.push({
                         value: assignmentVersion.id,
-                        text: `${assignmentVersion.name} (ID: ${assignmentVersion.id})`
+                        text: `${assignmentVersion.name} (ID: ${assignmentVersion.id})`,
                     })
                 }
             }
             return options
-        }
+        },
     },
     methods: {
         async editAssignmentVersion() {
@@ -103,7 +103,7 @@ export default {
             )
             this.showSuccessMessage({ message: "Assignment version succesfully changed" })
             this.$emit("assignmentVersionChanged")
-        }
-    }
+        },
+    },
 }
 </script>
