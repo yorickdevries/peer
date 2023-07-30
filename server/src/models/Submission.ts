@@ -1,19 +1,21 @@
 import {
   Column,
   Entity,
-  PrimaryGeneratedColumn,
   JoinColumn,
   ManyToOne,
-  OneToOne,
-  RelationId,
   OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  RelationId,
+  getManager,
 } from "typeorm";
 import {
-  IsDefined,
   IsBoolean,
+  IsDefined,
+  IsEnum,
+  IsNotEmpty,
   IsOptional,
   IsString,
-  IsNotEmpty,
 } from "class-validator";
 import BaseModel from "./BaseModel";
 import User from "./User";
@@ -21,6 +23,9 @@ import AssignmentVersion from "../models/AssignmentVersion";
 import Group from "./Group";
 import File from "./File";
 import ReviewOfSubmission from "./ReviewOfSubmission";
+import ServerFlagReason from "../enum/ServerFlagReason";
+import QuestionAnswer from "./QuestionAnswer";
+import ReviewOfReview from "./ReviewOfReview";
 
 @Entity()
 export default class Submission extends BaseModel {
@@ -92,6 +97,18 @@ export default class Submission extends BaseModel {
   @ManyToOne((_type) => User, { eager: true })
   approvingTA: User | null;
 
+  @Column("boolean", { nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  flaggedByServer: boolean | null;
+
+  @Column("text", { nullable: true })
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  @IsEnum(ServerFlagReason)
+  commentByServer: ServerFlagReason | null;
+
   constructor(
     user: User,
     group: Group,
@@ -109,6 +126,8 @@ export default class Submission extends BaseModel {
     this.approvalByTA = null;
     this.commentByTA = null;
     this.approvingTA = null;
+    this.flaggedByServer = null;
+    this.commentByServer = null;
   }
 
   // validation: check whether the group is in the assingment and the user in the group
@@ -130,8 +149,11 @@ export default class Submission extends BaseModel {
       throw new Error("Group is not part of this assignment");
     }
     // check if the file has the right extension
+    const submissionExtensions =
+      assignment.submissionExtensions.split(/\s*,\s*/);
     if (
-      !assignment.submissionExtensions.split(",").includes(this.file.extension)
+      !submissionExtensions.includes(this.file.extension) &&
+      !submissionExtensions.includes(".*")
     ) {
       throw new Error("The file is of the wrong extension");
     }
@@ -149,6 +171,20 @@ export default class Submission extends BaseModel {
       if (!(await course.isTeacherOrTeachingAssistant(this.approvingTA))) {
         throw new Error(
           `${this.approvingTA.netid} should be enrolled in the course`
+        );
+      }
+    }
+
+    if (this.flaggedByServer) {
+      if (this.commentByServer === null) {
+        throw new Error(
+          "A server comment should be set if the submission is flagged."
+        );
+      }
+    } else {
+      if (this.commentByServer !== null) {
+        throw new Error(
+          "A server comment should not be set if the submission is flagged."
         );
       }
     }
@@ -175,5 +211,87 @@ export default class Submission extends BaseModel {
   async isTeacherOrTeachingAssistantInCourse(user: User): Promise<boolean> {
     const assignmentVersion = await this.getAssignmentVersion();
     return await assignmentVersion.isTeacherOrTeachingAssistantInCourse(user);
+  }
+
+  async isTeacherInCourse(user: User): Promise<boolean> {
+    const assignmentVersion = await this.getAssignmentVersion();
+    return await assignmentVersion.isTeacherInCourse(user);
+  }
+  async deleteAllReviews(): Promise<void> {
+    const ids = await ReviewOfSubmission.createQueryBuilder("review")
+      .select("review.id", "rid")
+      .where("review.submissionId = :submissionId", {
+        submissionId: this.id,
+      })
+      .execute();
+    const reviewIds = ids.map((idObject: { rid: any }) => idObject.rid);
+
+    if (reviewIds.length > 0) {
+      await QuestionAnswer.createQueryBuilder()
+        .delete()
+        .where("reviewId IN (:...idValues)", { idValues: reviewIds })
+        .execute();
+    }
+
+    await ReviewOfSubmission.createQueryBuilder()
+      .delete()
+      .where("submissionId = :submissionId", {
+        submissionId: this.id,
+      })
+      .execute();
+  }
+  async deleteAllReviewEvals(): Promise<void> {
+    // get all reviews for this submission
+    const ids = await ReviewOfSubmission.createQueryBuilder("review")
+      .select("review.id", "rid")
+      .where("review.submissionId = :submissionId", {
+        submissionId: this.id,
+      })
+      .execute();
+
+    if (ids.length !== 0) {
+      const reviewIds = ids.map((idObject: { rid: any }) => idObject.rid);
+
+      // get all review evaluations for this submission
+      const feedbackReviews = await ReviewOfReview.createQueryBuilder("review")
+        .select("review.id", "rid")
+        .where("reviewOfSubmissionId IN (:...idValues)", {
+          idValues: reviewIds,
+        })
+        .execute();
+
+      const feedbackReviewIds = feedbackReviews.map(
+        (idObject: { rid: any }) => idObject.rid
+      );
+
+      if (feedbackReviewIds.length > 0) {
+        await QuestionAnswer.createQueryBuilder()
+          .delete()
+          .where("reviewId IN (:...idValues)", { idValues: feedbackReviewIds })
+          .execute();
+
+        await ReviewOfReview.createQueryBuilder()
+          .delete()
+          .where("reviewOfSubmissionId IN (:...idValues)", {
+            idValues: reviewIds,
+          })
+          .execute();
+      }
+    }
+  }
+
+  /**
+   * Returns a boolean indicating whether a group has made a submission
+   *
+   * @param groupId the group id
+   * @returns whether the group has made a submission
+   */
+  static async hasGroupMadeSubmission(groupId: number): Promise<boolean> {
+    const group = await getManager()
+      .createQueryBuilder(Submission, "submission")
+      .leftJoin("submission.group", "group")
+      .where("group.id = :id", { id: groupId })
+      .getOne();
+    return !!group;
   }
 }

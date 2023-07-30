@@ -7,6 +7,9 @@ import copyGroupsForAssignment from "./copyGroups";
 import exportGradesForAssignmentVersion from "./exportGrades";
 import exportReviewsForAssignmentVersion from "./exportReviews";
 import exportSubmissionsForAssignmentVersion from "./exportSubmissions";
+import submissionFlagging from "./submissionFlagging";
+import exportSubmissionsForZip from "./exportZip";
+//import importWebLabSubmissions from "./importSubmissions";
 
 const workerFunctions = {
   publishAssignment: publishAssignment,
@@ -18,6 +21,9 @@ const workerFunctions = {
   exportGradesForAssignmentVersion: exportGradesForAssignmentVersion,
   exportReviewsForAssignmentVersion: exportReviewsForAssignmentVersion,
   exportSubmissionsForAssignmentVersion: exportSubmissionsForAssignmentVersion,
+  submissionFlagging: submissionFlagging,
+  exportSubmissionsForZip: exportSubmissionsForZip,
+  //importWebLabSubmissions: importWebLabSubmissions,
 };
 
 export default workerFunctions;

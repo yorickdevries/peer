@@ -1,17 +1,17 @@
 import {
-  PrimaryGeneratedColumn,
   Column,
   Entity,
+  PrimaryGeneratedColumn,
   TableInheritance,
 } from "typeorm";
 import {
   IsDefined,
-  IsString,
   IsInt,
   IsNotEmpty,
   IsOptional,
-  Min,
+  IsString,
   Max,
+  Min,
 } from "class-validator";
 import BaseModel from "./BaseModel";
 import QuestionOptionType from "../enum/QuestionType";

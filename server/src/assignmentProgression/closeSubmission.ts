@@ -8,7 +8,8 @@ const closeSubmissionHelper = async function (assignment: Assignment) {
     throw new Error("The assignment is not in submission state");
   }
   for (const assignmentVersion of assignment.versions) {
-    const submissions = await assignmentVersion.getFinalSubmissionsOfEachGroup();
+    const submissions =
+      await assignmentVersion.getFinalSubmissionsOfEachGroup();
     if (submissions.length === 0) {
       throw new Error(
         "There are no submissions for one of the assignment versions"

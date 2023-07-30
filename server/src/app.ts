@@ -1,7 +1,9 @@
-import express, { Request, Response, NextFunction } from "express";
+import express, { NextFunction, Request, Response } from "express";
 // library to make sure async errors are handled
 require("express-async-errors");
 import path from "path";
+import config from "config";
+import * as Sentry from "@sentry/node";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import compression from "compression";
@@ -14,9 +16,58 @@ import ResponseMessage from "./enum/ResponseMessage";
 // instantiate the app
 const app = express();
 
-app.use(helmet());
+if (config.has("sentry")) {
+  Sentry.init({
+    release: process.env.SENTRY_RELEASE,
+    dsn: config.get("sentry.dsn"),
+    environment: process.env.NODE_ENV,
+    integrations: [
+      // enable HTTP calls tracing
+      new Sentry.Integrations.Http({ tracing: true }),
+      // enable Express.js middleware tracing
+      new Sentry.Integrations.Express({ app }),
+    ],
+
+    // Set tracesSampleRate to 1.0 to capture 100%
+    // of transactions for performance monitoring.
+    // We recommend adjusting this value in production
+    tracesSampleRate: config.get("sentry.rate"),
+  });
+
+  // RequestHandler creates a separate execution context using domains, so that every
+  // transaction/span/breadcrumb is attached to its own Hub instance
+  app.use(
+    Sentry.Handlers.requestHandler({
+      user: ["id", "netid", "email"],
+    })
+  );
+  // TracingHandler creates a trace for every incoming request
+  app.use(Sentry.Handlers.tracingHandler());
+}
+
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        "connect-src": [
+          "'self'",
+          "https://*.adobe.com",
+          "https://*.adobe.io",
+          "*.typekit.com",
+          "*.typekit.net",
+        ],
+        "script-src": [
+          "'self'",
+          "'unsafe-eval'",
+          "https://documentservices.adobe.com",
+        ],
+        "frame-src": ["'self'", "https://documentservices.adobe.com"],
+      },
+    },
+    crossOriginEmbedderPolicy: false,
+  })
+);
 app.use(compression());
-app.use(errorLogger);
 
 const clientWebsite = path.resolve(__dirname, "../dist/public");
 app.use(express.static(clientWebsite));
@@ -33,6 +84,12 @@ const clientIndex = path.resolve(clientWebsite, "index.html");
 app.get("/*", (_req, res) => {
   res.sendFile(clientIndex);
 });
+if (config.has("sentry")) {
+  //Sentry error handler
+  app.use(Sentry.Handlers.errorHandler());
+}
+
+app.use(errorLogger);
 
 // Error handler
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

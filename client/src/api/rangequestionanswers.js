@@ -8,5 +8,5 @@ export default {
     delete(rangeQuestionId, reviewId) {
         const params = { rangeQuestionId, reviewId }
         return client.delete("rangequestionanswers", { params: params })
-    }
+    },
 }

@@ -8,7 +8,7 @@
         <b-row>
             <b-col>
                 <b-card no-body>
-                    <b-tabs card fill>
+                    <b-tabs-persist card fill>
                         <b-row>
                             <b-col>
                                 <!--Enrollable-->
@@ -76,8 +76,8 @@
                                                     name: 'student-dashboard.course.assignment',
                                                     params: {
                                                         courseId: assignment.courseId,
-                                                        assignmentId: assignment.id
-                                                    }
+                                                        assignmentId: assignment.id,
+                                                    },
                                                 }"
                                                 >View Assignment</b-button
                                             >
@@ -127,8 +127,8 @@
                                                     name: 'student-dashboard.course.assignment',
                                                     params: {
                                                         courseId: assignment.courseId,
-                                                        assignmentId: assignment.id
-                                                    }
+                                                        assignmentId: assignment.id,
+                                                    },
                                                 }"
                                                 >View Assignment</b-button
                                             >
@@ -171,8 +171,8 @@
                                                     name: 'student-dashboard.course.assignment',
                                                     params: {
                                                         courseId: assignment.courseId,
-                                                        assignmentId: assignment.id
-                                                    }
+                                                        assignmentId: assignment.id,
+                                                    },
                                                 }"
                                                 >View Assignment</b-button
                                             >
@@ -181,7 +181,7 @@
                                 </b-tab>
                             </b-col>
                         </b-row>
-                    </b-tabs>
+                    </b-tabs-persist>
                 </b-card>
             </b-col>
         </b-row>
@@ -193,33 +193,34 @@ import api from "../../api/api"
 import _ from "lodash"
 import BreadcrumbTitle from "../BreadcrumbTitle"
 import notifications from "../../mixins/notifications"
+import BTabsPersist from "@/components/general/b-tabs-persist"
 
 export default {
     mixins: [notifications],
-    components: { BreadcrumbTitle },
+    components: { BTabsPersist, BreadcrumbTitle },
     data() {
         return {
             enrollableAssignments: [],
             enrolledAssignments: [],
-            assignments: []
+            assignments: [],
         }
     },
     computed: {
         assignmentsInSubmissionState() {
-            return _.filter(this.enrolledAssignments, assignment => {
+            return _.filter(this.enrolledAssignments, (assignment) => {
                 return assignment.state === "submission"
             })
         },
         assignmentsInWaitingForReviewOrReviewState() {
-            return _.filter(this.enrolledAssignments, assignment => {
+            return _.filter(this.enrolledAssignments, (assignment) => {
                 return assignment.state === "waitingforreview" || assignment.state === "review"
             })
         },
         assignmentsInFeedbackState() {
-            return _.filter(this.enrolledAssignments, assignment => {
+            return _.filter(this.enrolledAssignments, (assignment) => {
                 return assignment.state === "feedback"
             })
-        }
+        },
     },
     async created() {
         await this.fetchAssignments()
@@ -241,7 +242,7 @@ export default {
         },
         isInWaitingForReviewState(assignment) {
             return assignment.state === "waitingforreview"
-        }
-    }
+        },
+    },
 }
 </script>

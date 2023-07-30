@@ -39,7 +39,7 @@
                         size="sm"
                         :to="{
                             name: 'teaching-assistant-dashboard.course.assignment',
-                            params: { assignmentId: data.item.id }
+                            params: { assignmentId: data.item.id },
                         }"
                         >Details</b-button
                     >
@@ -70,17 +70,17 @@ export default {
                 { key: "id", label: "ID", sortable: true },
                 { key: "name", label: "Name", sortable: true },
                 { key: "description", label: "Description" },
-                { key: "action", label: "Action" }
+                { key: "action", label: "Action" },
             ],
             currentPage: 1,
             perPage: 10,
-            filter: ""
+            filter: "",
         }
     },
     async created() {
         // Fetch assignments information.
         const res = await api.assignments.getAllForCourse(this.$route.params.courseId)
         this.assignments = res.data
-    }
+    },
 }
 </script>

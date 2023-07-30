@@ -25,7 +25,10 @@
                         class="p-0 m-0"
                         size="lg"
                     >
-                        <ImportGroupsWizard></ImportGroupsWizard>
+                        <ImportGroupsWizard
+                            :modalId="`importGroups${assignment.id}`"
+                            :overwrite="this.groups && this.groups.length > 0"
+                        ></ImportGroupsWizard>
                     </b-modal>
                 </template>
             </b-col>
@@ -39,9 +42,7 @@
                 </template>
                 <template v-else>
                     <dt>Copy groups</dt>
-                    <dd>
-                        This action will import the groups of another assignment to this assignment.
-                    </dd>
+                    <dd>This action will import the groups of another assignment to this assignment.</dd>
                     <b-button v-b-modal="`copyGroups${assignment.id}`" variant="primary" size="sm"
                         >Copy groups
                     </b-button>
@@ -110,9 +111,13 @@
                     {{ row.detailsShowing ? "Hide" : "Show" }} Edit Group/Submissions
                 </b-button>
                 <!--Delete Group-->
-                <b-button size="sm" @click="deleteGroup(row.item.id)" class="mr-2" variant="danger">
+                <b-button size="sm" v-b-modal="`deleteGroup${row.item.id}`" class="mr-2" variant="danger">
                     Delete Group
                 </b-button>
+
+                <b-modal :id="`deleteGroup${row.item.id}`" centered title="Warning" @ok="deleteGroup(row.item.id)">
+                    <div>Are you sure you want to delete this group?</div>
+                </b-modal>
             </template>
 
             <!--Actions-->
@@ -136,10 +141,10 @@
                             variant="success"
                             class="mr-2"
                             size="sm"
-                            @click="addUserToGroup(row.item.id, newUserNetId)"
+                            @click="addUserToGroup(row.item.id, newUserNetId[row.item.id])"
                             >Add Group Member</b-button
                         >
-                        <b-input v-model="newUserNetId" placeholder="Enter valid NetID here."></b-input>
+                        <b-input v-model="newUserNetId[row.item.id]" placeholder="Enter valid NetID here."></b-input>
                     </dd>
                 </b-card>
                 <b-card header="Submissions" class="h-100">
@@ -269,7 +274,7 @@ export default {
     mixins: [notifications],
     components: {
         ImportGroupsWizard,
-        CopyGroupsWizard
+        CopyGroupsWizard,
     },
     data() {
         return {
@@ -279,14 +284,14 @@ export default {
             groupFields: [
                 { key: "id", label: "Group ID", sortable: true },
                 { key: "name", label: "Group name", sortable: true },
-                { key: "actions", label: "Actions" }
+                { key: "actions", label: "Actions" },
             ],
             userFields: [
                 { key: "displayName", label: "Name" },
                 { key: "netid", label: "NetID" },
                 { key: "email", label: "​​​Email" },
                 { key: "studentNumber", label: "Studentnumber" },
-                { key: "action", label: "Action" }
+                { key: "action", label: "Action" },
             ],
             submissionFields: [
                 { key: "id", label: "ID", sortable: true },
@@ -295,7 +300,7 @@ export default {
                 { key: "userNetid", label: "Submitted by" },
                 { key: "date", label: "​​​Date" },
                 { key: "final", label: "Final" },
-                { key: "action", label: "Action" }
+                { key: "action", label: "Action" },
             ],
             currentPage: 1,
             perPage: 10,
@@ -303,7 +308,7 @@ export default {
             // add new group
             newGroupName: "",
             // add new user
-            newUserNetId: ""
+            newUserNetId: {},
         }
     },
     computed: {
@@ -313,12 +318,12 @@ export default {
                 for (const assignmentVersion of this.assignment.versions) {
                     options.push({
                         value: assignmentVersion.id,
-                        text: `${assignmentVersion.name} (ID: ${assignmentVersion.id})`
+                        text: `${assignmentVersion.name} (ID: ${assignmentVersion.id})`,
                     })
                 }
             }
             return options
-        }
+        },
     },
     async created() {
         await this.fetchAssignment()
@@ -369,7 +374,7 @@ export default {
             }
             await api.groups.addUser(groupId, userNetid)
             await this.fetchGroups()
-            this.newUserNetId = ""
+            this.newUserNetId[groupId] = ""
             this.showSuccessMessage({ message: "Succesfully added user to group." })
         },
         async removeUserFromGroup(groupId, userNetid) {
@@ -407,7 +412,7 @@ export default {
             await api.submissions.patch(id, false)
             this.showSuccessMessage({ message: "Set submission as not final" })
             await this.fetchGroups()
-        }
-    }
+        },
+    },
 }
 </script>

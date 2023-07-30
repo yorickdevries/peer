@@ -1,6 +1,12 @@
 <template>
     <div>
         <b-card v-if="!assignment || assignment.versions.length === 0">No assignment versions available.</b-card>
+        <div v-else-if="assignment.versions.length === 1">
+            <Submission
+                :assignmentVersion="assignment.versions[0]"
+                :assignmentVersionId="assignment.versions[0].id"
+            ></Submission>
+        </div>
         <div v-else>
             <b-card no-body>
                 <b-alert v-if="assignment.versions.length > 1" show
@@ -8,11 +14,17 @@
                 >
                 <hr />
                 <b-tabs card lazy>
-                    <b-tab v-for="assignmentVersion in assignment.versions" :key="assignmentVersion.id">
+                    <b-tab>
+                        <template slot="title">
+                            <div class="d-flex align-items-center">Select</div>
+                        </template>
+                        <b-alert show>Please select your assignment version above</b-alert>
+                    </b-tab>
+                    <b-tab v-for="(assignmentVersion, index) in assignment.versions" :key="assignmentVersion.id">
                         <template slot="title">
                             <div class="d-flex align-items-center">
                                 <b-badge variant="warning" class="mr-2"
-                                    >{{ assignmentVersion.name }} (ID: {{ assignmentVersion.id }})</b-badge
+                                    >{{ assignmentVersion.name }} #{{ index + 1 }}</b-badge
                                 >
                             </div>
                         </template>
@@ -30,16 +42,16 @@ import api from "../../../api/api"
 
 export default {
     components: {
-        Submission
+        Submission,
     },
     data() {
         return {
-            assignment: null
+            assignment: null,
         }
     },
     async created() {
         const res = await api.assignments.get(this.$route.params.assignmentId)
         this.assignment = res.data
-    }
+    },
 }
 </script>

@@ -1,14 +1,11 @@
 <template>
     <b-container v-if="assignmentVersion" fluid class="px-0">
         <!--Submission Information-->
-        <b-card
-            :header="`Submission for Assignment version: ${assignmentVersion.name} (ID: ${assignmentVersion.id})`"
-            class="h-100"
-        >
+        <b-card :header="`Submission for Assignment version: ${assignmentVersion.name}`" class="h-100">
             <b-row>
                 <b-col>
                     <div v-if="submissions.length > 0">
-                        <dt>These are the submission you have made:</dt>
+                        <dt>These are the submissions you have made:</dt>
                         <b-table
                             striped
                             outlined
@@ -25,6 +22,19 @@
                             <template v-slot:cell(date)="data">
                                 {{ data.item.createdAt | formatDate }}
                             </template>
+                            <template v-slot:cell(serverStatus)="data">
+                                <dl>
+                                    <dt v-if="data.item.flaggedByServer">⚠️ There might be a problem with this file</dt>
+                                    <dd v-if="data.item.flaggedByServer === null">
+                                        Your file was not checked by the server
+                                    </dd>
+                                </dl>
+                                <dl>
+                                    <dd v-if="data.item.flaggedByServer">
+                                        Server's reason for flagging {{ data.item.commentByServer }}
+                                    </dd>
+                                </dl>
+                            </template>
                             <!--Actions-->
                             <template v-slot:cell(action)="data">
                                 <!--Trigger final /  not final-->
@@ -32,6 +42,11 @@
                                     v-if="!data.item.final"
                                     v-b-modal="`changeSubmissionToFinalModal${data.item.id}`"
                                     :disabled="!isSubmissionActive"
+                                    :title="
+                                        isSubmissionActive
+                                            ? null
+                                            : 'You cannot change the final submission since the deadline has passed'
+                                    "
                                     size="sm"
                                     variant="secondary"
                                     class="mr-2"
@@ -42,6 +57,11 @@
                                     v-else
                                     v-b-modal="`changeSubmissionToNotFinalModal${data.item.id}`"
                                     :disabled="!isSubmissionActive"
+                                    :title="
+                                        isSubmissionActive
+                                            ? null
+                                            : 'You cannot change the final submission since the deadline has passed'
+                                    "
                                     size="sm"
                                     variant="danger"
                                     class="mr-2"
@@ -92,66 +112,79 @@
                         Only the final submission will be used for reviewing
                         <br />
                     </div>
-                    <b-alert v-else show variant="danger"
-                        >You have not yet made a submission for this assignment version</b-alert
-                    >
-                    <b-alert show variant="warning">Maximum file size for submission: 50MB</b-alert>
-
-                    <!-- Modal Button -->
-                    <b-button
-                        v-b-modal="`uploadModal${assignmentVersion.id}`"
-                        :disabled="!isSubmissionActive"
-                        variant="primary"
-                        @click="resetFile"
-                        >Upload new Submission</b-button
-                    >
-
-                    <!-- Upload Modal-->
-                    <b-modal
-                        :id="`uploadModal${assignmentVersion.id}`"
-                        ref="uploadModal"
-                        centered
-                        hide-footer
-                        title="Upload Submission"
-                    >
-                        Assignment version:
-                        <b-badge pill>{{ assignmentVersion.name }} (ID: {{ assignmentVersion.id }})</b-badge>
-                        <hr />
-                        <b-alert show variant="warning"
-                            >If you have already uploaded a file, it will not be used for reviewing anymore!
+                    <b-alert v-else show variant="danger">
+                        You have not (yet) made a submission for this assignment version
+                    </b-alert>
+                    <div v-if="isSubmissionActive">
+                        <b-alert show variant="danger">
+                            You should never include any personal information in your submission files unless
+                            specifically mentioned otherwise!
                         </b-alert>
-                        <b-progress :value="fileProgress" :animated="fileProgress !== 100" class="mb-3" />
-                        <b-alert show variant="secondary"
-                            >Allowed file types: {{ assignment.submissionExtensions }}</b-alert
+
+                        <!-- Modal Button -->
+                        <b-button
+                            v-b-modal="`uploadModal${assignmentVersion.id}`"
+                            :disabled="!isSubmissionActive"
+                            variant="primary"
+                            @click="resetFile"
+                            >Upload new Submission</b-button
                         >
-                        <b-form-file
-                            v-model="file"
-                            :accept="assignment.submissionExtensions"
-                            placeholder="Choose a file..."
-                            required
-                            :state="Boolean(file)"
-                        />
-                        <b-button variant="primary" class="mt-3" :disabled="buttonDisabled" @click="submitSubmission()"
-                            >Upload</b-button
+
+                        <!-- Upload Modal-->
+                        <b-modal
+                            :id="`uploadModal${assignmentVersion.id}`"
+                            ref="uploadModal"
+                            centered
+                            hide-footer
+                            title="Upload Submission"
                         >
-                    </b-modal>
+                            Assignment version:
+                            <b-badge pill>{{ assignmentVersion.name }}</b-badge>
+                            <hr />
+                            <b-alert show variant="warning">
+                                If you have already uploaded a file, it will not be used for reviewing anymore!
+                            </b-alert>
+                            <b-alert show variant="warning">
+                                Please make sure you have not included personal information anywhere unless specifically
+                                mentioned otherwise!
+                            </b-alert>
+                            <b-progress :value="fileProgress" :animated="fileProgress !== 100" class="mb-3" />
+                            <b-alert show variant="secondary"
+                                >Allowed file types: {{ assignment.submissionExtensions }}</b-alert
+                            >
+                            <b-form-file
+                                v-model="file"
+                                :accept="assignment.submissionExtensions"
+                                placeholder="Choose a file..."
+                                required
+                                :state="Boolean(file)"
+                            />
+                            <b-button
+                                variant="primary"
+                                class="mt-3"
+                                :disabled="buttonDisabled"
+                                @click="submitSubmission()"
+                                >Upload</b-button
+                            >
+                        </b-modal>
+                    </div>
                 </b-col>
             </b-row>
             <b-row>
                 <b-col>
                     <dt>You can view your final submission here:</dt>
-                    <div v-if="finalSubmission && finalSubmission.file.extension === '.pdf'">
-                        <b-alert show variant="secondary"
+                    <div v-if="finalSubmission">
+                        <b-alert v-if="finalSubmission.file.extension === '.pdf'" variant="secondary"
                             >In case the viewer shows any errors, your .pdf is malformed and no pdf annotations can be
                             made by your reviewers directly in the browser. Reviewers can always download the file
                             instead.</b-alert
                         >
-                        <PDFAnnotator :submissionId="finalSubmission.id" :readOnly="true"></PDFAnnotator>
-                    </div>
-                    <div v-else>
-                        <b-alert show variant="secondary">
-                            Your final submission is not a .pdf file, so it will not be rendered in the browser</b-alert
-                        >
+                        <FileAnnotator
+                            :submissionId="finalSubmission.id"
+                            :assignmentType="assignment.assignmentType"
+                            :readOnly="true"
+                            :ignoreAnnotations="true"
+                        />
                     </div>
                 </b-col>
             </b-row>
@@ -162,13 +195,12 @@
 <script>
 import api from "../../../api/api"
 import _ from "lodash"
-import PDFAnnotator from "./PDFAnnotator"
+import FileAnnotator from "./FileAnnotator"
 import notifications from "../../../mixins/notifications"
-
 export default {
     props: ["assignmentVersionId"],
     mixins: [notifications],
-    components: { PDFAnnotator },
+    components: { FileAnnotator },
     data() {
         return {
             assignment: null,
@@ -184,11 +216,12 @@ export default {
                 { key: "file", label: "File" },
                 { key: "userNetid", label: "Submitted by" },
                 { key: "date", label: "​​​Date" },
+                { key: "serverStatus", label: "Server Status" },
                 { key: "final", label: "Final" },
                 { key: "action", label: "Action" },
-                { key: "taFeedback", label: "TA Feedback" }
+                { key: "taFeedback", label: "TA Feedback" },
             ],
-            buttonDisabled: false
+            buttonDisabled: false,
         }
     },
     computed: {
@@ -200,10 +233,10 @@ export default {
             )
         },
         finalSubmission() {
-            return _.find(this.submissions, submission => {
+            return _.find(this.submissions, (submission) => {
                 return submission.final
             })
-        }
+        },
     },
     async created() {
         await this.fetchAssignment()
@@ -240,9 +273,9 @@ export default {
             // Config set for the HTTP request & updating the progress field.
             let config = {
                 "Content-Type": "multipart/form-data",
-                onUploadProgress: progressEvent => {
+                onUploadProgress: (progressEvent) => {
                     this.fileProgress = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-                }
+                },
             }
             // Perform upload.
             try {
@@ -277,7 +310,7 @@ export default {
             await api.submissions.patch(id, false)
             this.showSuccessMessage({ message: "Set submission as not final" })
             await this.fetchSubmissions()
-        }
-    }
+        },
+    },
 }
 </script>

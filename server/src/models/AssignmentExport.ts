@@ -1,10 +1,10 @@
 import {
   Entity,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  RelationId,
-  OneToOne,
   JoinColumn,
+  ManyToOne,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  RelationId,
 } from "typeorm";
 import BaseModel from "./BaseModel";
 import User from "./User";

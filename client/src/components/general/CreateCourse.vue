@@ -78,23 +78,23 @@ export default {
                 enrollable: false,
                 faculty: null,
                 academicYear: null,
-                description: null
+                description: null,
             },
             faculties: [],
-            academicYears: []
+            academicYears: [],
         }
     },
     async created() {
         await this.fetchFaculties()
-        await this.fetchActiveAcademicYears()
+        await this.fetchAcademicYears()
     },
     methods: {
         async fetchFaculties() {
             let res = await api.faculties.get()
             this.faculties = res.data
         },
-        async fetchActiveAcademicYears() {
-            const res = await api.academicyears.get(true)
+        async fetchAcademicYears() {
+            const res = await api.academicyears.get()
             this.academicYears = res.data
         },
         async onSubmit() {
@@ -107,7 +107,7 @@ export default {
                 this.course.description
             )
             this.$router.push({ name: "teacher-dashboard.course", params: { courseId: res.data.id } })
-        }
-    }
+        },
+    },
 }
 </script>

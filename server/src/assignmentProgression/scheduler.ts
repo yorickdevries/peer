@@ -3,11 +3,15 @@ import schedule from "node-schedule";
 import { AssignmentState } from "../enum/AssignmentState";
 import Assignment from "../models/Assignment";
 import {
-  startPublishAssignmentWorker,
   startCloseSubmissionForAssignmentWorker,
   startDistributeReviewsForAssignmentWorker,
   startOpenFeedbackForAssignmentWorker,
+  startPublishAssignmentWorker,
 } from "../workers/pool";
+import {
+  genMailForMissingStageSubmission,
+  sendMessageBatch,
+} from "../util/mailer";
 
 // map assignments to jobs
 const scheduledJobs: Map<number, schedule.Job[]> = new Map<
@@ -51,7 +55,11 @@ const scheduleJobsForAssignment = function (assignment: Assignment): void {
       assignment.isAtOrBeforeState(AssignmentState.SUBMISSION) &&
       moment(now).isBefore(assignment.dueDate)
     ) {
-      const job = schedule.scheduleJob(assignment.dueDate, () => {
+      const closeSubmissionDate = assignment.lateSubmissions
+        ? moment(assignment.reviewPublishDate).subtract("15", "m").toDate()
+        : assignment.dueDate;
+
+      const job = schedule.scheduleJob(closeSubmissionDate, () => {
         startCloseSubmissionForAssignmentWorker(assignment.id);
       });
       // job can be null if scheduled in the past
@@ -90,6 +98,14 @@ const scheduleJobsForAssignment = function (assignment: Assignment): void {
   }
 };
 
+const scheduleReminderJob = function (): void {
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  schedule.scheduleJob("7 1 * * *", async () => {
+    const emailsToSend = await genMailForMissingStageSubmission();
+    await sendMessageBatch(emailsToSend);
+  });
+};
+
 const scheduleAllJobs = async function (): Promise<void> {
   // find all assignments
   const assignments = await Assignment.find();
@@ -101,6 +117,9 @@ const scheduleAllJobs = async function (): Promise<void> {
     counter += element[1].length;
   }
   console.log(`Scheduled ${counter} jobs`);
+
+  scheduleReminderJob();
+  console.log("Scheduled stage reminder job");
 };
 
 export { scheduleAllJobs, scheduleJobsForAssignment };

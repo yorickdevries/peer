@@ -2,19 +2,17 @@
     <div>
         <b-container>
             <!--Header-->
-            <BreadcrumbTitle
-                :items="['Assignments', assignment.name, 'Submissions', submission.id]"
-                class="mt-3"
-            ></BreadcrumbTitle>
+            <BreadcrumbTitle :items="['Assignments', assignment.name, 'Submissions', submission.id]" class="mt-3">
+            </BreadcrumbTitle>
 
             <!--Next Submission-->
             <b-card no-body>
                 <b-card-header class="d-flex justify-content-between align-items-center">
                     <div>Submission information</div>
                     <div>
-                        <b-button size="sm" variant="secondary" @click="goToAssignment" class="mr-2"
-                            >Back to Assignment</b-button
-                        >
+                        <b-button size="sm" variant="secondary" @click="$router.back()" class="mr-2"
+                            >Back to Assignment
+                        </b-button>
                         <b-button size="sm" variant="primary" @click="goToNextFinalSubmissionWithoutApproval"
                             >Next (Random) Final Submission Without Approval</b-button
                         >
@@ -27,7 +25,6 @@
                             <div>
                                 <dl>
                                     <dt>Download</dt>
-                                    <dd>The download for the submission.</dd>
                                     <a target="_blank" :href="submissionFilePath">
                                         <button
                                             type="button"
@@ -47,21 +44,33 @@
                                 <dt>Current submission status</dt>
                                 <dd>{{ submission.final ? "" : "Not " }}Final</dd>
                             </dl>
-                            <dt>Current approval status</dt>
+                            <dl>
+                                <dt>Current server flagging status</dt>
+                                <dd v-if="submission.flaggedByServer">Flagged as suspicious⚠️</dd>
+                                <dd v-if="submission.flaggedByServer === false">Not flagged as suspicious✔️</dd>
+                                <dd v-if="submission.flaggedByServer === null">No action by the server yet</dd>
+                            </dl>
+                            <dl>
+                                <dt>Server's reason for flagging</dt>
+                                <dd>{{ submission.commentByServer }}</dd>
+                            </dl>
+                            <dt>Current TA approval status</dt>
                             <dd v-if="submission.approvalByTA">Approved 👍</dd>
                             <dd v-if="submission.approvalByTA === false">Disapproved 👎</dd>
-                            <dd v-if="submission.approvalByTA === null">No action yet by any TA.</dd>
+                            <dd v-if="submission.approvalByTA === null">No action yet by any TA</dd>
                             <dt>Current TA Comment</dt>
                             <b-form-textarea :rows="10" :max-rows="15" v-model="submission.commentByTA" readonly />
                         </b-col>
                     </b-row>
                     <b-row>
                         <b-col>
-                            <PDFAnnotator
-                                v-if="viewPDF && submission.file.extension === '.pdf'"
+                            <FileAnnotator
+                                v-if="viewFile"
                                 :submissionId="submission.id"
+                                :assignmentType="assignment.assignmentType"
                                 :readOnly="true"
-                            ></PDFAnnotator>
+                                :ignoreAnnotations="true"
+                            />
                         </b-col>
                     </b-row>
                 </b-card-body>
@@ -80,8 +89,8 @@
                                 class="mr-2"
                                 @click="updateSubmissionApproval(false)"
                                 :disabled="submission.approvalByTA === false && !commentChanged"
-                                >Disapprove 👎</b-button
-                            >
+                                >Disapprove 👎
+                            </b-button>
                             <b-button
                                 variant="success"
                                 @click="updateSubmissionApproval(true)"
@@ -113,18 +122,18 @@ import api from "../../api/api"
 import _ from "lodash"
 import notifications from "../../mixins/notifications"
 import BreadcrumbTitle from "../BreadcrumbTitle"
-import PDFAnnotator from "../student-dashboard/assignment/PDFAnnotator"
+import FileAnnotator from "../student-dashboard/assignment/FileAnnotator"
 
 export default {
     mixins: [notifications],
-    components: { BreadcrumbTitle, PDFAnnotator },
+    components: { BreadcrumbTitle, FileAnnotator },
     data() {
         return {
             assignment: {},
             submission: {},
             commentChanged: false,
-            // dont view pdf until data is fetched
-            viewPDF: false
+            // dont view file until data is fetched
+            viewFile: false,
         }
     },
     computed: {
@@ -138,7 +147,7 @@ export default {
             } else {
                 return ""
             }
-        }
+        },
     },
     async created() {
         await this.fetchData()
@@ -146,9 +155,9 @@ export default {
     methods: {
         async fetchData() {
             await this.fetchAssignment()
-            this.viewPDF = false
+            this.viewFile = false
             await this.fetchSubmission()
-            this.viewPDF = true
+            this.viewFile = true
         },
         async fetchAssignment() {
             // Fetch the assignment information.
@@ -165,24 +174,13 @@ export default {
             this.showSuccessMessage({ message: "Submission approval status changed" })
             await this.fetchSubmission()
         },
-        goToAssignment() {
-            if (this.$router.currentRoute.name.includes("teacher")) {
-                this.$router.push({
-                    name: "teacher-dashboard.assignments.assignment"
-                })
-            } else {
-                this.$router.push({
-                    name: "teaching-assistant-dashboard.course.assignment"
-                })
-            }
-        },
         async goToNextFinalSubmissionWithoutApproval() {
             const submissions = []
             for (const assignmentVersion of this.assignment.versions) {
                 const res = await api.submissions.getAllForAssignmentVersion(assignmentVersion.id)
                 submissions.push(...res.data)
             }
-            const finalSubmissionsWithoutApproval = _.filter(submissions, submission => {
+            const finalSubmissionsWithoutApproval = _.filter(submissions, (submission) => {
                 return submission.final && submission.approvalByTA === null
             })
             if (finalSubmissionsWithoutApproval.length === 0) {
@@ -191,11 +189,11 @@ export default {
                 const randomSubmission = _.sample(finalSubmissionsWithoutApproval)
                 this.$router.push({
                     name: this.$router.currentRoute.name,
-                    params: { submissionId: randomSubmission.id }
+                    params: { submissionId: randomSubmission.id },
                 })
                 location.reload()
             }
-        }
-    }
+        },
+    },
 }
 </script>

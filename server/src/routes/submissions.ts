@@ -1,10 +1,10 @@
 import express from "express";
-import Joi from "@hapi/joi";
+import Joi from "joi";
 import {
-  validateQuery,
-  validateBody,
   idSchema,
+  validateBody,
   validateParams,
+  validateQuery,
 } from "../middleware/validation";
 import AssignmentVersion from "../models/AssignmentVersion";
 import HttpStatusCode from "../enum/HttpStatusCode";
@@ -22,11 +22,16 @@ import moment from "moment";
 import { getManager } from "typeorm";
 import removePDFMetadata from "../util/removePDFMetadata";
 import AssignmentExport from "../models/AssignmentExport";
-import { startExportSubmissionsForAssignmentVersionWorker } from "../workers/pool";
+import {
+  startExportSubmissionsForAssignmentVersionWorker,
+  startExportSubmissionsForZipWorker,
+  startSubmissionFlaggingWorker,
+  //startImportWebLabSubmissionsWorker,
+} from "../workers/pool";
+//import AssignmentType from "../enum/AssignmentType";
 
 // config values
 const uploadFolder = config.get("uploadFolder") as string;
-const allowedExtensions = config.get("allowedExtensions") as string[];
 const maxFileSize = config.get("maxFileSize") as number;
 
 const router = express.Router();
@@ -64,6 +69,78 @@ router.get("/", validateQuery(assignmentVersionIdSchema), async (req, res) => {
   const sortedSubmissions = _.sortBy(submissions, "id");
   res.send(sortedSubmissions);
 });
+
+//get a zip of all submissions for an assignment
+router.get(
+  "/zip",
+  validateQuery(assignmentVersionIdSchema),
+  async (req, res) => {
+    const user = req.user!;
+    const assignmentVersionId: number = req.query.assignmentVersionId as any;
+    const assignmentVersion = await AssignmentVersion.findOne(
+      assignmentVersionId
+    );
+    if (!assignmentVersion) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.ASSIGNMENTVERSION_NOT_FOUND);
+      return;
+    }
+    if (
+      // not a teacher
+      !(await assignmentVersion.isTeacherOrTeachingAssistantInCourse(user))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
+      return;
+    }
+    const assignment = await assignmentVersion.getAssignment();
+    const assignmentExport = new AssignmentExport(user, assignment, null);
+    await assignmentExport.save();
+
+    //offload to worker function
+    startExportSubmissionsForZipWorker(
+      assignmentVersion.id,
+      assignmentExport.id
+    );
+    res.send(assignmentExport);
+  }
+);
+
+//get number of submissions
+router.get(
+  "/count",
+  validateQuery(assignmentVersionIdSchema),
+  async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const user = req.user!;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const assignmentVersionId: number = req.query.assignmentVersionId as any;
+    const assignmentVersion = await AssignmentVersion.findOne(
+      assignmentVersionId
+    );
+    if (!assignmentVersion) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.ASSIGNMENTVERSION_NOT_FOUND)
+        .toString();
+      return;
+    }
+    if (
+      // not a teacher
+      !(await assignmentVersion.isTeacherOrTeachingAssistantInCourse(user))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE)
+        .toString();
+      return;
+    }
+    const submissions = await assignmentVersion.getSubmissions();
+    res.send(submissions.length.toString());
+  }
+);
 
 // get the submission
 router.get("/:id", validateParams(idSchema), async (req, res) => {
@@ -142,7 +219,8 @@ router.get("/:id/feedback", validateParams(idSchema), async (req, res) => {
       .send("You are not allowed to view reviews");
     return;
   }
-  const submissionQuestionnaire = await assignmentVersion.getSubmissionQuestionnaire();
+  const submissionQuestionnaire =
+    await assignmentVersion.getSubmissionQuestionnaire();
   if (!submissionQuestionnaire) {
     res
       .status(HttpStatusCode.FORBIDDEN)
@@ -184,7 +262,7 @@ const submissionSchema = Joi.object({
 // post a submission in a course
 router.post(
   "/",
-  upload(allowedExtensions, maxFileSize, "file"),
+  upload([".*"], maxFileSize, "file"),
   validateBody(submissionSchema),
   async (req, res) => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -254,6 +332,18 @@ router.post(
 
     // file info
     const fileExtension = path.extname(req.file.originalname);
+
+    const submissionExtensions =
+      assignment.submissionExtensions.split(/\s*,\s*/);
+    if (
+      !submissionExtensions.includes(fileExtension) &&
+      !submissionExtensions.includes(".*")
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(`Extension not allowed: ${fileExtension}`);
+      return;
+    }
     const fileName = path.basename(req.file.originalname, fileExtension);
     // run removePDFMetadata in case the file is a pdf
     if (fileExtension === ".pdf") {
@@ -277,15 +367,13 @@ router.post(
       async (transactionalEntityManager) => {
         for (const assignmentVersion of assignment.versions) {
           // unsubmit all previous submissions
-          const submissionsOfGroupForAssignment = await transactionalEntityManager.find(
-            Submission,
-            {
+          const submissionsOfGroupForAssignment =
+            await transactionalEntityManager.find(Submission, {
               where: {
                 assignmentVersion: assignmentVersion,
                 group: group,
               },
-            }
-          );
+            });
           // Set boolean of submission of older submissions to false
           for (const submissionOfGroupForAssignment of submissionsOfGroupForAssignment) {
             submissionOfGroupForAssignment.final = false;
@@ -305,7 +393,8 @@ router.post(
 
         // move the file (so if this fails everything above fails)
         // where the file is temporary saved
-        const tempPath = req.file.path;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const tempPath = req.file!.path;
         // new place where the file will be saved
         const filePath = path.resolve(uploadFolder, file.id.toString());
         // move file
@@ -318,6 +407,8 @@ router.post(
     await submission!.reload();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     res.send(submission!);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    startSubmissionFlaggingWorker(submission!.id);
   }
 );
 
@@ -387,15 +478,13 @@ router.patch(
       "SERIALIZABLE", // serializable is the only way double final submissions can be prevented
       async (transactionalEntityManager) => {
         for (const assignmentVersion of assignment.versions) {
-          const submissionsOfGroupForAssignment = await transactionalEntityManager.find(
-            Submission,
-            {
+          const submissionsOfGroupForAssignment =
+            await transactionalEntityManager.find(Submission, {
               where: {
                 assignmentVersion: assignmentVersion,
                 group: group,
               },
-            }
-          );
+            });
           // set booleans to false for all other assignments
           for (const submissionOfGroupForAssignment of submissionsOfGroupForAssignment) {
             if (submissionOfGroupForAssignment.id !== submission.id) {
@@ -442,9 +531,11 @@ router.patch(
         .send(ResponseMessage.NOT_TEACHER_OR_TEACHING_ASSISTANT_IN_COURSE);
       return;
     }
+    // Only teachers and the TA giving the approval can modify the approval.
     if (
       submission.approvingTA !== null &&
-      submission.approvingTA.netid !== user.netid
+      submission.approvingTA.netid !== user.netid &&
+      !(await submission.isTeacherInCourse(user))
     ) {
       res
         .status(HttpStatusCode.FORBIDDEN)
@@ -513,10 +604,93 @@ router.post(
       assignmentExport.id,
       exportType
     );
-
     // send message that reviews are being exported
     res.send(assignmentExport);
   }
 );
+
+/*
+This route needs some looking into:
+- users who are not in the database are simply skipped now
+-- they cannot be automatically added as we use netid's are identifiers, not student numbers
+- in the current implementation a Multer object is passed instead of a raw string, which causes it not to work in production
+router.post(
+  "/import",
+  upload([".zip"], maxFileSize, "file"),
+  validateBody(assignmentVersionIdSchema),
+  async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const user = req.user!;
+    if (!req.file) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send("File is needed for the import");
+      return;
+    }
+
+    const assignmentVersion = await AssignmentVersion.findOne(
+      req.body.assignmentVersionId
+    );
+    if (!assignmentVersion) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.ASSIGNMENTVERSION_NOT_FOUND);
+      return;
+    }
+    if (
+      // not a teacher
+      !(await assignmentVersion.isTeacherInCourse(user))
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(ResponseMessage.NOT_TEACHER_IN_COURSE);
+      return;
+    }
+    const assignment = await assignmentVersion.getAssignment();
+    if (assignment.assignmentType !== AssignmentType.CODE) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send(`The assignment must be a '${AssignmentType.CODE}' assignment`);
+      return;
+    }
+    if (assignment.enrollable) {
+      res.status(HttpStatusCode.FORBIDDEN).send("The assignment is enrollable");
+      return;
+    }
+    if (!assignment.isAtOrBeforeState(AssignmentState.SUBMISSION)) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The submission state has passed");
+      return;
+    }
+    if (!/\.zip($|[\s,])/.test(assignment.submissionExtensions)) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("The assignment must allow .zip submissions");
+      return;
+    }
+    const groups = await assignment.getGroups();
+    if (groups.length > 0) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("There are already groups for this assignment");
+      return;
+    }
+    const submissions = await assignmentVersion.getSubmissions();
+    if (submissions.length > 0) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("There are already submissions for this assignment");
+      return;
+    }
+
+    // offload a function to a worker
+    startImportWebLabSubmissionsWorker(assignmentVersion.id, req.file);
+
+    // send message that submissions are being imported
+    res.send();
+  }
+);
+*/
 
 export default router;

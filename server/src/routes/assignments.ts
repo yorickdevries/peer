@@ -1,11 +1,11 @@
 import express from "express";
-import Joi from "@hapi/joi";
+import Joi, { CustomHelpers } from "joi";
 import { getManager } from "typeorm";
 import {
-  validateBody,
-  validateQuery,
-  validateParams,
   idSchema,
+  validateBody,
+  validateParams,
+  validateQuery,
 } from "../middleware/validation";
 import Assignment from "../models/Assignment";
 import Course from "../models/Course";
@@ -19,11 +19,12 @@ import _ from "lodash";
 import ResponseMessage from "../enum/ResponseMessage";
 import Group from "../models/Group";
 import { AssignmentState } from "../enum/AssignmentState";
-import Extensions from "../enum/Extensions";
+import AssignmentType from "../enum/AssignmentType";
 import Submission from "../models/Submission";
 import publishAssignment from "../assignmentProgression/publishAssignment";
 import closeSubmission from "../assignmentProgression/closeSubmission";
 import { scheduleJobsForAssignment } from "../assignmentProgression/scheduler";
+import * as Sentry from "@sentry/node";
 
 const router = express.Router();
 
@@ -222,6 +223,23 @@ router.get(
   }
 );
 
+const extensionValidation = (value: string, helpers: CustomHelpers) => {
+  const extensions = value.split(/\s*,\s*/);
+  // Remove empty extension belonging to trailing comma
+  if (extensions.length > 1 && extensions[extensions.length - 1].length == 0) {
+    extensions.pop();
+  }
+
+  for (const extension of extensions) {
+    // Match file extensions starting with . followed by 1 or more alphabetic characters or a star
+    if (!/^\.([A-Za-z]+|\*)$/.test(extension)) {
+      return helpers.error("any.invalid");
+    }
+  }
+
+  return value;
+};
+
 // Joi inputvalidation
 const assignmentSchema = Joi.object({
   name: Joi.string().required(),
@@ -236,14 +254,16 @@ const assignmentSchema = Joi.object({
   description: Joi.string().allow(null).required(),
   file: Joi.allow(null),
   externalLink: Joi.string().allow(null).required(),
-  submissionExtensions: Joi.string()
-    .valid(...Object.values(Extensions))
-    .required(),
+  submissionExtensions: Joi.string().custom(extensionValidation).required(),
   blockFeedback: Joi.boolean().required(),
   lateSubmissions: Joi.boolean().required(),
   lateSubmissionReviews: Joi.boolean().required(),
   lateReviewEvaluations: Joi.boolean().allow(null).required(),
   automaticStateProgression: Joi.boolean().required(),
+  assignmentType: Joi.string()
+    .valid(...Object.values(AssignmentType))
+    .required(),
+  sendNotificationEmails: Joi.boolean().required(),
 });
 // post an assignment in a course
 router.post(
@@ -286,7 +306,9 @@ router.post(
       req.body.lateSubmissions,
       req.body.lateSubmissionReviews,
       req.body.lateReviewEvaluations,
-      req.body.automaticStateProgression
+      req.body.automaticStateProgression,
+      req.body.assignmentType,
+      req.body.sendNotificationEmails
     );
 
     // construct file to be saved in transaction
@@ -316,7 +338,8 @@ router.post(
         if (file) {
           // move the file (so if this fails everything above fails)
           // where the file is temporary saved
-          const tempPath = req.file.path;
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          const tempPath = req.file!.path;
           // new place where the file will be saved
           const filePath = path.resolve(uploadFolder, file.id.toString());
           // move file
@@ -348,14 +371,16 @@ const assignmentPatchSchema = Joi.object({
   description: Joi.string().allow(null).required(),
   file: Joi.allow(null),
   externalLink: Joi.string().allow(null).required(),
-  submissionExtensions: Joi.string()
-    .valid(...Object.values(Extensions))
-    .required(),
+  submissionExtensions: Joi.string().custom(extensionValidation).required(),
   blockFeedback: Joi.boolean().required(),
   lateSubmissions: Joi.boolean().required(),
   lateSubmissionReviews: Joi.boolean().required(),
   lateReviewEvaluations: Joi.boolean().allow(null).required(),
   automaticStateProgression: Joi.boolean().required(),
+  assignmentType: Joi.string()
+    .valid(...Object.values(AssignmentType))
+    .required(),
+  sendNotificationEmails: Joi.boolean().required(),
 });
 // patch an assignment in a course
 router.patch(
@@ -416,6 +441,15 @@ router.patch(
         .send("You cannot change submissionExtensions at this state");
       return;
     }
+    if (
+      !assignment.isAtState(AssignmentState.UNPUBLISHED) &&
+      assignment.assignmentType !== req.body.assignmentType
+    ) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("You cannot change assignmentType at this state");
+      return;
+    }
     // either a new file can be sent or a file can be removed, not both
     if (req.file && req.body.file === null) {
       res
@@ -471,6 +505,8 @@ router.patch(
         assignment.lateReviewEvaluations = req.body.lateReviewEvaluations;
         assignment.automaticStateProgression =
           req.body.automaticStateProgression;
+        assignment.assignmentType = req.body.assignmentType;
+        assignment.sendNotificationEmails = req.body.sendNotificationEmails;
 
         // change the file in case it is not undefined
         if (newFile !== undefined) {
@@ -488,7 +524,8 @@ router.patch(
         if (newFile) {
           // move the file (so if this fails everything above fails)
           // where the file is temporary saved
-          const tempPath = req.file.path;
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          const tempPath = req.file!.path;
           // new place where the file will be saved
           const filePath = path.resolve(uploadFolder, newFile.id.toString());
           // move file
@@ -512,6 +549,65 @@ router.patch(
     scheduleJobsForAssignment(assignment);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     res.send(assignment!);
+  }
+);
+
+const revertSchema = Joi.object({
+  id: Joi.number().integer().required(),
+});
+
+//revert submission state
+router.patch(
+  "/:id/revertState",
+  validateParams(revertSchema),
+  async (req, res) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const user = req.user!;
+    const assignmentId = req.params.id;
+    const assignment = await Assignment.findOne(assignmentId);
+    if (!assignment) {
+      res
+        .status(HttpStatusCode.BAD_REQUEST)
+        .send(ResponseMessage.ASSIGNMENT_NOT_FOUND);
+      return;
+    }
+    if (!(await assignment.isTeacherInCourse(user))) {
+      res
+        .status(HttpStatusCode.FORBIDDEN)
+        .send("User is not a teacher of the course");
+      return;
+    }
+    try {
+      const state = assignment.state;
+      assignment.revertState();
+      if (state == AssignmentState.SUBMISSION) {
+        await assignment.deleteAllSubmissions();
+        await assignment.save();
+        res.send();
+        return;
+      } else if (state == AssignmentState.WAITING_FOR_REVIEW) {
+        await assignment.save();
+        res.send();
+        return;
+      } else if (state == AssignmentState.REVIEW) {
+        await assignment.deleteAllReviews();
+        await assignment.save();
+        res.send();
+        return;
+      } else {
+        //delete review evaluations
+        await assignment.deleteAllReviewEvals();
+        await assignment.save();
+        res.send();
+        return;
+      }
+    } catch (error) {
+      Sentry.captureException(error);
+      res
+        .status(HttpStatusCode.INTERNAL_SERVER_ERROR)
+        .send("Something went wrong while reverting the state");
+      return;
+    }
   }
 );
 

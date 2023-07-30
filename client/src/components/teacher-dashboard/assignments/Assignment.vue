@@ -11,7 +11,7 @@
                     variant="success"
                     :to="{
                         name: 'teacher-dashboard.assignments.assignment.edit',
-                        params: { courseId: this.$route.params.courseId, assignmentId: assignment.id }
+                        params: { courseId: this.$route.params.courseId, assignmentId: assignment.id },
                     }"
                 >
                     Edit assignment
@@ -19,7 +19,7 @@
             </BreadcrumbTitle>
 
             <b-card no-body>
-                <b-tabs card lazy>
+                <b-tabs-persist card lazy>
                     <!--Details & Action-->
                     <b-tab title="Home" active>
                         <AssignmentHome></AssignmentHome>
@@ -36,12 +36,12 @@
                     </b-tab>
 
                     <!--SubmissionQuestionnaireList-->
-                    <b-tab title="Submissionquestionnaire">
+                    <b-tab title="Review Questionnaire">
                         <SubmissionQuestionnaireList></SubmissionQuestionnaireList>
                     </b-tab>
 
                     <!--ReviewQuestionnaireList-->
-                    <b-tab v-if="assignment.reviewEvaluation" title="Reviewquestionnaire">
+                    <b-tab v-if="assignment.reviewEvaluation" title="Evaluation Questionnaire">
                         <ReviewQuestionnaireList></ReviewQuestionnaireList>
                     </b-tab>
 
@@ -59,7 +59,7 @@
                     <b-tab title="Exports">
                         <AssignmentExports></AssignmentExports>
                     </b-tab>
-                </b-tabs>
+                </b-tabs-persist>
             </b-card>
         </b-container>
     </div>
@@ -76,9 +76,11 @@ import Groups from "../Groups"
 import ReviewList from "../../ta_teacher_shared/ReviewList"
 import SubmissionList from "../../ta_teacher_shared/SubmissionList"
 import AssignmentExports from "../AssignmentExports"
+import BTabsPersist from "@/components/general/b-tabs-persist"
 
 export default {
     components: {
+        BTabsPersist,
         BreadcrumbTitle,
         AssignmentHome,
         AssignmentVersions,
@@ -87,11 +89,11 @@ export default {
         Groups,
         ReviewList,
         SubmissionList,
-        AssignmentExports
+        AssignmentExports,
     },
     data() {
         return {
-            assignment: null
+            assignment: null,
         }
     },
     async created() {
@@ -102,7 +104,7 @@ export default {
             this.assignment = null
             let res = await api.assignments.get(this.$route.params.assignmentId)
             this.assignment = res.data
-        }
-    }
+        },
+    },
 }
 </script>

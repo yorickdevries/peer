@@ -14,6 +14,9 @@ export default {
     closeSubmission(id) {
         return client.patch(`assignments/${id}/closesubmission`)
     },
+    revertState(assignmentId) {
+        return client.patch(`assignments/${assignmentId}/revertState`)
+    },
     getGroup(id) {
         return client.get(`assignments/${id}/group`)
     },
@@ -39,7 +42,9 @@ export default {
         lateSubmissions,
         lateSubmissionReviews,
         lateReviewEvaluations,
-        automaticStateProgression
+        automaticStateProgression,
+        assignmentType,
+        sendNotificationEmails
     ) {
         // Create formData and append data
         const formData = new FormData()
@@ -72,6 +77,8 @@ export default {
             formData.append("lateReviewEvaluations", null)
         }
         formData.append("automaticStateProgression", automaticStateProgression)
+        formData.append("assignmentType", assignmentType)
+        formData.append("sendNotificationEmails", sendNotificationEmails)
         return client.post("assignments/", formData)
     },
     patch(
@@ -92,7 +99,9 @@ export default {
         lateSubmissions,
         lateSubmissionReviews,
         lateReviewEvaluations,
-        automaticStateProgression
+        automaticStateProgression,
+        assignmentType,
+        sendNotificationEmails
     ) {
         // Create formData and append data
         const formData = new FormData()
@@ -131,9 +140,11 @@ export default {
             formData.append("lateReviewEvaluations", null)
         }
         formData.append("automaticStateProgression", automaticStateProgression)
+        formData.append("assignmentType", assignmentType)
+        formData.append("sendNotificationEmails", sendNotificationEmails)
         return client.patch(`assignments/${id}`, formData)
     },
     enroll(id) {
         return client.post(`assignments/${id}/enroll`)
-    }
+    },
 }

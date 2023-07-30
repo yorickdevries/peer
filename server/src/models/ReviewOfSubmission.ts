@@ -6,6 +6,7 @@ import SubmissionQuestionnaire from "./SubmissionQuestionnaire";
 import Review from "./Review";
 import ReviewOfReview from "./ReviewOfReview";
 import PDFAnnotation from "./PDFAnnotation";
+import CodeAnnotation from "./CodeAnnotation";
 
 @ChildEntity(ReviewType.REVIEW_OF_SUBMISSION)
 export default class ReviewOfSubmission extends Review {
@@ -46,9 +47,11 @@ export default class ReviewOfSubmission extends Review {
     const questionnaire = this.questionnaire
       ? this.questionnaire
       : await this.getQuestionnaire();
-    const questionnaireAssignmentVersion = await questionnaire.getAssignmentVersion();
+    const questionnaireAssignmentVersion =
+      await questionnaire.getAssignmentVersion();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const submissionAssignmentVersion = await this.submission.getAssignmentVersion();
+    const submissionAssignmentVersion =
+      await this.submission.getAssignmentVersion();
     if (questionnaireAssignmentVersion.id !== submissionAssignmentVersion.id) {
       throw new Error(
         "The questionnaire should correspond to the assignmentversion of the submission"
@@ -76,5 +79,9 @@ export default class ReviewOfSubmission extends Review {
 
   async getPDFAnnotations(): Promise<PDFAnnotation[]> {
     return await PDFAnnotation.find({ where: { review: this } });
+  }
+
+  async getCodeAnnotations(): Promise<CodeAnnotation[]> {
+    return CodeAnnotation.find({ where: { review: this } });
   }
 }

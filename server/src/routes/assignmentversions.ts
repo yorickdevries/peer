@@ -1,11 +1,11 @@
 import express from "express";
-import Joi from "@hapi/joi";
+import Joi from "joi";
 import Assignment from "../models/Assignment";
 import { AssignmentState } from "../enum/AssignmentState";
 import {
+  idSchema,
   validateBody,
   validateParams,
-  idSchema,
   validateQuery,
 } from "../middleware/validation";
 import HttpStatusCode from "../enum/HttpStatusCode";
@@ -47,7 +47,8 @@ router.get("/:id", validateParams(idSchema), async (req, res) => {
       .send("You are not allowed to view this assignment");
     return;
   }
-  const assignmentVersionWithVersionsToReview = await assignmentVersion.getAssignmentVersionWithVersionsToReview();
+  const assignmentVersionWithVersionsToReview =
+    await assignmentVersion.getAssignmentVersionWithVersionsToReview();
   res.send(assignmentVersionWithVersionsToReview);
 });
 
@@ -90,7 +91,8 @@ router.post("/", validateBody(assignmentVersionSchema), async (req, res) => {
     null // reviewQuestionnaire (initially empty)
   );
   await assignmentVersion.save();
-  const assignmentVersionWithVersionsToReview = await assignmentVersion.getAssignmentVersionWithVersionsToReview();
+  const assignmentVersionWithVersionsToReview =
+    await assignmentVersion.getAssignmentVersionWithVersionsToReview();
   res.send(assignmentVersionWithVersionsToReview);
 });
 
@@ -160,7 +162,8 @@ router.patch(
 
     // perform save
     await assignmentVersion.save();
-    const assignmentVersionWithVersionsToReview = await assignmentVersion.getAssignmentVersionWithVersionsToReview();
+    const assignmentVersionWithVersionsToReview =
+      await assignmentVersion.getAssignmentVersionWithVersionsToReview();
     res.send(assignmentVersionWithVersionsToReview);
   }
 );
