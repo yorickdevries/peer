@@ -323,6 +323,7 @@ export default {
             let optionMap = {}
             for (let i = 0; i < question.options.length; i++) {
                 optionMap[question.options[i].id] = {
+                    initOrder: i,
                     text: question.options[i].text,
                     votes: 0,
                 }
@@ -343,7 +344,8 @@ export default {
                     }
                 }
             }
-            return { answers: Object.values(optionMap) }
+            const compareByInitOrder = (a, b) => a.initOrder - b.initOrder
+            return { answers: Object.values(optionMap).sort(compareByInitOrder) }
         },
         aggregateMultipleChoice(question) {
             // Option ids don't necessarily start at 1
@@ -351,6 +353,7 @@ export default {
 
             for (let i = 0; i < question.options.length; i++) {
                 optionMap[question.options[i].id] = {
+                    initOrder: i,
                     text: question.options[i].text,
                     votes: 0,
                 }
@@ -363,8 +366,8 @@ export default {
                     currAnswer.votes++
                 }
             }
-
-            return { answers: Object.values(optionMap) }
+            const compareByInitOrder = (a, b) => a.initOrder - b.initOrder
+            return { answers: Object.values(optionMap).sort(compareByInitOrder) }
         },
         async fetchData() {
             await this.fetchAssignment()
