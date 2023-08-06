@@ -18,7 +18,7 @@
                 </b-col>
                 <b-col sm="4" align-self="center" class="flexCenterElem footerElem">
                     <div class="flexCenterElem">
-                        <a href="https://eip.pages.ewi.tudelft.nl/peer/">Wiki</a>
+                        <a target="_blank" href="https://eip.pages.ewi.tudelft.nl/peer/">Wiki</a>
                     </div>
                     <router-link @click.native="scrollToTop" to="/privacy">Privacy Policy</router-link>
                 </b-col>
