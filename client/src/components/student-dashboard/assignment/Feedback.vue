@@ -123,7 +123,7 @@
                                                 <h6>Multiple Choice Overview:</h6>
                                                 <vue-poll
                                                     v-bind="aggregateMultipleChoice(question)"
-                                                    showResults="true"
+                                                    :showResults="true"
                                                 />
                                             </b-card>
                                             <b-card v-if="question.type === 'range'">
@@ -145,7 +145,7 @@
                                             </b-card>
                                             <b-card v-if="question.type === 'checkbox'">
                                                 <h6>Checkbox Overview:</h6>
-                                                <vue-poll v-bind="aggregateCheckbox(question)" showResults="true" />
+                                                <vue-poll v-bind="aggregateCheckbox(question)" :showResults="true" />
                                             </b-card>
                                         </b-list-group-item>
                                         <b-list-group-item v-for="(answer, index) in answers[question.id]" :key="index">
@@ -345,7 +345,7 @@ export default {
                 }
             }
             const compareByInitOrder = (a, b) => a.initOrder - b.initOrder
-            return { answers: Object.values(optionMap).sort(compareByInitOrder) }
+            return { question: "", answers: Object.values(optionMap).sort(compareByInitOrder) }
         },
         aggregateMultipleChoice(question) {
             // Option ids don't necessarily start at 1
@@ -367,7 +367,7 @@ export default {
                 }
             }
             const compareByInitOrder = (a, b) => a.initOrder - b.initOrder
-            return { answers: Object.values(optionMap).sort(compareByInitOrder) }
+            return { question: "", answers: Object.values(optionMap).sort(compareByInitOrder) }
         },
         async fetchData() {
             await this.fetchAssignment()
