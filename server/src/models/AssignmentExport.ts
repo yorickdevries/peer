@@ -48,10 +48,6 @@ export default class AssignmentExport extends BaseModel {
   @JoinColumn()
   file: File | null;
 
-  constructor() {
-    super();
-  }
-
   init(init: AssignmentExportInterface) {
     this.user = init.user;
     this.assignment = init.assignment;

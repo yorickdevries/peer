@@ -36,10 +36,6 @@ export default class File extends BaseModel {
   @IsNotEmpty()
   hash: string;
 
-  constructor() {
-    super();
-  }
-
   init(init: FileInterface) {
     this.name = init.name;
     this.extension = init.extension;

@@ -20,10 +20,6 @@ export default class MultipleChoiceQuestionAnswer extends QuestionAnswer {
   })
   multipleChoiceAnswer: MultipleChoiceQuestionOption;
 
-  constructor() {
-    super();
-  }
-
   init(init: MultipleChoiceQuestionAnswerInterface) {
     this.question = init.question;
     this.review = init.review;

@@ -33,10 +33,6 @@ export default class CommentingPDFAnnotation extends PDFAnnotation {
   )
   replyingPDFAnnotations?: ReplyingPDFAnnotation[];
 
-  constructor() {
-    super();
-  }
-
   init(init: CommentingPDFAnnotationInterface) {
     this.id = init.id;
     this.bodyValue = init.bodyValue;

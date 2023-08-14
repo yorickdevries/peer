@@ -16,10 +16,6 @@ export default class SubmissionQuestionnaire extends Questionnaire {
   // cannot be named assignment as this clashed with reviewquestionnaire
   assignmentVersionOfSubmissionQuestionnaire?: AssignmentVersion;
 
-  constructor() {
-    super();
-  }
-
   async getAssignmentVersion(): Promise<AssignmentVersion> {
     return AssignmentVersion.findOneOrFail({
       where: { submissionQuestionnaire: { id: this.id } },

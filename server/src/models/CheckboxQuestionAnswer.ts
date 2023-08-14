@@ -18,10 +18,6 @@ export default class CheckboxQuestionAnswer extends QuestionAnswer {
   @JoinTable()
   checkboxAnswer: CheckboxQuestionOption[];
 
-  constructor() {
-    super();
-  }
-
   init(init: CheckboxQuestionAnswerInterface) {
     this.question = init.question;
     this.review = init.review;

@@ -105,10 +105,6 @@ export default class AssignmentVersion extends BaseModel {
   @JoinColumn()
   reviewQuestionnaire?: ReviewQuestionnaire | null;
 
-  constructor() {
-    super();
-  }
-
   init(init: AssignmentVersionInterface) {
     this.name = init.name;
     this.assignment = init.assignment;

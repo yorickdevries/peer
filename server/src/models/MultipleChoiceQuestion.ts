@@ -25,10 +25,6 @@ export default class MultipleChoiceQuestion extends Question {
   )
   options!: MultipleChoiceQuestionOption[];
 
-  constructor() {
-    super();
-  }
-
   init(init: MultipleChoiceQuestionInterface) {
     this.text = init.text;
     this.number = init.number;

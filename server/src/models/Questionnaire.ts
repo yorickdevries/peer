@@ -36,10 +36,6 @@ export default abstract class Questionnaire extends BaseModel {
   @OneToMany((_type) => Review, (review) => review.questionnaire)
   reviews?: Review[];
 
-  constructor() {
-    super();
-  }
-
   abstract getAssignmentVersion(): Promise<AssignmentVersion>;
 
   async getReviews(submitted?: boolean): Promise<Review[]> {

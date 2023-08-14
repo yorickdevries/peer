@@ -15,8 +15,4 @@ export default class Preferences extends BaseModel {
 
   @Column("boolean", { default: true })
   stRemLateSubmission!: boolean;
-
-  constructor() {
-    super();
-  }
 }

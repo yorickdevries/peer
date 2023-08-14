@@ -78,10 +78,6 @@ export default class Course extends BaseModel {
   @OneToMany((_type) => Assignment, (assignment) => assignment.course)
   assignments?: Assignment[];
 
-  constructor() {
-    super();
-  }
-
   init(init: CourseInterface) {
     this.name = init.name;
     this.courseCode = init.courseCode;

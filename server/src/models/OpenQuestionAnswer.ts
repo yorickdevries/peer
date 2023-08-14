@@ -20,10 +20,6 @@ export default class OpenQuestionAnswer extends QuestionAnswer {
   @IsNotEmpty()
   openAnswer: string;
 
-  constructor() {
-    super();
-  }
-
   init(init: OpenQuestionAnswerInterface) {
     this.question = init.question;
     this.review = init.review;

@@ -221,10 +221,6 @@ export default class Assignment extends BaseModel {
     (assignmentExport) => assignmentExport.assignment
   )
   assignmentExports?: AssignmentExport[];
-
-  constructor() {
-    super();
-  }
   init(init: AssignmentInterface) {
     this.name = init.name;
     this.course = init.course;

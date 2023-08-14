@@ -33,10 +33,6 @@ export default class Enrollment extends BaseModel {
   @IsEnum(UserRole)
   role: UserRole;
 
-  constructor() {
-    super();
-  }
-
   init(init: EnrollmentInterface) {
     this.user = init.user;
     this.course = init.course;

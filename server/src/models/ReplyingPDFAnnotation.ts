@@ -30,10 +30,6 @@ export default class ReplyingPDFAnnotation extends PDFAnnotation {
   // can be null as it is in the same table as commentingPDFAnnotation
   commentingPDFAnnotation?: CommentingPDFAnnotation;
 
-  constructor() {
-    super();
-  }
-
   init(init: ReplyingPDFAnnotationInterface) {
     this.id = init.id;
     this.bodyValue = init.bodyValue;

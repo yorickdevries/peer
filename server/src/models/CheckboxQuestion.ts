@@ -25,10 +25,6 @@ export default class CheckboxQuestion extends Question {
   )
   options!: CheckboxQuestionOption[];
 
-  constructor() {
-    super();
-  }
-
   init(init: CheckboxQuestionInterface) {
     this.text = init.text;
     this.number = init.number;

@@ -35,10 +35,6 @@ export default class Banner extends BaseModel {
   @IsBoolean()
   active: boolean;
 
-  constructor() {
-    super();
-  }
-
   init(init: BannerInterface) {
     this.title = init.title;
     this.text = init.text;

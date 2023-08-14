@@ -27,10 +27,6 @@ export default class ReviewOfReview extends Review {
   // can be null as it is in the same table as reviewOfSubmission
   reviewOfSubmission?: ReviewOfSubmission;
 
-  constructor() {
-    super();
-  }
-
   init(init: ReviewOfReviewInterface) {
     this.questionnaire = init.questionnaire;
     this.reviewer = init.user;

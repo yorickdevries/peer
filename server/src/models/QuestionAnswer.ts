@@ -45,10 +45,6 @@ export default abstract class QuestionAnswer extends BaseModel {
   // method to get number of points awarded for an answer (if graded)
   abstract getAnswerPoints(): Promise<number | undefined>;
 
-  constructor() {
-    super();
-  }
-
   async validateOrReject(): Promise<void> {
     // validation: questions should be part of the questionnaire of the review
     const question = await this.getQuestion();

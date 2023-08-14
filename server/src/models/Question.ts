@@ -71,10 +71,6 @@ export default abstract class Question extends BaseModel {
   )
   questionnaire?: Questionnaire;
 
-  constructor() {
-    super();
-  }
-
   async getQuestionnaire(): Promise<Questionnaire> {
     return dataSource.getRepository(Questionnaire).findOneByOrFail({
       id: this.questionnaireId,

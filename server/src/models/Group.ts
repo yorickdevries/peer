@@ -49,10 +49,6 @@ export default class Group extends BaseModel {
   @JoinTable()
   assignments?: Assignment[];
 
-  constructor() {
-    super();
-  }
-
   init(init: GroupInterface) {
     this.name = init.name;
     this.course = init.course;

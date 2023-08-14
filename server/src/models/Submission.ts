@@ -117,10 +117,6 @@ export default class Submission extends BaseModel {
   @IsEnum(ServerFlagReason)
   commentByServer: ServerFlagReason | null;
 
-  constructor() {
-    super();
-  }
-
   init(init: SubmissionInterface) {
     this.user = init.user;
     this.group = init.group;

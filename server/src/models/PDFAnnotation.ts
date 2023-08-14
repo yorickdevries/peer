@@ -58,10 +58,6 @@ export default abstract class PDFAnnotation extends BaseModel {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   abstract getWebAnnotationVersion(): any;
 
-  constructor() {
-    super();
-  }
-
   // custom validation which is run before saving
   async validateOrReject(): Promise<void> {
     const user = this.user ? this.user : await this.getUser();

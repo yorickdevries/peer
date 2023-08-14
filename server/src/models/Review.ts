@@ -136,9 +136,6 @@ export default abstract class Review extends BaseModel {
   questionAnswers?: QuestionAnswer[];
 
   abstract isReviewed(user: User): Promise<boolean>;
-  constructor() {
-    super();
-  }
 
   // custom validation which is run before saving
   async validateOrReject(): Promise<void> {

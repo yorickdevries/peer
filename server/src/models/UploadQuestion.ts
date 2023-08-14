@@ -24,10 +24,6 @@ export default class UploadQuestion extends Question {
   // needs later to be revised to a list of strings
   extensions: Extensions;
 
-  constructor() {
-    super();
-  }
-
   init(init: UploadQuestionInterface) {
     this.text = init.text;
     this.number = init.number;

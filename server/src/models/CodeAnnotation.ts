@@ -59,10 +59,6 @@ export default class CodeAnnotation extends BaseModel {
   @IsNotEmpty()
   selectedFile: string;
 
-  constructor() {
-    super();
-  }
-
   init(init: CodeAnnotationInterface) {
     this.review = init.review;
     this.annotationText = init.annotationText;

@@ -51,10 +51,6 @@ export default abstract class QuestionOption extends BaseModel {
 
   abstract question?: Question;
 
-  constructor() {
-    super();
-  }
-
   init(init: QuestionOptionInterface) {
     this.text = init.text;
     this.points = init.points;

@@ -21,10 +21,6 @@ export default class UploadQuestionAnswer extends QuestionAnswer {
   @IsDefined()
   uploadAnswer: File;
 
-  constructor() {
-    super();
-  }
-
   init(init: UploadQuestionInterface) {
     this.question = init.question;
     this.review = init.review;

@@ -29,10 +29,6 @@ export default class RangeQuestion extends Question {
   @Max(rangeconfig.max) //needs to be checked whats most useful
   range: number;
 
-  constructor() {
-    super();
-  }
-
   init(init: RangeQuestionInterface) {
     this.text = init.text;
     this.number = init.number;

@@ -12,9 +12,6 @@ interface OpenQuestionInterface {
 
 @ChildEntity(QuestionType.OPEN)
 export default class OpenQuestion extends Question {
-  constructor() {
-    super();
-  }
 
   init(init: OpenQuestionInterface) {
     this.text = init.text;

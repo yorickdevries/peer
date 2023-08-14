@@ -28,11 +28,6 @@ export default abstract class BaseModel extends BaseEntity {
   @IsDate()
   updatedAt!: Date;
 
-  // basic super constructor
-  constructor() {
-    super();
-  }
-
   // validateOrReject to be run before saving/updating by TypeORM
   // @BeforeInsert and @BeforeUpdate have a bug and lock up the database connection
   // see also: https://github.com/typeorm/typeorm/issues/6779

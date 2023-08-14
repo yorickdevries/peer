@@ -124,10 +124,6 @@ export default class User extends BaseModel {
   @JoinColumn()
   preferences!: Preferences;
 
-  constructor() {
-    super();
-  }
-
   init(init: UserInterface) {
     this.netid = init.netid;
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
