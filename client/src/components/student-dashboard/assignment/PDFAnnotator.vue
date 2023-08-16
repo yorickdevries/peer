@@ -57,6 +57,9 @@ export default {
         // generate random number for id
         this.pdfDivId = "adobe-dc-view-" + String(Math.floor(Math.random() * Math.pow(10, 9)))
         this.$nextTick(() => {
+            window.AdobeDC = undefined
+            window.adobe_dc_sdk = undefined
+            window.adobe_dc_view_sdk = undefined
             this.renderPDF()
         })
     },
