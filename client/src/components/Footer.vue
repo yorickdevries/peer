@@ -17,6 +17,9 @@
                     </div>
                 </b-col>
                 <b-col sm="4" align-self="center" class="flexCenterElem footerElem">
+                    <div class="flexCenterElem">
+                        <a target="_blank" href="https://eip.pages.ewi.tudelft.nl/peer/">Wiki</a>
+                    </div>
                     <router-link @click.native="scrollToTop" to="/privacy">Privacy Policy</router-link>
                 </b-col>
             </b-row>
@@ -37,9 +40,6 @@ export default {
 
 <style scoped>
 @media (max-width: 576px) {
-    .flexCenterElem {
-        text-align: center;
-    }
     #logoImg {
         right: 0;
     }
@@ -51,6 +51,9 @@ export default {
     #logoImg {
         right: -13px;
     }
+}
+.flexCenterElem {
+    text-align: center;
 }
 footer {
     margin-top: 25px;
