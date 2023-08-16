@@ -60,16 +60,6 @@
             </b-col>
         </b-row>
         <hr />
-        <b-alert variant="danger" show
-            >Modifying groups should be done with caution!
-            <b-badge
-                v-b-tooltip.hover
-                title="Once a student has been removed from a group, they are no longer part of the assignment unless they are
-added back to a new or pre-existing group."
-                variant="primary"
-                >?</b-badge
-            ></b-alert
-        >
         <!--Table Options-->
         <b-row>
             <b-col cols="6" class="mb-3">
