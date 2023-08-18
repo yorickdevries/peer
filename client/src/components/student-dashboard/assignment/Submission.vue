@@ -268,9 +268,13 @@
                             :assignmentType="assignment.assignmentType"
                             :readOnly="true"
                             :ignoreAnnotations="true"
+                            :editable="assignment.state == 'submission'"
                         />
                         <!-- Modal Button -->
-                        <b-button v-if="assignment.assignmentType == 'text'" @click="submitTextFile" variant="primary"
+                        <b-button
+                            v-if="assignment.assignmentType == 'text' && assignment.state == 'submission'"
+                            @click="submitTextFile"
+                            variant="primary"
                             >Save submission</b-button
                         >
                     </div>

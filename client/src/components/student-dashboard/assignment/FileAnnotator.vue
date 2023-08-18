@@ -21,7 +21,7 @@
             v-else-if="renderAs === 'text'"
             ref="editor"
             :answer-object="{ answer: this.text, changed: false }"
-            :displayeditor="true"
+            :displayeditor="editable"
         />
         <div v-else>
             <b-alert show variant="secondary">
@@ -43,7 +43,7 @@ export default {
         CodeWrapper,
         PDFAnnotator,
     },
-    props: ["reviewId", "submissionId", "readOnly", "assignmentType", "reviewColors", "ignoreAnnotations"],
+    props: ["reviewId", "submissionId", "readOnly", "assignmentType", "reviewColors", "ignoreAnnotations", "editable"],
 
     computed: {
         filePath() {
