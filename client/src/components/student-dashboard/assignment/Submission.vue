@@ -263,11 +263,16 @@
                             instead.</b-alert
                         >
                         <FileAnnotator
+                            ref="childRef"
                             :submissionId="finalSubmission.id"
                             :assignmentType="assignment.assignmentType"
                             :readOnly="true"
                             :ignoreAnnotations="true"
                         />
+                        <!-- Modal Button -->
+                        <b-button v-if="assignment.assignmentType == 'text'" @click="submitTextFile" variant="primary"
+                            >Save submission</b-button
+                        >
                     </div>
                 </b-col>
             </b-row>
@@ -332,6 +337,11 @@ export default {
         await this.fetchSubmissions()
     },
     methods: {
+        async submitTextFile() {
+            const childRef = this.$refs.childRef
+            this.file = await childRef.makeFile()
+            this.submitSubmission()
+        },
         parseTransformedImage(canvas) {
             if (canvas.type === "error") {
                 this.showErrorMessage({ message: "There was an error parsing your image file." })
