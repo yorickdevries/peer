@@ -79,7 +79,7 @@ export default {
         makeFile() {
             this.text = this.$refs.editor.answerObject.answer
             const blob = new Blob([this.text], { type: "text/plain" })
-            return new File([blob], "file.txt", { type: "text/plain" })
+            return new File([blob], "textSubmission.txt", { type: "text/plain" })
         },
     },
     async created() {
