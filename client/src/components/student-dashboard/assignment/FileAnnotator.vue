@@ -92,7 +92,11 @@ export default {
                 .then((file) => {
                     if (file.type.includes("text/plain")) {
                         // The given file contains plain text and should be rendered as text
-                        this.renderAs = "text"
+                        if (this.filePath.split(".").pop() === "txt") {
+                            this.renderAs = "text"
+                        } else {
+                            this.renderAs = "code"
+                        }
                     } else {
                         // The given file contains binary data, we should test whether it is a zip or a
                         // pdf
