@@ -22,6 +22,11 @@
             ref="editor"
             :answer-object="{ answer: this.text, changed: false }"
             :displayeditor="editable"
+            @shortcut-save="
+                () => {
+                    this.$emit('shortcut-save')
+                }
+            "
         />
         <div v-else>
             <b-alert show variant="secondary">

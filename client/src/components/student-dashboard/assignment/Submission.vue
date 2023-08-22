@@ -269,10 +269,12 @@
                             :readOnly="true"
                             :ignoreAnnotations="true"
                             :editable="assignment.state == 'submission'"
+                            @shortcut-save="changed = true"
                         />
                         <!-- Modal Button -->
                         <b-button
                             v-if="assignment.assignmentType == 'text' && assignment.state == 'submission'"
+                            :disabled="!changed"
                             @click="submitTextFile"
                             variant="primary"
                             >Save submission</b-button
@@ -318,6 +320,7 @@ export default {
             ],
             buttonDisabled: false,
             files: [],
+            changed: false,
         }
     },
     computed: {
@@ -345,6 +348,7 @@ export default {
             const childRef = this.$refs.childRef
             this.file = await childRef.makeFile()
             this.submitSubmission()
+            this.changed = false
         },
         parseTransformedImage(canvas) {
             if (canvas.type === "error") {
