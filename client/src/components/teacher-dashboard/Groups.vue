@@ -60,7 +60,6 @@
             </b-col>
         </b-row>
         <hr />
-        <b-alert variant="danger" show>Modifying groups should be done with caution!</b-alert>
         <!--Table Options-->
         <b-row>
             <b-col cols="6" class="mb-3">
@@ -108,10 +107,18 @@
             <template v-slot:cell(actions)="row">
                 <!--Show Details-->
                 <b-button size="sm" @click="showDetails(row)" class="mr-2">
-                    {{ row.detailsShowing ? "Hide" : "Show" }} Edit Group/Submissions
+                    {{ row.detailsShowing ? "Hide" : "Show" }}
+                    {{ assignment.state === `submission` || assignment.state === `unpublished` ? "Edit" : "" }}
+                    Group/Submissions
                 </b-button>
                 <!--Delete Group-->
-                <b-button size="sm" v-b-modal="`deleteGroup${row.item.id}`" class="mr-2" variant="danger">
+                <b-button
+                    v-if="assignment.state === `submission` || assignment.state === `unpublished`"
+                    size="sm"
+                    v-b-modal="`deleteGroup${row.item.id}`"
+                    class="mr-2"
+                    variant="danger"
+                >
                     Delete Group
                 </b-button>
 
@@ -127,6 +134,7 @@
                     <b-table striped outlined show-empty stacked="md" :items="row.item.users" :fields="userFields">
                         <template v-slot:cell(action)="data">
                             <b-button
+                                v-if="assignment.state === `submission` || assignment.state === `unpublished`"
                                 variant="danger"
                                 size="sm"
                                 @click="removeUserFromGroup(row.item.id, data.item.netid)"
@@ -134,18 +142,23 @@
                             >
                         </template>
                     </b-table>
-                    <!--Add Group Member-->
-                    <dt>Add Group Member</dt>
-                    <dd class="d-flex">
-                        <b-button
-                            variant="success"
-                            class="mr-2"
-                            size="sm"
-                            @click="addUserToGroup(row.item.id, newUserNetId[row.item.id])"
-                            >Add Group Member</b-button
-                        >
-                        <b-input v-model="newUserNetId[row.item.id]" placeholder="Enter valid NetID here."></b-input>
-                    </dd>
+                    <div v-if="assignment.state === `submission` || assignment.state === `unpublished`">
+                        <!--Add Group Member-->
+                        <dt>Add Group Member</dt>
+                        <dd class="d-flex">
+                            <b-button
+                                variant="success"
+                                class="mr-2"
+                                size="sm"
+                                @click="addUserToGroup(row.item.id, newUserNetId[row.item.id])"
+                                >Add Group Member</b-button
+                            >
+                            <b-input
+                                v-model="newUserNetId[row.item.id]"
+                                placeholder="Enter valid NetID here."
+                            ></b-input>
+                        </dd>
+                    </div>
                 </b-card>
                 <b-card header="Submissions" class="h-100">
                     <div v-if="row.item.submissions.length > 0">
