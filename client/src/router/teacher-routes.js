@@ -45,6 +45,11 @@ export default [
                 component: () => import("../components/teacher-dashboard/assignments/CreateAssignment"),
             },
             {
+                path: "courses/:courseId/create-simple-assignment",
+                name: "teacher-dashboard.assignments.createSimple",
+                component: () => import("../components/teacher-dashboard/assignments/CreateSimpleAssignment.vue"),
+            },
+            {
                 path: "courses/:courseId/assignments/:assignmentId",
                 name: "teacher-dashboard.assignments.assignment",
                 component: () => import("../components/teacher-dashboard/assignments/Assignment"),
