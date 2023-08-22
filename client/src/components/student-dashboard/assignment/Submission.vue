@@ -239,9 +239,12 @@
                             hide-footer
                             title="Select Upload Mode"
                         >
-                            <b-alert show> Would you like to upload a PDF or would you like to upload several images? </b-alert>
+                            <b-alert show>
+                                Would you like to upload a PDF or would you like to upload several images?
+                            </b-alert>
                             <b-alert show
-                                >On mobile devices, images can be taken directly with the camera or selected from your gallery.</b-alert
+                                >On mobile devices, images can be taken directly with the camera or selected from your
+                                gallery.</b-alert
                             >
 
                             <b-container class="d-flex justify-content-between">
