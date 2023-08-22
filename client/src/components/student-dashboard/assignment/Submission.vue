@@ -239,9 +239,9 @@
                             hide-footer
                             title="Select Upload Mode"
                         >
-                            <b-alert show> Would you like to upload a PDF or several images from your phone? </b-alert>
+                            <b-alert show> Would you like to upload a PDF or would you like to upload several images? </b-alert>
                             <b-alert show
-                                >Images can be taken directly with the camera or selected from your gallery.</b-alert
+                                >On mobile devices, images can be taken directly with the camera or selected from your gallery.</b-alert
                             >
 
                             <b-container class="d-flex justify-content-between">
@@ -507,7 +507,7 @@ export default {
 
             // new submission button clicked
             if (id) {
-                if (this.isMobile && this.assignment.submissionExtensions.includes(".pdf")) {
+                if (this.assignment.submissionExtensions.includes(".pdf")) {
                     this.$bvModal.show(`uploadTypeModal${id}`)
                 } else {
                     this.$bvModal.show(`uploadModal${id}`)
