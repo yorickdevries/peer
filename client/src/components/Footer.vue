@@ -1,22 +1,28 @@
 <template>
     <footer class="text-muted">
-        <div class="container d-flex align-items-center h-100">
-            <div class="float-left">
-                <router-link @click.native="scrollToTop" to="/privacy">Privacy Policy</router-link>
-                <div>For technical support, contact: <a href="mailto:eip-ewi@tudelft.nl">eip-ewi@tudelft.nl</a></div>
-            </div>
-            <div class="mr-auto"></div>
-            <div>{{ timezoneString }}</div>
-            <div class="mr-auto"></div>
-            <b-img
-                :src="require('../assets/images/tu_delft_logo_black.png')"
-                alt="tu-delft-logo"
-                height="30px"
-                class="mr-5 mb-3"
-            ></b-img>
-            <div class="float-right">
-                <a href="#">Back to top</a>
-            </div>
+        <div class="container">
+            <b-row align-v="center" align-h="center">
+                <b-col sm="4" align-self="center" class="d-flex justify-content-center footerElem">
+                    <b-img
+                        id="logoImg"
+                        :src="require('../assets/images/tu_delft_logo_black.png')"
+                        alt="tu-delft-logo"
+                        height="30px"
+                        style="position: relative"
+                    ></b-img>
+                </b-col>
+                <b-col sm="4" align-self="center" class="flexCenterElem footerElem">
+                    <div class="flexCenterElem">
+                        For technical support, contact: <a href="mailto:eip-ewi@tudelft.nl">eip-ewi@tudelft.nl</a>
+                    </div>
+                </b-col>
+                <b-col sm="4" align-self="center" class="flexCenterElem footerElem">
+                    <div class="flexCenterElem">
+                        <a target="_blank" href="https://eip.pages.ewi.tudelft.nl/peer/">Wiki</a>
+                    </div>
+                    <router-link @click.native="scrollToTop" to="/privacy">Privacy Policy</router-link>
+                </b-col>
+            </b-row>
         </div>
     </footer>
 </template>
@@ -24,13 +30,6 @@
 <script>
 export default {
     name: "Footer",
-    computed: {
-        timezoneString() {
-            const re = /([A-Z]+[+-][0-9]+.*)/
-            const timezone = new Date().toString().match(re)[1]
-            return "Timezone: " + timezone
-        },
-    },
     methods: {
         scrollToTop() {
             window.scrollTo(0, 0)
@@ -40,8 +39,25 @@ export default {
 </script>
 
 <style scoped>
+@media (max-width: 576px) {
+    #logoImg {
+        right: 0;
+    }
+    .footerElem {
+        margin-bottom: 5px;
+    }
+}
+@media not (max-width: 576px) {
+    #logoImg {
+        right: -13px;
+    }
+}
+.flexCenterElem {
+    text-align: center;
+}
 footer {
-    height: 125px;
+    margin-top: 25px;
+    height: 75px;
 }
 
 footer p {

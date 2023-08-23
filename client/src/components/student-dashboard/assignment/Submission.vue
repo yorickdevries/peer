@@ -123,10 +123,9 @@
 
                         <!-- Modal Button -->
                         <b-button
-                            v-b-modal="`uploadModal${assignmentVersion.id}`"
                             :disabled="!isSubmissionActive"
                             variant="primary"
-                            @click="resetFile"
+                            @click="resetFile(assignmentVersion.id)"
                             >Upload new Submission</b-button
                         >
 
@@ -141,8 +140,8 @@
                             Assignment version:
                             <b-badge pill>{{ assignmentVersion.name }}</b-badge>
                             <hr />
-                            <b-alert show variant="warning">
-                                If you have already uploaded a file, it will not be used for reviewing anymore!
+                            <b-alert v-if="submissions.length > 0" show variant="warning">
+                                This will replace your previous submission.
                             </b-alert>
                             <b-alert show variant="warning">
                                 Please make sure you have not included personal information anywhere unless specifically
@@ -152,6 +151,7 @@
                             <b-alert show variant="secondary"
                                 >Allowed file types: {{ assignment.submissionExtensions }}</b-alert
                             >
+
                             <b-form-file
                                 v-model="file"
                                 :accept="assignment.submissionExtensions"
@@ -159,6 +159,7 @@
                                 required
                                 :state="Boolean(file)"
                             />
+
                             <b-button
                                 variant="primary"
                                 class="mt-3"
@@ -167,13 +168,98 @@
                                 >Upload</b-button
                             >
                         </b-modal>
+
+                        <!-- Upload Img Modal-->
+                        <b-modal
+                            :id="`uploadImgModal${assignmentVersion.id}`"
+                            ref="uploadImgModal"
+                            centered
+                            hide-footer
+                            title="Upload Submission"
+                        >
+                            Assignment version:
+                            <b-badge pill>{{ assignmentVersion.name }}</b-badge>
+                            <hr />
+                            <b-alert v-if="submissions.length > 0" show variant="warning">
+                                This will replace your previous submission.
+                            </b-alert>
+                            <b-alert show variant="warning">
+                                Please make sure you have not included personal information anywhere unless specifically
+                                mentioned otherwise!
+                            </b-alert>
+                            <b-progress :value="fileProgress" :animated="fileProgress !== 100" class="mb-3" />
+                            <b-alert show variant="secondary">Allowed file types: image files</b-alert>
+
+                            <b-card v-for="(file, index) in files" :key="index" class="mb-3">
+                                <b-row class="d-flex justify-content-between">
+                                    <b-col cols="2" class="mb-3 d-flex flex-column justify-content-between">
+                                        <icon
+                                            icon="fa-solid fa-angle-up"
+                                            class="mr-2 align-middle"
+                                            @click="moveImageUp(index)"
+                                        ></icon>
+                                        <icon
+                                            icon="fa-solid fa-trash"
+                                            class="mr-2 align-middle"
+                                            @click="deleteImage(index)"
+                                        ></icon>
+                                        <icon
+                                            icon="fa-solid fa-angle-down"
+                                            class="mr-2 align-middle"
+                                            @click="moveImageDown(index)"
+                                        ></icon>
+                                    </b-col>
+                                    <b-col cols="10" class="mb-3">
+                                        <b-img :src="file.src" fluid />
+                                    </b-col>
+                                </b-row>
+                            </b-card>
+                            <b-form-file
+                                accept="image/*"
+                                @input="uploadImage"
+                                :disabled="buttonDisabled"
+                                placeholder="Add an image"
+                                ref="imgUploadButton"
+                            />
+
+                            <b-button
+                                variant="primary"
+                                class="mt-3"
+                                :disabled="buttonDisabled"
+                                @click="submitImageSubmission()"
+                                >Upload</b-button
+                            >
+                        </b-modal>
+
+                        <!-- Upload Type Modal-->
+                        <b-modal
+                            :id="`uploadTypeModal${assignmentVersion.id}`"
+                            ref="uploadTypeModal"
+                            centered
+                            hide-footer
+                            title="Select Upload Mode"
+                        >
+                            <b-alert show>
+                                Would you like to upload a PDF or would you like to upload several images?
+                            </b-alert>
+                            <b-alert show
+                                >On mobile devices, images can be taken directly with the camera or selected from your
+                                gallery.</b-alert
+                            >
+
+                            <b-container class="d-flex justify-content-between">
+                                <b-button variant="primary" @click="selectUploadType('pdf')">Upload PDF</b-button>
+                                <b-button variant="primary" @click="selectUploadType('img')">Upload Images</b-button>
+                            </b-container>
+                        </b-modal>
                     </div>
                 </b-col>
             </b-row>
             <b-row>
                 <b-col>
-                    <dt>You can view your final submission here:</dt>
-                    <div v-if="finalSubmission">
+                    <dt v-if="!isMobile">You can view your final submission here:</dt>
+                    <dt v-else>You can download your final submission by clicking on the filename above.</dt>
+                    <div v-if="finalSubmission && !isMobile">
                         <b-alert v-if="finalSubmission.file.extension === '.pdf'" variant="secondary"
                             >In case the viewer shows any errors, your .pdf is malformed and no pdf annotations can be
                             made by your reviewers directly in the browser. Reviewers can always download the file
@@ -197,9 +283,12 @@ import api from "../../../api/api"
 import _ from "lodash"
 import FileAnnotator from "./FileAnnotator"
 import notifications from "../../../mixins/notifications"
+import screenSize from "../../../mixins/screenSize"
+import { jsPDF } from "jspdf"
+import loadImage from "blueimp-load-image"
 export default {
     props: ["assignmentVersionId"],
-    mixins: [notifications],
+    mixins: [notifications, screenSize],
     components: { FileAnnotator },
     data() {
         return {
@@ -222,6 +311,7 @@ export default {
                 { key: "taFeedback", label: "TA Feedback" },
             ],
             buttonDisabled: false,
+            files: [],
         }
     },
     computed: {
@@ -245,6 +335,73 @@ export default {
         await this.fetchSubmissions()
     },
     methods: {
+        parseTransformedImage(canvas) {
+            if (canvas.type === "error") {
+                this.showErrorMessage({ message: "There was an error parsing your image file." })
+            } else {
+                this.files.push({
+                    src: canvas.toDataURL("image/jpeg", 0.75),
+                    width: canvas.width,
+                    height: canvas.height,
+                })
+            }
+
+            this.$refs.imgUploadButton.reset()
+            this.buttonDisabled = false
+        },
+        uploadImage(file) {
+            const img = new Image()
+            const reader = new FileReader()
+            reader.addEventListener("load", () => {
+                img.onload = () => {
+                    loadImage(img.src, this.parseTransformedImage, { meta: true, orientation: true, canvas: true })
+                }
+                img.onerror = () => {
+                    this.showErrorMessage({ message: "The image you uploaded is not supported." })
+                    this.$refs.imgUploadButton.reset()
+                    this.buttonDisabled = false
+                }
+                img.src = reader.result
+            })
+
+            if (file) {
+                this.buttonDisabled = true
+                reader.readAsDataURL(file)
+            }
+        },
+        selectUploadType(selectType) {
+            this.$bvModal.hide(`uploadTypeModal${this.assignment.id}`)
+            if (selectType === "pdf") {
+                this.$bvModal.show(`uploadModal${this.assignment.id}`)
+            } else {
+                this.$bvModal.show(`uploadImgModal${this.assignment.id}`)
+            }
+        },
+        deleteImage(id) {
+            this.files.splice(id, 1)
+        },
+        moveImageUp(id) {
+            if (id === 0) return
+
+            const vm = this
+            const upImage = this.files[id - 1]
+            const curImage = this.files[id]
+
+            vm.$set(this.files, id, upImage)
+            vm.$set(this.files, id - 1, curImage)
+        },
+        moveImageDown(id) {
+            if (id === this.files.length - 1) {
+                return
+            }
+
+            const vm = this
+            const downImage = this.files[id + 1]
+            const curImage = this.files[id]
+
+            vm.$set(this.files, id, downImage)
+            vm.$set(this.files, id + 1, curImage)
+        },
         async fetchAssignment() {
             const res = await api.assignments.get(this.$route.params.assignmentId)
             this.assignment = res.data
@@ -292,14 +449,73 @@ export default {
             await this.fetchSubmissions()
             this.buttonDisabled = false
         },
+        async submitImageSubmission() {
+            this.buttonDisabled = true
+            if (this.files.length === 0) {
+                this.showErrorMessage({ message: "No image(s) selected" })
+                this.buttonDisabled = false
+                return
+            }
+
+            //pdf creation and conversion
+            const firstImg = this.files[0]
+            const doc = new jsPDF({
+                orientation: firstImg.width > firstImg.height ? "l" : "p",
+                unit: "px",
+                format: [firstImg.width, firstImg.height],
+                hotfixes: ["px_scaling"],
+            })
+            doc.addImage(firstImg.src, "JPEG", 0, 0, firstImg.width, firstImg.height)
+
+            for (let i = 1; i < this.files.length; i++) {
+                const curImg = this.files[i]
+                doc.addPage([curImg.width, curImg.height], curImg.width > curImg.height ? "l" : "p")
+                doc.addImage(curImg.src, "JPEG", 0, 0, curImg.width, curImg.height)
+            }
+
+            const outputBlob = doc.output("blob")
+            this.file = new File([outputBlob], "submission.pdf")
+
+            // Config set for the HTTP request & updating the progress field.
+            let config = {
+                "Content-Type": "multipart/form-data",
+                onUploadProgress: (progressEvent) => {
+                    this.fileProgress = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+                },
+            }
+            // Perform upload.
+            try {
+                await api.submissions.post(this.group.id, this.assignmentVersionId, this.file, config)
+                this.showSuccessMessage({ message: "Successfully submitted submission." })
+            } catch (error) {
+                this.buttonDisabled = false
+                return
+            }
+            this.$refs.uploadImgModal.hide()
+
+            // Reset and fetch new submission.
+            this.resetFile()
+            await this.fetchSubmissions()
+            this.buttonDisabled = false
+        },
         submissionFilePath(id) {
             // Get the submission file path.
             return `/api/submissions/${id}/file`
         },
-        resetFile() {
+        resetFile(id) {
             // Reset the upload modal state.
             this.fileProgress = 0
             this.file = null
+            this.files = []
+
+            // new submission button clicked
+            if (id) {
+                if (this.assignment.submissionExtensions.includes(".pdf")) {
+                    this.$bvModal.show(`uploadTypeModal${id}`)
+                } else {
+                    this.$bvModal.show(`uploadModal${id}`)
+                }
+            }
         },
         async changeSubmissionToFinal(id) {
             await api.submissions.patch(id, true)

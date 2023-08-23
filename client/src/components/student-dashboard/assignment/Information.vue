@@ -1,7 +1,7 @@
 <template>
     <b-container fluid class="p-0">
         <b-row>
-            <b-col cols="7">
+            <b-col sm="7" class="mb-3">
                 <!--Assignment Details-->
                 <b-card header="Assignment Details" class="h-100">
                     <span class="font-weight-bold">Description</span>
@@ -35,7 +35,7 @@
                     </b-button>
                 </b-card>
             </b-col>
-            <b-col cols="5">
+            <b-col sm="5" class="mb-3">
                 <!--Group Information-->
                 <b-card header="Group Information" no-body>
                     <b-card-body>
@@ -51,7 +51,15 @@
                             <dd>{{ group.name }}</dd>
 
                             <dt>Group Members</dt>
-                            <b-table striped outlined show-empty stacked="md" :items="group.users" :fields="userFields">
+                            <b-table
+                                striped
+                                outlined
+                                show-empty
+                                stacked="sm"
+                                responsive
+                                :items="group.users"
+                                :fields="userFields"
+                            >
                             </b-table>
 
                             <dt>Final Submission</dt>

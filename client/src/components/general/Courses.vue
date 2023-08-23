@@ -24,15 +24,15 @@
             <b-card no-body>
                 <b-tabs card>
                     <!--Enrolled Courses Tab-->
-                    <b-tab title="Enrolled Courses">
-                        <!--Filter Input-->
+                    <b-tab title="Your Courses">
+                        <!--Filter Input  sm class="mb-3" cols="6" -->
                         <b-row>
-                            <b-col class="mb-3" cols="6">
+                            <b-col sm="6">
                                 <b-form-group label="" description="Search a course">
                                     <b-input placeholder="Filter courses" v-model="filterOptions.name"></b-input>
                                 </b-form-group>
                             </b-col>
-                            <b-col class="mb-3" cols="3">
+                            <b-col sm="3">
                                 <b-form-group label="" description="Select the faculty">
                                     <b-form-select v-model="filterOptions.faculty">
                                         <b-form-select-option :value="null">All</b-form-select-option>
@@ -45,7 +45,7 @@
                                     </b-form-select>
                                 </b-form-group>
                             </b-col>
-                            <b-col class="mb-3" cols="3">
+                            <b-col sm="3">
                                 <b-form-group label="" description="Select the academic year">
                                     <b-form-select v-model="filterOptions.academicYear">
                                         <b-form-select-option :value="null">All</b-form-select-option>
@@ -74,7 +74,7 @@
                         <!--Course Cards-->
                         <b-row>
                             <b-col
-                                cols="6"
+                                sm="6"
                                 v-for="enrollment in filteredEnrollments"
                                 :key="enrollment.course.id"
                                 class="d-flex align-items-stretch mb-3"
@@ -141,7 +141,7 @@
                     </b-tab>
 
                     <!--Enrollable Courses Tab-->
-                    <b-tab title="Enrollable Courses">
+                    <b-tab title="All Courses">
                         <!--Filter Input-->
                         <b-row>
                             <b-col class="mb-3" cols="6">
