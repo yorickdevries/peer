@@ -7,7 +7,7 @@
                     <b-button variant="primary" size="lg" block class="custom-button">Button 1</b-button>
                 </div>
                 <div class="col-md-6">
-                    <b-button variant="secondary" size="lg" block class="custom-button">Button 2</b-button>
+                    <b-button variant="secondary" block class="custom-button" @click="nextCard">Button 2</b-button>
                 </div>
             </div>
         </b-card>
@@ -17,6 +17,12 @@
 <script>
 export default {
     name: "AssignmentDetailsCard",
+
+    methods: {
+        nextCard() {
+            this.$emit("next-card")
+        },
+    },
 }
 </script>
 
