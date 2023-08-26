@@ -1,31 +1,24 @@
 <template>
-    <div>
-        <b-card class="m-5">
-            <h1 class="text-center custom-margin" style="font-size: 5rem">Second question</h1>
-            <div class="row">
-                <div class="col-md-6">
-                    <b-button variant="primary" size="lg" block class="custom-button">Button 1</b-button>
-                </div>
-                <div class="col-md-6">
-                    <b-button variant="secondary" size="lg" block class="custom-button">Button 2</b-button>
-                </div>
-            </div>
-        </b-card>
-    </div>
+    <CardTemplate @next-card="nextCard" @prev-card="prevCard">
+        <h1 class="text-center" style="font-size: 5rem">Please upload a comma separated file containing the groups</h1>
+        <b-form-file class="form" placeholder=".csv" accept=".csv"> </b-form-file>
+    </CardTemplate>
 </template>
 
 <script>
+import CardTemplate from "@/components/teacher-dashboard/wizard/CardTemplate.vue"
+import Cards from "@/mixins/cards"
 export default {
-    name: "GroupUploadCard",
+    name: "AssignmentDetailsCard",
+    components: { CardTemplate },
+    mixins: [Cards],
 }
 </script>
 
 <style scoped>
-.custom-margin {
-    margin-bottom: 20rem;
-}
-.custom-button {
-    font-size: 1.5rem;
-    padding: 20px 30px;
+.form {
+    margin-top: 8rem;
+    height: 5rem;
+    font-size: 2rem;
 }
 </style>

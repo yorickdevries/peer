@@ -1,37 +1,30 @@
 <template>
-    <div>
-        <b-card class="m-5">
-            <h1 class="text-center custom-margin" style="font-size: 5rem">This is a question</h1>
-            <div class="row">
-                <div class="col-md-6">
-                    <b-button variant="primary" size="lg" block class="custom-button">Button 1</b-button>
-                </div>
-                <div class="col-md-6">
-                    <b-button variant="secondary" block class="custom-button" @click="nextCard">Button 2</b-button>
-                </div>
-            </div>
-        </b-card>
-    </div>
+    <CardTemplate @next-card="nextCard" @prev-card="prevCard">
+        <h1 class="text-center" style="font-size: 5rem">Assignment Details</h1>
+        <b-form-input class="assignment-name" type="text" placeholder="Assignment Name"></b-form-input>
+        <b-form-textarea class="description" type="text" placeholder="Description"></b-form-textarea>
+    </CardTemplate>
 </template>
 
 <script>
+import CardTemplate from "@/components/teacher-dashboard/wizard/CardTemplate.vue"
+import Cards from "@/mixins/cards"
 export default {
     name: "AssignmentDetailsCard",
-
-    methods: {
-        nextCard() {
-            this.$emit("next-card")
-        },
-    },
+    components: { CardTemplate },
+    mixins: [Cards],
 }
 </script>
 
 <style scoped>
-.custom-margin {
-    margin-bottom: 20rem;
-}
-.custom-button {
+.description {
+    height: 10rem;
     font-size: 1.5rem;
-    padding: 20px 30px;
+}
+.assignment-name {
+    height: 5rem;
+    font-size: 2rem;
+    margin-top: 5rem;
+    margin-bottom: 1rem;
 }
 </style>
