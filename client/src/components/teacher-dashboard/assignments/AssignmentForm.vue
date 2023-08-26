@@ -404,7 +404,7 @@ export default {
             whitelistExtensions: null,
             extensionTypes: null,
 
-            extensionTypesText: [{ value: ".txt", text: ".txt" }],
+            extensionTypesText: [{ value: ".txt,.md", text: ".txt,.md" }],
 
             extensionTypesDocument: [
                 { value: ".pdf", text: ".pdf" },
