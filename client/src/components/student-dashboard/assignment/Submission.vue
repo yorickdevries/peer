@@ -269,7 +269,7 @@
                             :readOnly="true"
                             :ignoreAnnotations="true"
                             :editable="assignment.state == 'submission'"
-                            @shortcut-save="changed = true"
+                            @shortcut-save="getChanged"
                         />
                         <!-- Modal Button -->
                         <b-button
@@ -344,6 +344,10 @@ export default {
         await this.fetchSubmissions()
     },
     methods: {
+        getChanged() {
+            this.changed = true
+            this.$emit("shortcut-save")
+        },
         async submitTextFile() {
             const childRef = this.$refs.childRef
             this.file = await childRef.makeFile()
