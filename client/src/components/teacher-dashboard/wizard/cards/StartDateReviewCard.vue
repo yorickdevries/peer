@@ -1,5 +1,9 @@
 <template>
-    <DatePickerCardTemplate :title="'Select the publish date and time'" @next-card="nextCard" @prev-card="prevCard">
+    <DatePickerCardTemplate
+        :title="'Select the start date and time for peer review(s)'"
+        @next-card="nextCard"
+        @prev-card="prevCard"
+    >
     </DatePickerCardTemplate>
 </template>
 
@@ -8,7 +12,7 @@ import DatePickerCardTemplate from "@/components/teacher-dashboard/wizard/cards/
 import Cards from "@/mixins/cards"
 
 export default {
-    name: "PublishAssignmentCard",
+    name: "StartDateReview",
     components: { DatePickerCardTemplate },
     mixins: [Cards],
 }

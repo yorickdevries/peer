@@ -11,11 +11,13 @@
 
 <script>
 import CardTemplate from "@/components/teacher-dashboard/wizard/CardTemplate.vue"
+import Cards from "@/mixins/cards"
 
 export default {
     name: "DatePickerCardTemplate",
     components: { CardTemplate },
     props: ["title"],
+    mixins: [Cards],
 }
 </script>
 

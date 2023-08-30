@@ -2,6 +2,7 @@
     <CardTemplate @next-card="nextCard" @prev-card="prevCard">
         <h1 class="text-center" style="font-size: 5rem">Please upload a comma separated file containing the groups</h1>
         <b-form-file class="form" placeholder=".csv" accept=".csv"> </b-form-file>
+        <b-checkbox class="checkboxes">I don't want students to work in groups</b-checkbox>
     </CardTemplate>
 </template>
 
@@ -20,5 +21,8 @@ export default {
     margin-top: 8rem;
     height: 5rem;
     font-size: 2rem;
+}
+.checkboxes {
+    align-self: flex-start;
 }
 </style>
