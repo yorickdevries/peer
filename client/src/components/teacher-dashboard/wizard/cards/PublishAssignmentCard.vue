@@ -1,5 +1,11 @@
 <template>
-    <DatePickerCardTemplate :title="'Select the publish date and time'" @next-card="nextCard" @prev-card="prevCard">
+    <DatePickerCardTemplate
+        :title="'Select the publish date and time'"
+        @next-card="nextCard"
+        @prev-card="prevCard"
+        @date-pick="setPublishDate"
+        @time-pick="setPublishTime"
+    >
     </DatePickerCardTemplate>
 </template>
 
@@ -11,6 +17,15 @@ export default {
     name: "PublishAssignmentCard",
     components: { DatePickerCardTemplate },
     mixins: [Cards],
+    props: ["assignment"],
+    methods: {
+        setPublishDate(date) {
+            this.assignment.publishDay = date
+        },
+        setPublishTime(time) {
+            this.assignment.publishTime = time
+        },
+    },
 }
 </script>
 

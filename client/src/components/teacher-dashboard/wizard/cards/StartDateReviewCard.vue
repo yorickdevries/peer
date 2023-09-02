@@ -3,6 +3,8 @@
         :title="'Select the start date and time for peer review(s)'"
         @next-card="nextCard"
         @prev-card="prevCard"
+        @date-pick="setReviewPublishDate"
+        @time-pick="setReviewPublishTime"
     >
     </DatePickerCardTemplate>
 </template>
@@ -15,6 +17,15 @@ export default {
     name: "StartDateReview",
     components: { DatePickerCardTemplate },
     mixins: [Cards],
+    props: ["assignment"],
+    methods: {
+        setReviewPublishDate(date) {
+            this.assignment.reviewPublishDay = date
+        },
+        setReviewPublishTime(time) {
+            this.assignment.reviewPublishTime = time
+        },
+    },
 }
 </script>
 

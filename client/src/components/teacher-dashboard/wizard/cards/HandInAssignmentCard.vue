@@ -1,6 +1,12 @@
 <template>
-    <DatePickerCardTemplate :title="'Select the hand-in due date and time'" @next-card="nextCard" @prev-card="prevCard">
-        <b-form-checkbox class="checkboxes"
+    <DatePickerCardTemplate
+        :title="'Select the hand-in due date and time'"
+        @next-card="nextCard"
+        @prev-card="prevCard"
+        @date-pick="setHandInDate"
+        @time-pick="setHandInTime"
+    >
+        <b-form-checkbox class="checkboxes" @input="allowLateSubmissions"
             >Allow late submissions until shortly after before the reviews are distributed</b-form-checkbox
         >
     </DatePickerCardTemplate>
@@ -14,6 +20,18 @@ export default {
     name: "HandInAssignmentCard",
     components: { DatePickerCardTemplate },
     mixins: [Cards],
+    props: ["assignment"],
+    methods: {
+        setHandInDate(date) {
+            this.assignment.dueDay = date
+        },
+        setHandInTime(time) {
+            this.assignment.dueTime = time
+        },
+        allowLateSubmissions() {
+            this.assignment.lateSubmissions = !this.assignment.lateSubmissions
+        },
+    },
 }
 </script>
 

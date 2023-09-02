@@ -1,5 +1,5 @@
 <template>
-    <Wizard></Wizard>
+    <Wizard :assignment="assignment"></Wizard>
 </template>
 
 <script>
@@ -9,7 +9,32 @@ export default {
     components: { Wizard },
     data() {
         return {
-            stuff: false,
+            assignment: {
+                name: "",
+                enrollable: false,
+                reviewEvaluation: true,
+                publishDay: null,
+                publishTime: "23:59",
+                dueDay: null,
+                dueTime: "23:59",
+                reviewPublishDay: null,
+                reviewPublishTime: "23:59",
+                reviewDueDay: null,
+                reviewDueTime: "23:59",
+                reviewEvaluationDueDay: null,
+                reviewEvaluationDueTime: "23:59",
+                description: null,
+                file: null,
+                externalLink: null,
+                submissionExtensions: ".pdf",
+                blockFeedback: false,
+                lateSubmissions: false,
+                lateSubmissionReviews: false,
+                lateReviewEvaluations: false,
+                automaticStateProgression: false,
+                assignmentType: "document",
+                sendNotificationEmails: false,
+            },
         }
     },
 }

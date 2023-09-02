@@ -1,6 +1,11 @@
 <template>
     <div>
-        <component @next-card="nextCard" @prev-card="prevCard" :is="cardNames[currCardIndex]"></component>
+        <component
+            :assignment="assignment"
+            @next-card="nextCard"
+            @prev-card="prevCard"
+            :is="cardNames[currCardIndex]"
+        ></component>
     </div>
 </template>
 
@@ -29,6 +34,7 @@ export default {
         AssignmentFileCard,
         AssignmentLinkCard,
     },
+    props: ["assignment"],
     data() {
         return {
             cardNames: [

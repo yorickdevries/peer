@@ -1,8 +1,20 @@
 <template>
     <CardTemplate @next-card="nextCard" @prev-card="prevCard">
         <h1 class="text-center" style="font-size: 5rem">Assignment Details</h1>
-        <b-form-input class="assignment-name" type="text" placeholder="Assignment Name"></b-form-input>
-        <b-form-textarea class="description" type="text" placeholder="Description"></b-form-textarea>
+        <b-form-input
+            v-model="name"
+            class="assignment-name"
+            type="text"
+            placeholder="Assignment Name"
+            @input="emitAssignmentName"
+        ></b-form-input>
+        <b-form-textarea
+            v-model="description"
+            class="description"
+            type="text"
+            placeholder="Description"
+            @input="emitAssignmentDescription"
+        ></b-form-textarea>
     </CardTemplate>
 </template>
 
@@ -13,6 +25,21 @@ export default {
     name: "AssignmentDetailsCard",
     components: { CardTemplate },
     mixins: [Cards],
+    props: ["assignment"],
+    data() {
+        return {
+            name: "",
+            description: "",
+        }
+    },
+    methods: {
+        emitAssignmentName() {
+            this.assignment.name = this.name
+        },
+        emitAssignmentDescription() {
+            this.assignment.description = this.description
+        },
+    },
 }
 </script>
 

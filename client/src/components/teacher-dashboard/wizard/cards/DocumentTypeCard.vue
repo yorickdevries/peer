@@ -4,9 +4,9 @@
             Choose the type of assignment to be submitted.
         </h1>
         <div class="buttons">
-            <b-button class="custom-button">Document</b-button>
-            <b-button class="custom-button">Code</b-button>
-            <b-button class="custom-button">Text</b-button>
+            <b-button @click="setDocument" class="custom-button">Document</b-button>
+            <b-button @click="setCode" class="custom-button">Code</b-button>
+            <b-button @click="setText" class="custom-button">Text</b-button>
         </div>
     </CardTemplate>
 </template>
@@ -19,6 +19,22 @@ export default {
     name: "DocumentTypeCard",
     components: { CardTemplate },
     mixins: [cards],
+    props: ["assignment"],
+
+    methods: {
+        setDocument() {
+            // this.$emit("document-type", "document")\
+            this.assignment.assignmentType = "document"
+        },
+        setCode() {
+            // this.$emit("document-type", "code")
+            this.assignment.assignmentType = "code"
+        },
+        setText() {
+            // this.$emit("document-type", "text")
+            this.assignment.assignmentType = "text"
+        },
+    },
 }
 </script>
 

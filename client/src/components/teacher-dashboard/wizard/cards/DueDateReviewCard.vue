@@ -3,11 +3,13 @@
         :title="'Select the due date and time for peer review(s)'"
         @next-card="nextCard"
         @prev-card="prevCard"
+        @date-pick="setReviewDueDate"
+        @time-pick="setReviewDueTime"
     >
-        <b-form-checkbox class="checkboxes"
+        <b-form-checkbox class="checkboxes" @input="allowLateSubmissionReviews"
             >Allow late submission reviews indefinitely after the deadline</b-form-checkbox
         >
-        <b-form-checkbox class="checkboxes"
+        <b-form-checkbox class="checkboxes" @input="blockFeedback"
             >Block feedback for students who did not finish their reviews</b-form-checkbox
         >
     </DatePickerCardTemplate>
@@ -21,6 +23,21 @@ export default {
     name: "DueDateReview",
     components: { DatePickerCardTemplate },
     mixins: [Cards],
+    props: ["assignment"],
+    methods: {
+        setReviewDueDate(date) {
+            this.assignment.reviewDueDay = date
+        },
+        setReviewDueTime(time) {
+            this.assignment.reviewDueTime = time
+        },
+        allowLateSubmissionReviews() {
+            this.assignment.lateSubmissionReviews = !this.assignment.lateSubmissionReviews
+        },
+        blockFeedback() {
+            this.assignment.blockFeedback = !this.assignment.blockFeedback
+        },
+    },
 }
 </script>
 
