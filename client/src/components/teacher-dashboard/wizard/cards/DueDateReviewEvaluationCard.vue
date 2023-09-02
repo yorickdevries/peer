@@ -2,6 +2,7 @@
     <DatePickerCardTemplate
         :title="'Select the due date and time for review evaluation(s)'"
         :isDisabled="isEvalDisabled"
+        :assignment="assignment"
         @next-card="nextCard"
         @prev-card="prevCard"
         @date-pick="setEvalDueDate"

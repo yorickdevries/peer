@@ -1,5 +1,5 @@
 <template>
-    <CardTemplate @next-card="nextCard" @prev-card="prevCard">
+    <CardTemplate :assignment="assignment" @next-card="nextCard" @prev-card="prevCard">
         <h1 class="text-center custom-margin" style="font-size: 4rem">
             Choose the type of assignment to be submitted.
         </h1>

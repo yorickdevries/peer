@@ -1,6 +1,7 @@
 <template>
     <DatePickerCardTemplate
         :title="'Select the publish date and time'"
+        :assignment="assignment"
         @next-card="nextCard"
         @prev-card="prevCard"
         @date-pick="setPublishDate"

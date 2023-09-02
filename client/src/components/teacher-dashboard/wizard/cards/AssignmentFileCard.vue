@@ -1,7 +1,7 @@
 <template>
-    <CardTemplate @next-card="nextCard" @prev-card="prevCard">
+    <CardTemplate :assignment="assignment" @next-card="nextCard" @prev-card="prevCard">
         <h1 class="text-center" style="font-size: 5rem">Add a file for the assignment (optional)</h1>
-        <b-form-file class="form" placeholder="Choose a file"> </b-form-file>
+        <b-form-file class="form" placeholder="Choose a file" @input="setFile"> </b-form-file>
     </CardTemplate>
 </template>
 
@@ -13,6 +13,13 @@ export default {
     name: "AssignmentFileCard",
     components: { CardTemplate },
     mixins: [Cards],
+    props: ["assignment"],
+
+    methods: {
+        setFile(file) {
+            this.assignment.file = file
+        },
+    },
 }
 </script>
 

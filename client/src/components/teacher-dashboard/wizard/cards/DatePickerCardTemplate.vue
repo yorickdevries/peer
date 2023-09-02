@@ -1,5 +1,5 @@
 <template>
-    <CardTemplate @next-card="nextCard" @prev-card="prevCard">
+    <CardTemplate :assignment="assignment" @next-card="nextCard" @prev-card="prevCard">
         <h1 class="text-center" style="font-size: 4rem">{{ title }}</h1>
         <div class="flexbox">
             <b-calendar :disabled="isDisabled" v-model="date" @context="onDatePick" locale="en-US"></b-calendar>
@@ -22,7 +22,7 @@ import Cards from "@/mixins/cards"
 export default {
     name: "DatePickerCardTemplate",
     components: { CardTemplate },
-    props: ["title", "isDisabled"],
+    props: ["title", "isDisabled", "assignment"],
     mixins: [Cards],
     data() {
         return {

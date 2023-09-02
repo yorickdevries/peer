@@ -1,9 +1,9 @@
 <template>
-    <CardTemplate @next-card="nextCard" @prev-card="prevCard">
+    <CardTemplate :assignment="assignment" @next-card="nextCard" @prev-card="prevCard">
         <h1 class="text-center" style="font-size: 5rem">
             Add a link where the assignment can be found for the student (optional)
         </h1>
-        <b-form-input class="link" type="text" placeholder="Link"></b-form-input>
+        <b-form-input class="link" type="text" placeholder="Link" @input="setLink"></b-form-input>
     </CardTemplate>
 </template>
 
@@ -15,6 +15,13 @@ export default {
     name: "AssignmentLinkCard",
     components: { CardTemplate },
     mixins: [Cards],
+    props: ["assignment"],
+
+    methods: {
+        setLink(link) {
+            this.assignment.externalLink = link
+        },
+    },
 }
 </script>
 

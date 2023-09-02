@@ -1,19 +1,19 @@
 <template>
-    <CardTemplate @next-card="nextCard" @prev-card="prevCard">
+    <CardTemplate :assignment="assignment" @next-card="nextCard" @prev-card="prevCard">
         <h1 class="text-center" style="font-size: 5rem">Assignment Details</h1>
         <b-form-input
             v-model="name"
             class="assignment-name"
             type="text"
             placeholder="Assignment Name"
-            @input="emitAssignmentName"
+            @input="setAssignmentName"
         ></b-form-input>
         <b-form-textarea
             v-model="description"
             class="description"
             type="text"
             placeholder="Description"
-            @input="emitAssignmentDescription"
+            @input="setAssignmentDescription"
         ></b-form-textarea>
     </CardTemplate>
 </template>
@@ -33,10 +33,10 @@ export default {
         }
     },
     methods: {
-        emitAssignmentName() {
+        setAssignmentName() {
             this.assignment.name = this.name
         },
-        emitAssignmentDescription() {
+        setAssignmentDescription() {
             this.assignment.description = this.description
         },
     },
