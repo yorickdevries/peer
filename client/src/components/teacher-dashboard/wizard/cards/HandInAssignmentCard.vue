@@ -1,9 +1,9 @@
 <template>
     <DatePickerCardTemplate
         :title="'Select the hand-in due date and time'"
-        :assignment="assignment"
         @next-card="nextCard"
         @prev-card="prevCard"
+        @switch-mode="switchMode"
         @date-pick="setHandInDate"
         @time-pick="setHandInTime"
     >

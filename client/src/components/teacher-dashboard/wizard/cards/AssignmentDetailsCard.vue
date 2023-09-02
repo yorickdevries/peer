@@ -1,5 +1,5 @@
 <template>
-    <CardTemplate :assignment="assignment" @next-card="nextCard" @prev-card="prevCard">
+    <CardTemplate @next-card="nextCard" @prev-card="prevCard" @switch-mode="switchMode">
         <h1 class="text-center" style="font-size: 5rem">Assignment Details</h1>
         <b-form-input
             v-model="name"

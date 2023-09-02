@@ -1,11 +1,15 @@
 <template>
     <div>
         <component
+            v-if="simpleMode"
             :assignment="assignment"
             @next-card="nextCard"
             @prev-card="prevCard"
+            @switch-mode="switchMode"
             :is="cardNames[currCardIndex]"
         ></component>
+        <!--        <AssignmentForm v-else :assignment="assignment" @submitted="onSubmit" :edit="false" />-->
+        <AssignmentForm v-else :assignment="assignment" />
     </div>
 </template>
 
@@ -20,6 +24,7 @@ import DueDateReviewEvaluationCard from "@/components/teacher-dashboard/wizard/c
 import DueDateReviewCard from "@/components/teacher-dashboard/wizard/cards/DueDateReviewCard.vue"
 import StartDateReviewCard from "@/components/teacher-dashboard/wizard/cards/StartDateReviewCard.vue"
 import AssignmentLinkCard from "@/components/teacher-dashboard/wizard/cards/AssignmentLinkCard.vue"
+import AssignmentForm from "@/components/teacher-dashboard/assignments/AssignmentForm.vue"
 export default {
     name: "wizard",
     components: {
@@ -33,6 +38,7 @@ export default {
         DueDateReviewEvaluationCard,
         AssignmentFileCard,
         AssignmentLinkCard,
+        AssignmentForm,
     },
     props: ["assignment"],
     data() {
@@ -50,6 +56,7 @@ export default {
                 "AssignmentLinkCard",
             ],
             currCardIndex: 0,
+            simpleMode: true,
         }
     },
     methods: {
@@ -58,6 +65,9 @@ export default {
         },
         prevCard() {
             this.currCardIndex--
+        },
+        switchMode() {
+            this.simpleMode = !this.simpleMode
         },
     },
 }

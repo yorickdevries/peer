@@ -1,5 +1,5 @@
 <template>
-    <CardTemplate :assignment="assignment" @next-card="nextCard" @prev-card="prevCard">
+    <CardTemplate @next-card="nextCard" @prev-card="prevCard" @switch-mode="switchMode">
         <h1 class="text-center" style="font-size: 4rem">{{ title }}</h1>
         <div class="flexbox">
             <b-calendar :disabled="isDisabled" v-model="date" @context="onDatePick" locale="en-US"></b-calendar>

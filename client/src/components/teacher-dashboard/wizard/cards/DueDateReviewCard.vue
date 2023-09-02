@@ -1,9 +1,9 @@
 <template>
     <DatePickerCardTemplate
         :title="'Select the due date and time for peer review(s)'"
-        :assignment="assignment"
         @next-card="nextCard"
         @prev-card="prevCard"
+        @switch-mode="switchMode"
         @date-pick="setReviewDueDate"
         @time-pick="setReviewDueTime"
     >

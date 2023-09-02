@@ -1,5 +1,5 @@
 <template>
-    <CardTemplate :assignment="assignment" @next-card="nextCard" @prev-card="prevCard">
+    <CardTemplate @next-card="nextCard" @prev-card="prevCard" @switch-mode="switchMode">
         <h1 class="text-center" style="font-size: 5rem">
             Add a link where the assignment can be found for the student (optional)
         </h1>

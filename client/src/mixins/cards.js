@@ -6,5 +6,8 @@ export default {
         prevCard() {
             this.$emit("prev-card")
         },
+        switchMode() {
+            this.$emit("switch-mode")
+        },
     },
 }
