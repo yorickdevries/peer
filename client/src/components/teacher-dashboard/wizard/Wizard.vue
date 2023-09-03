@@ -9,7 +9,13 @@
             :is="cardNames[currCardIndex]"
         ></component>
         <!--        <AssignmentForm v-else :assignment="assignment" @submitted="onSubmit" :edit="false" />-->
-        <AssignmentForm v-else :assignment="assignment" />
+        <AssignmentForm
+            v-else
+            :assignment="assignment"
+            :simpleModeButton="showSimpleModeButton"
+            @submitted="onSubmit"
+            @switch-mode="switchMode"
+        />
     </div>
 </template>
 
@@ -57,17 +63,26 @@ export default {
             ],
             currCardIndex: 0,
             simpleMode: true,
+            showSimpleModeButton: true,
         }
     },
     methods: {
         nextCard() {
-            this.currCardIndex++
+            if (this.currCardIndex < this.cardNames.length - 1) {
+                this.currCardIndex++
+            } else {
+                this.showSimpleModeButton = false
+                this.switchMode()
+            }
         },
         prevCard() {
             this.currCardIndex--
         },
         switchMode() {
             this.simpleMode = !this.simpleMode
+        },
+        onSubmit(data) {
+            this.$emit("submitted", data)
         },
     },
 }

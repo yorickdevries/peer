@@ -2,11 +2,11 @@
     <CardTemplate @next-card="nextCard" @prev-card="prevCard" @switch-mode="switchMode">
         <h1 class="text-center" style="font-size: 4rem">{{ title }}</h1>
         <div class="flexbox">
-            <b-calendar :disabled="isDisabled" v-model="date" @context="onDatePick" locale="en-US"></b-calendar>
+            <b-calendar :disabled="isDisabled" v-model="selectedDate" @context="onDatePick" locale="en-US"></b-calendar>
             <b-form-timepicker
                 :disabled="isDisabled"
                 class="timePicker"
-                v-model="time"
+                v-model="selectedTime"
                 @input="onTimePick"
                 locale="nl"
             ></b-form-timepicker>
@@ -22,20 +22,14 @@ import Cards from "@/mixins/cards"
 export default {
     name: "DatePickerCardTemplate",
     components: { CardTemplate },
-    props: ["title", "isDisabled", "assignment"],
+    props: ["title", "isDisabled", "selectedDate", "selectedTime"],
     mixins: [Cards],
-    data() {
-        return {
-            date: null,
-            time: null,
-        }
-    },
     methods: {
         onDatePick() {
-            this.$emit("date-pick", this.date)
+            this.$emit("date-pick", new Date(this.selectedDate))
         },
         onTimePick() {
-            this.$emit("time-pick", this.time)
+            this.$emit("time-pick", this.selectedTime)
         },
     },
 }

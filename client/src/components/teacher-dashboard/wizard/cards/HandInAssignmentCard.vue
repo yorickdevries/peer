@@ -1,6 +1,8 @@
 <template>
     <DatePickerCardTemplate
         :title="'Select the hand-in due date and time'"
+        :selectedDate="assignment.dueDay"
+        :selectedTime="assignment.dueTime"
         @next-card="nextCard"
         @prev-card="prevCard"
         @switch-mode="switchMode"

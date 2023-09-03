@@ -2,6 +2,12 @@
     <b-row>
         <b-col>
             <b-card>
+                <div style="display: flex; justify-content: center">
+                    <b-button v-if="simpleModeButton" class="simpleMode" @click="switchMode"
+                        >Switch to simple mode</b-button
+                    >
+                </div>
+                <h1>Assignment Overview</h1>
                 <b-form @submit.prevent="onSubmit">
                     <!--Assignment name-->
                     <b-form-group label="Assignment name">
@@ -394,7 +400,7 @@ export default {
     components: {
         Datepicker,
     },
-    props: ["assignment", "edit"],
+    props: ["assignment", "edit", "simpleModeButton"],
     data() {
         return {
             // boolean which indicates whether the current file needs to be changed
@@ -537,6 +543,7 @@ export default {
             }
             // construct the full date
             const date = new Date()
+            console.log(day.getFullYear(), day.getMonth(), day.getDate())
             date.setFullYear(day.getFullYear(), day.getMonth(), day.getDate())
             date.setHours(time.split(":")[0])
             date.setMinutes(time.split(":")[1])
@@ -572,6 +579,9 @@ export default {
             const newIndex = assignmentStates.indexOf(state)
             if (newIndex < 0) throw new Error(`Illegal assignment state: ${state}`)
             return currentIndex > newIndex
+        },
+        switchMode() {
+            this.$emit("switch-mode")
         },
     },
     computed: {

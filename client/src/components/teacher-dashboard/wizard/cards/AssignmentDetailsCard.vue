@@ -2,19 +2,18 @@
     <CardTemplate @next-card="nextCard" @prev-card="prevCard" @switch-mode="switchMode">
         <h1 class="text-center" style="font-size: 5rem">Assignment Details</h1>
         <b-form-input
-            v-model="name"
+            v-model="assignment.name"
             class="assignment-name"
             type="text"
             placeholder="Assignment Name"
-            @input="setAssignmentName"
         ></b-form-input>
         <b-form-textarea
-            v-model="description"
+            v-model="assignment.description"
             class="description"
             type="text"
             placeholder="Description"
-            @input="setAssignmentDescription"
         ></b-form-textarea>
+        <b-form-checkbox v-model="assignment.sendNotificationEmails">Send notification emails</b-form-checkbox>
     </CardTemplate>
 </template>
 
@@ -26,20 +25,6 @@ export default {
     components: { CardTemplate },
     mixins: [Cards],
     props: ["assignment"],
-    data() {
-        return {
-            name: "",
-            description: "",
-        }
-    },
-    methods: {
-        setAssignmentName() {
-            this.assignment.name = this.name
-        },
-        setAssignmentDescription() {
-            this.assignment.description = this.description
-        },
-    },
 }
 </script>
 
