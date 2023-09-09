@@ -4,9 +4,24 @@
             Choose the type of assignment to be submitted.
         </h1>
         <div class="buttons">
-            <b-button @click="setDocument" class="custom-button">Document</b-button>
-            <b-button @click="setCode" class="custom-button">Code</b-button>
-            <b-button @click="setText" class="custom-button">Text</b-button>
+            <b-button
+                @click="setDocument"
+                class="custom-button"
+                :class="{ 'selected-button': assignment.assignmentType === 'document' }"
+                >Document</b-button
+            >
+            <b-button
+                @click="setCode"
+                class="custom-button"
+                :class="{ 'selected-button': assignment.assignmentType === 'code' }"
+                >Code</b-button
+            >
+            <b-button
+                @click="setText"
+                class="custom-button"
+                :class="{ 'selected-button': assignment.assignmentType === 'text' }"
+                >Text</b-button
+            >
         </div>
     </CardTemplate>
 </template>
@@ -55,5 +70,8 @@ export default {
     font-size: 1.5rem;
     padding: 20px 30px;
     width: 20rem;
+}
+.selected-button {
+    background-color: #007bff;
 }
 </style>
