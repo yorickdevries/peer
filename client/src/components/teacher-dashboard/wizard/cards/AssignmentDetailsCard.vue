@@ -13,6 +13,9 @@
             type="text"
             placeholder="Description"
         ></b-form-textarea>
+        <b-form-checkbox v-model="assignment.enrollable"
+            >Allow students to enroll themselves into this assignment</b-form-checkbox
+        >
         <b-form-checkbox v-model="assignment.sendNotificationEmails">Send notification emails</b-form-checkbox>
     </CardTemplate>
 </template>

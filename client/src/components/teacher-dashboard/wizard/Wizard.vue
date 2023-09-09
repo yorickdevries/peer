@@ -21,7 +21,6 @@
 
 <script>
 import AssignmentDetailsCard from "@/components/teacher-dashboard/wizard/cards/AssignmentDetailsCard.vue"
-import GroupUploadCard from "@/components/teacher-dashboard/wizard/cards/GroupUploadCard.vue"
 import DocumentTypeCard from "@/components/teacher-dashboard/wizard/cards/DocumentTypeCard.vue"
 import PublishAssignmentCard from "@/components/teacher-dashboard/wizard/cards/PublishAssignmentCard.vue"
 import HandInAssignmentCard from "@/components/teacher-dashboard/wizard/cards/HandInAssignmentCard.vue"
@@ -35,7 +34,6 @@ export default {
     name: "wizard",
     components: {
         AssignmentDetailsCard,
-        GroupUploadCard,
         DocumentTypeCard,
         PublishAssignmentCard,
         HandInAssignmentCard,
@@ -51,7 +49,6 @@ export default {
         return {
             cardNames: [
                 "AssignmentDetailsCard",
-                "GroupUploadCard",
                 "DocumentTypeCard",
                 "PublishAssignmentCard",
                 "HandInAssignmentCard",
