@@ -370,11 +370,11 @@ export default {
             }
         },
         selectUploadType(selectType) {
-            this.$bvModal.hide(`uploadTypeModal${this.assignment.id}`)
+            this.$bvModal.hide(`uploadTypeModal${this.assignmentVersion.id}`)
             if (selectType === "pdf") {
-                this.$bvModal.show(`uploadModal${this.assignment.id}`)
+                this.$bvModal.show(`uploadModal${this.assignmentVersion.id}`)
             } else {
-                this.$bvModal.show(`uploadImgModal${this.assignment.id}`)
+                this.$bvModal.show(`uploadImgModal${this.assignmentVersion.id}`)
             }
         },
         deleteImage(id) {
