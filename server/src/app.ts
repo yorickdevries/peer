@@ -55,11 +55,13 @@ app.use(
           "https://*.adobe.io",
           "*.typekit.com",
           "*.typekit.net",
+          "https://sentry.ewi.tudelft.nl",
         ],
         "script-src": [
           "'self'",
           "'unsafe-eval'",
           "https://documentservices.adobe.com",
+          "https://sentry.ewi.tudelft.nl",
         ],
         "frame-src": ["'self'", "https://documentservices.adobe.com"],
       },
