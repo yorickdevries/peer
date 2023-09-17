@@ -3,7 +3,12 @@
         <h1 class="text-center" style="font-size: 5rem">
             Add a link where the assignment can be found for the student (optional)
         </h1>
-        <b-form-input class="link" type="text" placeholder="Link" @input="setLink"></b-form-input>
+        <b-form-input
+            class="link"
+            type="text"
+            placeholder="Add a link where the assignment can be found for the student (optional)"
+            @input="setLink"
+        ></b-form-input>
     </CardTemplate>
 </template>
 

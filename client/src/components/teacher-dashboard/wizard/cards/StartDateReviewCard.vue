@@ -3,12 +3,25 @@
         :title="'Select the start date and time for peer review(s)'"
         :selectedDate="assignment.reviewPublishDay"
         :selectedTime="assignment.reviewPublishTime"
+        :selectedDate1="assignment.reviewDueDay"
+        :selectedTime1="assignment.reviewDueTime"
+        :second="true"
+        :firstTitle="`Review Start Details`"
+        :secondTitle="`Review Hand-in Details`"
         @next-card="nextCard"
         @prev-card="prevCard"
         @switch-mode="switchMode"
         @date-pick="setReviewPublishDate"
         @time-pick="setReviewPublishTime"
+        @date-pick1="setReviewDueDate"
+        @time-pick1="setReviewDueTime"
     >
+        <b-form-checkbox class="checkboxes" v-model="this.assignment.lateSubmissionReviews"
+            >Allow late submission reviews indefinitely after the deadline</b-form-checkbox
+        >
+        <b-form-checkbox class="checkboxes" v-model="this.assignment.blockFeedback"
+            >Block feedback for students who did not finish their reviews</b-form-checkbox
+        >
     </DatePickerCardTemplate>
 </template>
 
@@ -27,6 +40,12 @@ export default {
         },
         setReviewPublishTime(time) {
             this.assignment.reviewPublishTime = time
+        },
+        setReviewDueDate(date) {
+            this.assignment.reviewDueDay = date
+        },
+        setReviewDueTime(time) {
+            this.assignment.reviewDueTime = time
         },
     },
 }

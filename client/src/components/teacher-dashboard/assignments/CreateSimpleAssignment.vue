@@ -34,7 +34,7 @@ export default {
                 lateSubmissions: false,
                 lateSubmissionReviews: false,
                 lateReviewEvaluations: false,
-                automaticStateProgression: false,
+                automaticStateProgression: true,
                 assignmentType: "document",
                 sendNotificationEmails: false,
             },

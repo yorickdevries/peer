@@ -23,12 +23,9 @@
 import AssignmentDetailsCard from "@/components/teacher-dashboard/wizard/cards/AssignmentDetailsCard.vue"
 import DocumentTypeCard from "@/components/teacher-dashboard/wizard/cards/DocumentTypeCard.vue"
 import PublishAssignmentCard from "@/components/teacher-dashboard/wizard/cards/PublishAssignmentCard.vue"
-import HandInAssignmentCard from "@/components/teacher-dashboard/wizard/cards/HandInAssignmentCard.vue"
 import AssignmentFileCard from "@/components/teacher-dashboard/wizard/cards/AssignmentFileCard.vue"
 import DueDateReviewEvaluationCard from "@/components/teacher-dashboard/wizard/cards/DueDateReviewEvaluationCard.vue"
-import DueDateReviewCard from "@/components/teacher-dashboard/wizard/cards/DueDateReviewCard.vue"
 import StartDateReviewCard from "@/components/teacher-dashboard/wizard/cards/StartDateReviewCard.vue"
-import AssignmentLinkCard from "@/components/teacher-dashboard/wizard/cards/AssignmentLinkCard.vue"
 import AssignmentForm from "@/components/teacher-dashboard/assignments/AssignmentForm.vue"
 export default {
     name: "wizard",
@@ -36,12 +33,9 @@ export default {
         AssignmentDetailsCard,
         DocumentTypeCard,
         PublishAssignmentCard,
-        HandInAssignmentCard,
         StartDateReviewCard,
-        DueDateReviewCard,
         DueDateReviewEvaluationCard,
         AssignmentFileCard,
-        AssignmentLinkCard,
         AssignmentForm,
     },
     props: ["assignment"],
@@ -51,12 +45,9 @@ export default {
                 "AssignmentDetailsCard",
                 "DocumentTypeCard",
                 "PublishAssignmentCard",
-                "HandInAssignmentCard",
                 "StartDateReviewCard",
-                "DueDateReviewCard",
                 "DueDateReviewEvaluationCard",
                 "AssignmentFileCard",
-                "AssignmentLinkCard",
             ],
             currCardIndex: 0,
             simpleMode: true,
