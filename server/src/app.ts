@@ -62,6 +62,8 @@ app.use(
           "'unsafe-eval'",
           "https://documentservices.adobe.com",
           "https://sentry.ewi.tudelft.nl",
+          "blob:",
+          "data:",
         ],
         "frame-src": ["'self'", "https://documentservices.adobe.com"],
       },
