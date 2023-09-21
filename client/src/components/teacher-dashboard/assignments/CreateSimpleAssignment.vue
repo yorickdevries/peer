@@ -29,7 +29,7 @@ export default {
                 description: null,
                 file: null,
                 externalLink: null,
-                submissionExtensions: ".pdf",
+                submissionExtensions: ".*",
                 blockFeedback: false,
                 lateSubmissions: false,
                 lateSubmissionReviews: false,
@@ -72,6 +72,7 @@ export default {
                     params: { courseId: this.$route.params.courseId },
                 })
             } catch (error) {
+                this.showSuccessMessage({ message: `${error}` })
                 data.callback(error)
             }
         },

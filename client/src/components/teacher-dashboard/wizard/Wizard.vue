@@ -59,8 +59,9 @@ export default {
             if (this.currCardIndex < this.cardNames.length - 1) {
                 this.currCardIndex++
             } else {
-                this.showSimpleModeButton = false
-                this.switchMode()
+                // this.showSimpleModeButton = false
+                // this.switchMode()
+                this.onSubmit(this.assignment)
             }
         },
         prevCard() {
@@ -69,8 +70,42 @@ export default {
         switchMode() {
             this.simpleMode = !this.simpleMode
         },
-        onSubmit(data) {
-            this.$emit("submitted", data)
+        onSubmit() {
+            let publishDate = this.constructDate(this.assignment.publishDay, this.assignment.publishTime)
+            let dueDate = this.constructDate(this.assignment.dueDay, this.assignment.dueTime)
+            let reviewPublishDate = this.constructDate(
+                this.assignment.reviewPublishDay,
+                this.assignment.reviewPublishTime
+            )
+            let reviewDueDate = this.constructDate(this.assignment.reviewDueDay, this.assignment.reviewDueTime)
+            let reviewEvaluationDueDate = null
+            if (this.assignment.reviewEvaluation) {
+                reviewEvaluationDueDate = this.constructDate(
+                    this.assignment.reviewEvaluationDueDay,
+                    this.assignment.reviewEvaluationDueTime
+                )
+            }
+            let submissionExtensions = this.assignment.submissionExtensions
+            let file = this.assignment.file
+            this.$emit("submitted", {
+                publishDate,
+                dueDate,
+                reviewPublishDate,
+                reviewDueDate,
+                reviewEvaluationDueDate,
+                submissionExtensions,
+                file,
+            })
+        },
+        constructDate(day, time) {
+            // construct the full date
+            const date = new Date()
+            date.setFullYear(day.getFullYear(), day.getMonth(), day.getDate())
+            date.setHours(time.split(":")[0])
+            date.setMinutes(time.split(":")[1])
+            date.setSeconds(0)
+            date.setMilliseconds(0)
+            return date
         },
     },
 }

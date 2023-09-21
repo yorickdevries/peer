@@ -27,11 +27,13 @@
 <script>
 import DatePickerCardTemplate from "@/components/teacher-dashboard/wizard/cards/DatePickerCardTemplate.vue"
 import Cards from "@/mixins/cards"
+import moment from "moment/moment"
+import notifications from "@/mixins/notifications"
 
 export default {
     name: "PublishAssignmentCard",
     components: { DatePickerCardTemplate },
-    mixins: [Cards],
+    mixins: [Cards, notifications],
     props: ["assignment"],
     methods: {
         setPublishDate(date) {
@@ -45,6 +47,19 @@ export default {
         },
         setHandInTime(time) {
             this.assignment.dueTime = time
+        },
+        nextCard() {
+            try {
+                let publishDate = this.constructDate(this.assignment.publishDay, this.assignment.publishTime)
+                let dueDate = this.constructDate(this.assignment.dueDay, this.assignment.dueTime)
+                if (moment(publishDate).add(15, "minutes").isAfter(dueDate)) {
+                    throw new Error("The dates must chronologically correct and at least 15 minutes apart")
+                } else {
+                    this.$emit("next-card")
+                }
+            } catch (error) {
+                this.showErrorMessage({ message: String(error) })
+            }
         },
     },
 }
