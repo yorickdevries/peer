@@ -1,7 +1,7 @@
 <template>
     <DatePickerCardTemplate
         :title="'Select the due date and time for review evaluation(s)'"
-        :isDisabled="isEvalDisabled"
+        :isDisabled="!assignment.reviewEvaluation"
         :selectedDate="assignment.reviewEvaluationDueDay"
         :selectedTime="assignment.reviewEvaluationDueTime"
         @next-card="nextCard"
@@ -10,10 +10,15 @@
         @date-pick="setEvalDueDate"
         @time-pick="setEvalDueTime"
     >
-        <b-form-checkbox class="checkboxes" v-model="allowLateEvals" :disabled="isEvalDisabled" @input="setLateEvals">
+        <b-form-checkbox
+            class="checkboxes"
+            :checked="assignment.lateReviewEvaluations"
+            :disabled="!assignment.reviewEvaluation"
+            @input="setLateEvals"
+        >
             Allow late review evaluations indefinitely after the deadline
         </b-form-checkbox>
-        <b-form-checkbox class="checkboxes" v-model="isEvalDisabled" @input="setEvalDisabled">
+        <b-form-checkbox class="checkboxes" :checked="!assignment.reviewEvaluation" @input="setEvalDisabled">
             I don't want to enable review evaluations</b-form-checkbox
         >
     </DatePickerCardTemplate>
@@ -30,12 +35,7 @@ export default {
     components: { DatePickerCardTemplate },
     mixins: [Cards, notifications],
     props: ["assignment"],
-    data() {
-        return {
-            allowLateEvals: false,
-            isEvalDisabled: false,
-        }
-    },
+
     methods: {
         setEvalDueDate(date) {
             this.assignment.reviewEvaluationDueDay = date

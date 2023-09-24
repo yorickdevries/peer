@@ -65,7 +65,9 @@ export default {
             }
         },
         prevCard() {
-            this.currCardIndex--
+            if (this.currCardIndex > 0) {
+                this.currCardIndex--
+            }
         },
         switchMode() {
             this.simpleMode = !this.simpleMode

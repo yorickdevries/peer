@@ -23,11 +23,21 @@
 <script>
 import CardTemplate from "@/components/teacher-dashboard/wizard/CardTemplate.vue"
 import Cards from "@/mixins/cards"
+import notifications from "@/mixins/notifications"
 export default {
     name: "AssignmentDetailsCard",
     components: { CardTemplate },
-    mixins: [Cards],
+    mixins: [Cards, notifications],
     props: ["assignment"],
+    methods: {
+        nextCard() {
+            if (this.assignment.name && this.assignment.description) {
+                this.$emit("next-card")
+            } else {
+                this.showErrorMessage({ message: "Please fill in all fields" })
+            }
+        },
+    },
 }
 </script>
 

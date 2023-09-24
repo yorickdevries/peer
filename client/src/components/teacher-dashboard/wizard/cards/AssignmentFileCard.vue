@@ -1,12 +1,18 @@
 <template>
     <CardTemplate @next-card="nextCard" @prev-card="prevCard" @switch-mode="switchMode">
         <h1 class="text-center" style="font-size: 5rem">Add assignment file and link (optional)</h1>
-        <b-form-file class="form" placeholder="Add a file for the assignment" @input="setFile"> </b-form-file>
+        <b-form-file
+            class="form"
+            accept=".pdf,.zip,.doc,.docx"
+            :placeholder="assignment.file ? `${assignment.file.name}` : 'Add a file for the assignment'"
+            v-model="assignment.file"
+        >
+        </b-form-file>
         <b-form-input
             class="link"
             type="text"
             placeholder="Add a link where the assignment can be found for the student"
-            @input="setLink"
+            v-model="assignment.externalLink"
         ></b-form-input>
     </CardTemplate>
 </template>
@@ -20,13 +26,9 @@ export default {
     components: { CardTemplate },
     mixins: [Cards],
     props: ["assignment"],
-
     methods: {
         setFile(file) {
             this.assignment.file = file
-        },
-        setLink(link) {
-            this.assignment.externalLink = link
         },
     },
 }

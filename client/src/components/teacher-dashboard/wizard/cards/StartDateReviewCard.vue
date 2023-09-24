@@ -16,10 +16,10 @@
         @date-pick1="setReviewDueDate"
         @time-pick1="setReviewDueTime"
     >
-        <b-form-checkbox class="checkboxes" v-model="this.assignment.lateSubmissionReviews"
+        <b-form-checkbox class="checkboxes" v-model="assignment.lateSubmissionReviews"
             >Allow late submission reviews indefinitely after the deadline</b-form-checkbox
         >
-        <b-form-checkbox class="checkboxes" v-model="this.assignment.blockFeedback"
+        <b-form-checkbox class="checkboxes" v-model="assignment.blockFeedback"
             >Block feedback for students who did not finish their reviews</b-form-checkbox
         >
     </DatePickerCardTemplate>

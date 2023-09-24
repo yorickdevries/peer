@@ -259,7 +259,7 @@
                         description="Add a file for the assignment (optional)."
                     >
                         <b-form-file
-                            placeholder="Choose a file..."
+                            :placeholder="assignment.file ? `${assignment.file.name}` : 'Add a file for the assignment'"
                             accept=".pdf,.zip,.doc,.docx"
                             :state="Boolean(assignment.file)"
                             v-model="assignment.file"
@@ -543,7 +543,6 @@ export default {
             }
             // construct the full date
             const date = new Date()
-            console.log(day.getFullYear(), day.getMonth(), day.getDate())
             date.setFullYear(day.getFullYear(), day.getMonth(), day.getDate())
             date.setHours(time.split(":")[0])
             date.setMinutes(time.split(":")[1])
