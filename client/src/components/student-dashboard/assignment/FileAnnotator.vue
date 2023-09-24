@@ -97,7 +97,7 @@ export default {
                 .then((file) => {
                     if (file.type.includes("text/plain")) {
                         // The given file contains plain text and should be rendered as text
-                        if (this.filePath.split(".").pop() === "txt") {
+                        if (this.filePath.split(".").pop() === "txt" || this.filePath.split(".").pop() === "md") {
                             this.renderAs = "text"
                         } else {
                             this.renderAs = "code"

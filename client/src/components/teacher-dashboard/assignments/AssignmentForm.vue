@@ -554,7 +554,7 @@ export default {
             } else if (this.assignment.assignmentType === "code") {
                 this.assignment.submissionExtensions = ".zip"
             } else if (this.assignment.assignmentType === "text") {
-                this.assignment.submissionExtensions = ".txt"
+                this.assignment.submissionExtensions = ".txt,.md"
             }
             this.setExtensionTypes()
         },
