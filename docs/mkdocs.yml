@@ -5,6 +5,8 @@ theme:
   features:
    - navigation.instant
    - navigation.tabs
+extra_css:
+  - stylesheets/extra.css
 copyright: Copyright &copy; 2023 - 2023 Delft University of Technology
 extra:
   generator: false

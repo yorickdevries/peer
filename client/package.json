@@ -30,6 +30,7 @@
     "@vue/eslint-config-prettier": "^7.0.0",
     "apexcharts": "^3.36.3",
     "axios": "^1.2.2",
+    "blueimp-load-image": "^5.16.0",
     "bootstrap": "^4.6.2",
     "bootstrap-vue": "^2.23.1",
     "core-js": "^3.27.1",
@@ -38,6 +39,7 @@
     "eslint-plugin-vue": "^9.8.0",
     "highlight.js": "^11.7.0",
     "izitoast": "^1.4.0",
+    "jspdf": "^2.5.1",
     "jszip": "^3.10.1",
     "jszip-utils": "^0.1.0",
     "lodash": "^4.17.21",
@@ -50,6 +52,7 @@
     "vue-form-wizard": "^0.8.4",
     "vue-notifications": "^1.0.2",
     "vue-pdf-embed": "^1.1.5",
+    "vue-poll": "^0.1.8",
     "vue-rate-it": "^2.1.0",
     "vue-router": "^3.6.5",
     "vuejs-datepicker": "^1.6.2"

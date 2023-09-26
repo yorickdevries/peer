@@ -27,6 +27,8 @@ import {
     faGear,
     faUser,
     faRightFromBracket,
+    faAngleUp,
+    faAngleDown,
 } from "@fortawesome/free-solid-svg-icons"
 
 /* add icons to the library */
@@ -41,7 +43,9 @@ library.add(
     faComments,
     faGear,
     faUser,
-    faRightFromBracket
+    faRightFromBracket,
+    faAngleUp,
+    faAngleDown
 )
 
 /* add font awesome icon component */

@@ -134,6 +134,13 @@
                                             <b-badge v-else variant="danger" class="ml-2 float-right p-1">
                                                 REQUIRED
                                             </b-badge>
+                                            <b-badge
+                                                v-if="question.graded"
+                                                variant="secondary"
+                                                class="ml-2 float-right p-1"
+                                            >
+                                                GRADED
+                                            </b-badge>
                                         </b-card-header>
 
                                         <b-card-body>
@@ -159,8 +166,11 @@
                                                     v-for="option in question.options"
                                                     :key="option.id"
                                                     :value="option"
-                                                    >{{ option.text }}</b-form-radio
-                                                >
+                                                    >{{ option.text }}
+                                                    <b-badge v-if="question.graded" variant="dark"
+                                                        >Points: {{ pointsDisplay(option.points) }}</b-badge
+                                                    >
+                                                </b-form-radio>
                                             </b-form-radio-group>
 
                                             <!-- CHECKBOX QUESTION -->
@@ -175,8 +185,11 @@
                                                     v-for="option in question.options"
                                                     :key="option.id"
                                                     :value="option"
-                                                    >{{ option.text }}</b-form-checkbox
-                                                >
+                                                    >{{ option.text }}
+                                                    <b-badge v-if="question.graded" variant="dark"
+                                                        >Points: {{ pointsDisplay(option.points) }}</b-badge
+                                                    >
+                                                </b-form-checkbox>
                                             </b-form-checkbox-group>
 
                                             <!-- RANGE QUESTION -->
@@ -367,6 +380,9 @@ export default {
         await this.fetchData()
     },
     methods: {
+        pointsDisplay(points) {
+            return points / 100
+        },
         async fetchData() {
             await this.fetchAssignment()
             this.viewFile = false
