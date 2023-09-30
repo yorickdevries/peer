@@ -413,6 +413,7 @@ export default {
             extensionTypesCode: [
                 { value: ".zip", text: ".zip" },
                 { value: ".*", text: ".* (Single file submissions)" },
+                { value: ".ipynb", text: ".ipynb (Jupyter notebook )" },
             ],
             assignmentTypes: [
                 { value: "document", text: "Document review" },

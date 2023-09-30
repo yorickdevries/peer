@@ -17,6 +17,7 @@
             :reviewColors="reviewColors || defaultReviewColor"
             :ignoreAnnotations="ignoreAnnotations"
         />
+        <JupyterWrapper v-else-if="renderAs === 'jupyter'" ref="jupyterEditor" :file="file" />
         <div v-else>
             <b-alert show variant="secondary">
                 No file annotation is available, because the assignment type was not recognized.</b-alert
@@ -29,13 +30,15 @@
 import JSZip from "jszip"
 import CodeWrapper from "./../../general/CodeWrapper"
 import PDFAnnotator from "./PDFAnnotator"
+import JupyterWrapper from "./../../general/JupyterWrapper"
 
 export default {
     components: {
         CodeWrapper,
         PDFAnnotator,
+        JupyterWrapper,
     },
-    props: ["reviewId", "submissionId", "readOnly", "assignmentType", "reviewColors", "ignoreAnnotations"],
+    props: ["reviewId", "submissionId", "readOnly", "assignmentType", "reviewColors", "ignoreAnnotations", "file"],
     computed: {
         filePath() {
             if (this.reviewId) {
@@ -53,11 +56,22 @@ export default {
     data() {
         return {
             renderAs: "",
+            jupText: "",
         }
+    },
+    methods: {
+        async makeJupFile() {
+            this.jupText = this.$refs.jupyterEditor.getJupyterText()
+            const blob = new Blob([this.jupText], { type: "text/plain" })
+            return new File([blob], "jupyterSubmission.ipynb", { type: "text/plain" })
+        },
     },
     created() {
         if (this.assignmentType) {
             this.renderAs = this.assignmentType
+            if (this.file.extension == ".ipynb") {
+                this.renderAs = "jupyter"
+            }
         } else {
             fetch(this.filePath)
                 .then((res) => res.blob())

@@ -9,7 +9,6 @@
                     >Edit course
                 </b-button>
             </BreadcrumbTitle>
-
             <b-row>
                 <!--Course description card-->
                 <b-col cols="8">

@@ -1,0 +1,155 @@
+import requests
+import json
+import pytz
+
+def retrieve_messages(bot_token, channel_id, limit, within_time):
+    import datetime
+    headers = {
+        'Authorization': f'Bot {bot_token}'
+    }
+
+    params = {
+        'limit': limit
+    }
+
+    strings = ""
+    response = requests.get(f'https://discord.com/api/v9/channels/{channel_id}/messages', headers=headers, params=params)
+    json_data = response.json()
+    # print(json_data)
+    current_time = datetime.datetime.now(datetime.timezone.utc)
+
+    for message in reversed(json_data):
+        timestamp = datetime.datetime.strptime(message['timestamp'], '%Y-%m-%dT%H:%M:%S.%f%z')
+
+        time_difference = current_time - timestamp
+
+        if time_difference.total_seconds() <= within_time:  # Check if the message was sent within the last hour
+            strings += message['author']['username'] + ": " + message['content'] + "\n"
+
+    # print(strings)
+    return strings
+
+
+
+def get_summary(messages):
+    import openai
+    openai.api_key = "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"
+
+    messages += "Summarize this discord discussion concisely in full sentences: \n"
+
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages= [{"role": "user", "content": messages}]
+    )
+    # print(response["choices"][0]["message"]["content"])
+    return response["choices"][0]["message"]["content"]
+
+def get_prio_tags(messages):
+    import openai
+    openai.api_key = "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"
+
+    messages = "Put the following in this format: \n High: \nSummary: `Summary of topic`\n Users: `list of users involved in the discussion`.\n Medium: \nSummary: `Summary of topic`\n Users: `list of users involved in the discussion`.\n \n Low: \nSummary: `Summary of topic`\n Users: `list of users involved in the discussion`.\nGive priority tags (High, Medium, Low) for the conversation below: \n" + messages
+
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages= [{"role": "user", "content": messages}]
+    )
+    # print(response["choices"][0]["message"]["content"])
+    return response["choices"][0]["message"]["content"]
+
+
+def get_all_channels(server_id, bot_token):
+    headers = {
+        'Authorization': f'Bot {bot_token}'
+    }
+
+    response = requests.get(f'https://discord.com/api/v9/guilds/{server_id}/channels', headers=headers)
+
+    if response.status_code == 200:
+        channel_data = response.json()
+
+        channel_ids = [(channel['id'], channel['name']) for channel in channel_data]
+        print(channel_ids)
+        return channel_ids
+    else:
+        print(f"Error: {response.status_code} - {response.text}")
+
+def add_to_db(messages, topic):
+    from langchain.llms import OpenAI
+    from langchain.docstore.document import Document
+    import requests
+    from langchain.embeddings.openai import OpenAIEmbeddings
+    from langchain.vectorstores import Chroma
+    from langchain.text_splitter import CharacterTextSplitter
+    from langchain.prompts import PromptTemplate
+    import pathlib
+    import subprocess
+    import tempfile
+
+
+    source_chunks = []
+    splitter = CharacterTextSplitter(separator=" ", chunk_size=1024, chunk_overlap=0)
+    
+    for chunk in splitter.split_text(messages):
+        source_chunks.append(Document(page_content=chunk))
+
+    #put into vector index
+    search_index = Chroma.from_documents(source_chunks, OpenAIEmbeddings(openai_api_key="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"))
+
+    from langchain.chains import LLMChain
+
+    prompt_template = """Use the context below to write a 400 word blog post about the topic below:
+        Context: {context}
+        Topic: {topic}
+        Blog post:"""
+
+    PROMPT = PromptTemplate(template=prompt_template, input_variables=["context", "topic"])
+
+    llm = OpenAI(temperature=0, openai_api_key="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")
+
+    chain = LLMChain(llm=llm, prompt=PROMPT)
+
+    docs = search_index.similarity_search(topic, k=4)
+    inputs = [{"context": doc.page_content, "topic": topic} for doc in docs]
+    
+    print(inputs)
+
+    for input in inputs:
+        lines = input['context'].split('\n')
+
+        for line in lines:
+            if ': ' in line:
+                user, message = line.split(': ', 1)
+                print("User:", user.strip())
+                print("Message:", message.strip())
+                print()
+        print("----------------------------")
+    # print(chain.apply(inputs))
+
+
+
+
+bot_token = 'MTEyNjk1MzIzNzEwNzQ1ODE3OQ.GiPd98.IpbJTXhJpITsllXYKdFAo1g41a5Kl3dvhGpKmQ'
+channel_id = '1063883573523914857'
+server_id = '1063883573523914852'
+limit = 100
+
+
+channel_ids = get_all_channels(server_id, bot_token)
+
+messages = retrieve_messages(bot_token, channel_id, limit, 10000000)
+add_to_db(messages, "test coverage")
+
+# for channel_id in channel_ids:
+#     print(channel_id)
+#     messages = retrieve_messages(bot_token, channel_id, limit, 10000000)
+#     print(messages)
+
+#     summary = get_summary(messages)
+#     print(summary)
+#     prios = get_prio_tags(messages)
+#     print(prios)
+
+
+# print(q)
+

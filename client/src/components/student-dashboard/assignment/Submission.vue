@@ -266,11 +266,19 @@
                             instead.</b-alert
                         >
                         <FileAnnotator
+                            ref="childJupRef"
                             :submissionId="finalSubmission.id"
                             :assignmentType="assignment.assignmentType"
+                            :file="finalSubmission.file"
                             :readOnly="true"
                             :ignoreAnnotations="true"
                         />
+                        <b-button
+                            v-if="assignment.assignmentType === 'code' && assignment.submissionExtensions === '.ipynb'"
+                            @click="submitJupyterFile"
+                            variant="primary"
+                            >Save submission</b-button
+                        >
                     </div>
                 </b-col>
             </b-row>
@@ -335,6 +343,11 @@ export default {
         await this.fetchSubmissions()
     },
     methods: {
+        async submitJupyterFile() {
+            const childJupRef = this.$refs.childJupRef
+            this.file = await childJupRef.makeJupFile()
+            await this.submitSubmission()
+        },
         parseTransformedImage(canvas) {
             if (canvas.type === "error") {
                 this.showErrorMessage({ message: "There was an error parsing your image file." })
