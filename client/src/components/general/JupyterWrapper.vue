@@ -46,6 +46,25 @@ export default {
                 console.log(db)
                 let transaction = db.transaction(["files"], "readonly")
                 let objectStore = transaction.objectStore("files")
+                console.log(objectStore)
+
+                objectStore = db.transaction("files", "readwrite").objectStore("files")
+
+                const key = "file123"
+                const value = { fileName: "example.txt", content: "This is the file content." }
+
+                const addRequest = objectStore.add(value, key)
+
+                // eslint-disable-next-line no-unused-vars
+                addRequest.onsuccess = (event) => {
+                    console.log("Key-value pair added successfully.")
+                }
+
+                addRequest.onerror = (event) => {
+                    console.error("Error adding key-value pair:", event.target.error)
+                }
+
+                db.close()
 
                 const fileKey = "Untitled.ipynb"
 
@@ -56,7 +75,7 @@ export default {
                 })
                 const jupJson = JSON.stringify(fileData)
                 console.log(jupJson)
-
+                this.saveJupyter()
                 return jupJson
             } catch (error) {
                 console.error("An error occurred:", error)
