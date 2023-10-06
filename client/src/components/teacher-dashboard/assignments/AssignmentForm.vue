@@ -403,6 +403,9 @@ export default {
             newFile: null,
             whitelistExtensions: null,
             extensionTypes: null,
+
+            extensionTypesText: [{ value: ".txt,.md", text: ".txt,.md" }],
+
             extensionTypesDocument: [
                 { value: ".pdf", text: ".pdf" },
                 { value: ".zip", text: ".zip" },
@@ -417,6 +420,7 @@ export default {
             assignmentTypes: [
                 { value: "document", text: "Document review" },
                 { value: "code", text: "Code review" },
+                { value: "text", text: "Text review" },
             ],
             buttonDisabled: false,
         }
@@ -549,6 +553,8 @@ export default {
                 this.assignment.submissionExtensions = ".pdf"
             } else if (this.assignment.assignmentType === "code") {
                 this.assignment.submissionExtensions = ".zip"
+            } else if (this.assignment.assignmentType === "text") {
+                this.assignment.submissionExtensions = ".txt,.md"
             }
             this.setExtensionTypes()
         },
@@ -565,6 +571,8 @@ export default {
                     this.whitelistExtensions = this.assignment.submissionExtensions
                     this.assignment.submissionExtensions = ".*"
                 }
+            } else if (this.assignment.assignmentType === "text") {
+                this.extensionTypes = this.extensionTypesText
             }
         },
         assignmentStateAfter(state) {
