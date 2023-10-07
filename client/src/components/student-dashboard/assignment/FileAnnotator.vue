@@ -17,7 +17,7 @@
             :reviewColors="reviewColors || defaultReviewColor"
             :ignoreAnnotations="ignoreAnnotations"
         />
-        <JupyterWrapper v-else-if="renderAs === 'jupyter'" ref="jupyterEditor" :file="file" />
+        <JupyterWrapper v-else-if="renderAs === 'jupyter'" ref="jupyterEditor" :file="fileJson" />
         <div v-else>
             <b-alert show variant="secondary">
                 No file annotation is available, because the assignment type was not recognized.</b-alert
@@ -57,6 +57,7 @@ export default {
         return {
             renderAs: "",
             jupText: "",
+            fileJson: "",
         }
     },
     methods: {
@@ -80,19 +81,19 @@ export default {
             })
         },
         async makeJupFile() {
-            let str = await this.getJupFile()
-            console.log(JSON.parse(str))
             this.jupText = await this.$refs.jupyterEditor.getJupyterText()
             const blob = new Blob([JSON.stringify(this.jupText)], { type: "application/json" })
             const retVal = new File([blob], "jupyterSubmission.ipynb", { type: "application/json" })
             return retVal
         },
     },
-    created() {
+    async created() {
         if (this.assignmentType) {
             this.renderAs = this.assignmentType
             if (this.file.extension == ".ipynb") {
                 this.renderAs = "jupyter"
+                let tmp = await this.getJupFile()
+                this.fileJson = JSON.parse(tmp)
             }
         } else {
             fetch(this.filePath)

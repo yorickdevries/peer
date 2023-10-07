@@ -36,7 +36,7 @@ export default {
             }
         },
         async getJupyterText() {
-            // this.saveJupyterText()
+            this.saveJupyterText()
             try {
                 const indexedDB = window.indexedDB
                 const request = indexedDB.open("JupyterLite Storage")
@@ -82,8 +82,7 @@ export default {
 
                 objectStore = db.transaction("files", "readwrite").objectStore("files")
 
-                const key = "stuffedasda"
-                this.file.name = "stuffeadasd.ipynb"
+                const key = this.file.name
                 const value = this.file
 
                 const addRequest = objectStore.add(value, key)
