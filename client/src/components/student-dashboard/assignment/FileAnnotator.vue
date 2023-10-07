@@ -60,10 +60,32 @@ export default {
         }
     },
     methods: {
+        async getJupFile() {
+            return new Promise((resolve, reject) => {
+                fetch(this.filePath)
+                    .then((response) => response.blob())
+                    .then((blob) => {
+                        const fileReader = new FileReader()
+                        fileReader.onload = function (event) {
+                            const fileContents = event.target.result
+                            console.log(fileContents)
+                            resolve(fileContents)
+                        }
+                        fileReader.readAsText(blob)
+                    })
+                    .catch((error) => {
+                        console.error(error)
+                        reject(error)
+                    })
+            })
+        },
         async makeJupFile() {
-            this.jupText = this.$refs.jupyterEditor.getJupyterText()
-            const blob = new Blob([this.jupText], { type: "text/plain" })
-            return new File([blob], "jupyterSubmission.ipynb", { type: "text/plain" })
+            let str = await this.getJupFile()
+            console.log(JSON.parse(str))
+            this.jupText = await this.$refs.jupyterEditor.getJupyterText()
+            const blob = new Blob([JSON.stringify(this.jupText)], { type: "application/json" })
+            const retVal = new File([blob], "jupyterSubmission.ipynb", { type: "application/json" })
+            return retVal
         },
     },
     created() {

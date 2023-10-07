@@ -331,9 +331,10 @@ export default {
             )
         },
         finalSubmission() {
-            return _.find(this.submissions, (submission) => {
+            const retVal = _.find(this.submissions, (submission) => {
                 return submission.final
             })
+            return retVal
         },
     },
     async created() {
@@ -432,6 +433,7 @@ export default {
             this.submissions = []
             const res = await api.assignmentversions.getSubmissions(this.assignmentVersion.id, this.group.id)
             this.submissions = res.data
+            console.log(this.submissions)
         },
         async submitSubmission() {
             this.buttonDisabled = true
