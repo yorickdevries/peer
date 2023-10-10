@@ -87,9 +87,10 @@ export default {
         },
     },
     async created() {
+        console.log(this.file)
         if (this.assignmentType) {
             this.renderAs = this.assignmentType
-            if (this.file.extension == ".ipynb") {
+            if (this.file.extension === ".ipynb") {
                 this.renderAs = "jupyter"
                 let tmp = await this.getJupFile()
                 this.fileJson = JSON.parse(tmp)

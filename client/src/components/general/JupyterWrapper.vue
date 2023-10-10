@@ -11,10 +11,6 @@ export default {
     name: "JupyterWrapper",
     //TODO: remove redundant fileName prop
     props: ["file"],
-    created() {
-        // need to fetch jupyter file from backend
-        console.log(this.file)
-    },
     methods: {
         async submitAnnotation(annotationText) {
             // Update the current state
@@ -45,10 +41,8 @@ export default {
                     request.onsuccess = (event) => resolve(event.target.result)
                     request.onerror = (event) => reject(event.target.error)
                 })
-                console.log(db)
                 let transaction = db.transaction(["files"], "readonly")
                 let objectStore = transaction.objectStore("files")
-                console.log(objectStore)
 
                 // gets first file in indexedDB FOR NOW
                 //TODO: Get all files added
@@ -61,8 +55,6 @@ export default {
                 })
                 const jupJson = fileData
                 this.file = jupJson
-                console.log(this.file)
-                //TODO: Need to send jupyter file to backend
                 return jupJson
             } catch (error) {
                 console.error("An error occurred:", error)
@@ -104,7 +96,6 @@ export default {
         },
         // puts the notebook (receieved from backend) into indexedDB
         async saveJupyterText() {
-            console.log(this.file)
             try {
                 const indexedDB = window.indexedDB
                 const request = indexedDB.open("JupyterLite Storage")
