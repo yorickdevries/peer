@@ -17,6 +17,17 @@
             :reviewColors="reviewColors || defaultReviewColor"
             :ignoreAnnotations="ignoreAnnotations"
         />
+        <MarkdownEditorViewer
+            v-else-if="renderAs === 'text'"
+            ref="editor"
+            :answer-object="{ answer: this.text, changed: false }"
+            :displayeditor="editable"
+            @shortcut-save="
+                () => {
+                    this.$emit('shortcut-save')
+                }
+            "
+        />
         <div v-else>
             <b-alert show variant="secondary">
                 No file annotation is available, because the assignment type was not recognized.</b-alert
@@ -29,13 +40,16 @@
 import JSZip from "jszip"
 import CodeWrapper from "./../../general/CodeWrapper"
 import PDFAnnotator from "./PDFAnnotator"
+import MarkdownEditorViewer from "@/components/general/MarkdownEditorViewer.vue"
 
 export default {
     components: {
+        MarkdownEditorViewer,
         CodeWrapper,
         PDFAnnotator,
     },
-    props: ["reviewId", "submissionId", "readOnly", "assignmentType", "reviewColors", "ignoreAnnotations"],
+    props: ["reviewId", "submissionId", "readOnly", "assignmentType", "reviewColors", "ignoreAnnotations", "editable"],
+
     computed: {
         filePath() {
             if (this.reviewId) {
@@ -53,9 +67,28 @@ export default {
     data() {
         return {
             renderAs: "",
+            text: "Loading...",
         }
     },
-    created() {
+    methods: {
+        async fetchText() {
+            await fetch(this.filePath)
+                .then((res) => res.text())
+                .then((text) => {
+                    this.text = text
+                })
+                .catch((error) => {
+                    console.error("Error fetching or reading the file:", error)
+                })
+        },
+        makeFile() {
+            this.text = this.$refs.editor.answerObject.answer
+            const blob = new Blob([this.text], { type: "text/plain" })
+            return new File([blob], "textSubmission.txt", { type: "text/plain" })
+        },
+    },
+    async created() {
+        await this.fetchText()
         if (this.assignmentType) {
             this.renderAs = this.assignmentType
         } else {
@@ -63,8 +96,12 @@ export default {
                 .then((res) => res.blob())
                 .then((file) => {
                     if (file.type.includes("text/plain")) {
-                        // The given file contains plain text and should be rendered as code
-                        this.renderAs = "code"
+                        // The given file contains plain text and should be rendered as text
+                        if (this.filePath.split(".").pop() === "txt" || this.filePath.split(".").pop() === "md") {
+                            this.renderAs = "text"
+                        } else {
+                            this.renderAs = "code"
+                        }
                     } else {
                         // The given file contains binary data, we should test whether it is a zip or a
                         // pdf
