@@ -36,7 +36,7 @@ export default {
             }
         },
         async getJupyterText() {
-            this.saveJupyterText()
+            let files = await this.getAllFiles()
             try {
                 const indexedDB = window.indexedDB
                 const request = indexedDB.open("JupyterLite Storage")
@@ -50,7 +50,9 @@ export default {
                 let objectStore = transaction.objectStore("files")
                 console.log(objectStore)
 
-                const fileKey = "Untitled.ipynb"
+                // gets first file in indexedDB FOR NOW
+                //TODO: Get all files added
+                const fileKey = files[0]
 
                 const fileData = await new Promise((resolve, reject) => {
                     const getRequest = objectStore.get(fileKey)
@@ -60,13 +62,47 @@ export default {
                 const jupJson = fileData
                 this.file = jupJson
                 console.log(this.file)
-                // this.saveJupyterText()
                 //TODO: Need to send jupyter file to backend
                 return jupJson
             } catch (error) {
                 console.error("An error occurred:", error)
             }
         },
+        async getAllFiles() {
+            try {
+                const indexedDB = window.indexedDB
+                const request = indexedDB.open("JupyterLite Storage")
+
+                const db = await new Promise((resolve, reject) => {
+                    request.onsuccess = (event) => resolve(event.target.result)
+                    request.onerror = (event) => reject(event.target.error)
+                })
+
+                const transaction = db.transaction(["files"], "readonly")
+                const objectStore = transaction.objectStore("files")
+
+                const files = []
+
+                const cursorRequest = objectStore.openCursor()
+
+                cursorRequest.onsuccess = (event) => {
+                    const cursor = event.target.result
+                    if (cursor) {
+                        files.push(cursor.key)
+                        cursor.continue()
+                    } else {
+                        console.log("All files retrieved:", files)
+                    }
+                }
+                cursorRequest.onerror = (event) => {
+                    console.error("Cursor error:", event.target.error)
+                }
+                return files
+            } catch (error) {
+                console.error("An error occurred:", error)
+            }
+        },
+        // puts the notebook (receieved from backend) into indexedDB
         async saveJupyterText() {
             console.log(this.file)
             try {

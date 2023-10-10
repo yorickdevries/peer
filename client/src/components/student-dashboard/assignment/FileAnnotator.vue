@@ -56,7 +56,6 @@ export default {
     data() {
         return {
             renderAs: "",
-            jupText: "",
             fileJson: "",
         }
     },
@@ -81,8 +80,8 @@ export default {
             })
         },
         async makeJupFile() {
-            this.jupText = await this.$refs.jupyterEditor.getJupyterText()
-            const blob = new Blob([JSON.stringify(this.jupText)], { type: "application/json" })
+            let jupText = await this.$refs.jupyterEditor.getJupyterText()
+            const blob = new Blob([JSON.stringify(jupText)], { type: "application/json" })
             const retVal = new File([blob], "jupyterSubmission.ipynb", { type: "application/json" })
             return retVal
         },
@@ -94,6 +93,7 @@ export default {
                 this.renderAs = "jupyter"
                 let tmp = await this.getJupFile()
                 this.fileJson = JSON.parse(tmp)
+                await this.$refs.jupyterEditor.saveJupyterText()
             }
         } else {
             fetch(this.filePath)
