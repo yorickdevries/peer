@@ -38,19 +38,16 @@ export default {
 
     methods: {
         setDocument() {
-            // this.$emit("document-type", "document")\
             this.assignment.assignmentType = "document"
             this.assignment.submissionExtensions = ".pdf,.zip,.doc,.docx"
         },
         setCode() {
-            // this.$emit("document-type", "code")
             this.assignment.assignmentType = "code"
             this.assignment.submissionExtensions = ".*"
         },
         setText() {
-            // this.$emit("document-type", "text")
             this.assignment.assignmentType = "text"
-            // TODO: Add text file extensions to assignment object
+            this.assignment.submissionExtensions = ".txt,.md"
         },
     },
 }
