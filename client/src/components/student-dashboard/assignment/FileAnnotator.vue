@@ -94,6 +94,7 @@ export default {
                 this.renderAs = "jupyter"
                 let tmp = await this.getJupFile()
                 this.fileJson = JSON.parse(tmp)
+                this.$refs.jupyterEditor.file = this.fileJson
                 await this.$refs.jupyterEditor.saveJupyterText()
             }
         } else {

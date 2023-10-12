@@ -9,8 +9,30 @@ import api from "@/api/api"
 
 export default {
     name: "JupyterWrapper",
-    //TODO: remove redundant fileName prop
     props: ["file"],
+    async created() {
+        const indexedDB = window.indexedDB
+        const dbName = "JupyterLite Storage"
+
+        const request = indexedDB.open(dbName)
+
+        request.onsuccess = (event) => {
+            const db = event.target.result
+
+            const transaction = db.transaction(["files"], "readwrite")
+            const objectStore = transaction.objectStore("files")
+
+            const clearRequest = objectStore.clear()
+
+            clearRequest.onsuccess = () => {
+                console.log("Object store 'files' cleared successfully.")
+            }
+
+            clearRequest.onerror = (event) => {
+                console.error("Error clearing object store 'files':", event.target.error)
+            }
+        }
+    },
     methods: {
         async submitAnnotation(annotationText) {
             // Update the current state
@@ -96,6 +118,7 @@ export default {
         },
         // puts the notebook (receieved from backend) into indexedDB
         async saveJupyterText() {
+            console.log(this.file)
             try {
                 const indexedDB = window.indexedDB
                 const request = indexedDB.open("JupyterLite Storage")
