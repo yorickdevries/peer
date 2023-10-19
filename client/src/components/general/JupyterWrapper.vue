@@ -147,8 +147,10 @@ export default {
                 }
 
                 db.close()
+                return true
             } catch (error) {
                 console.error("An error occurred:", error)
+                return false
             }
         },
     },
