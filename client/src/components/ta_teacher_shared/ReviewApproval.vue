@@ -96,6 +96,7 @@
                             <FileAnnotator
                                 :reviewId="review.id"
                                 :assignmentType="assignment.assignmentType"
+                                :file="fileMetadata"
                                 :readOnly="true"
                             />
                         </b-col>
