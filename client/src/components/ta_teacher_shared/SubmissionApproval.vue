@@ -67,6 +67,7 @@
                             <FileAnnotator
                                 v-if="viewFile"
                                 :submissionId="submission.id"
+                                :file="submission.file"
                                 :assignmentType="assignment.assignmentType"
                                 :readOnly="true"
                                 :ignoreAnnotations="true"
