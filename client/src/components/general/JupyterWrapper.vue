@@ -1,5 +1,10 @@
 <template>
     <div>
+        <button v-if="loading" class="btn btn-primary" type="button" disabled>
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Loading...
+        </button>
+
         <iframe src="http://localhost/jupyter/index.html" width="100%" height="500px"></iframe>
     </div>
 </template>
@@ -10,6 +15,11 @@ import api from "@/api/api"
 export default {
     name: "JupyterWrapper",
     props: ["file"],
+    data() {
+        return {
+            loading: true,
+        }
+    },
     async created() {
         const indexedDB = window.indexedDB
         const dbName = "JupyterLite Storage"
@@ -147,6 +157,7 @@ export default {
                 }
 
                 db.close()
+                this.loading = false
                 return true
             } catch (error) {
                 console.error("An error occurred:", error)
