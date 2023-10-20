@@ -128,7 +128,6 @@ export default {
         },
         // puts the notebook (receieved from backend) into indexedDB
         async saveJupyterText() {
-            console.log(this.file)
             try {
                 const indexedDB = window.indexedDB
                 const request = indexedDB.open("JupyterLite Storage")
@@ -147,8 +146,7 @@ export default {
 
                 const addRequest = objectStore.add(value, key)
 
-                // eslint-disable-next-line no-unused-vars
-                addRequest.onsuccess = (event) => {
+                addRequest.onsuccess = () => {
                     console.log("Key-value pair added successfully.")
                 }
 

@@ -86,27 +86,8 @@ export default {
             const retVal = new File([blob], "jupyterSubmission.ipynb", { type: "application/json" })
             return retVal
         },
-        // Function to check if a database exists
-        async doesDatabaseExist(dbName) {
-            return new Promise((resolve, reject) => {
-                var request = indexedDB.open(dbName, 1, { readOnly: true })
-
-                request.onerror = function () {
-                    if (request.error.name === "InvalidStateError") {
-                        resolve(false)
-                    } else {
-                        reject(request.error)
-                    }
-                }
-
-                request.onsuccess = function () {
-                    resolve(true)
-                }
-            })
-        },
     },
     async created() {
-        console.log(this.file)
         if (this.assignmentType) {
             this.renderAs = this.assignmentType
             if (this.file.extension === ".ipynb") {
@@ -122,23 +103,16 @@ export default {
                     console.log(`Database ${dbName} exists: ${exists}`)
                     if (exists) {
                         const openRequest = indexedDB.open(dbName)
-                        // eslint-disable-next-line no-unused-vars
-                        const storeName = "files"
-                        openRequest.onsuccess = async function (event) {
-                            // eslint-disable-next-line no-unused-vars
-                            const db = event.target.result
+                        openRequest.onsuccess = async function () {
                             let intervalId = setInterval(async function () {
-                                console.log("he")
+                                console.log("Checking for objectStore")
                                 if (await vm.$refs.jupyterEditor.saveJupyterText()) {
                                     clearInterval(intervalId)
                                 }
                             }, 1000)
                         }
                     }
-
-                    // await this.$refs.jupyterEditor.saveJupyterText()
                 })
-                // await this.$refs.jupyterEditor.saveJupyterText()
             }
         } else {
             fetch(this.filePath)
