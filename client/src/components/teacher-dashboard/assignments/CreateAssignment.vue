@@ -5,7 +5,6 @@
             <b-row>
                 <b-col>
                     <h1 class="mt-5">Create a new assignment</h1>
-                    <iframe src="http://localhost/jupyter/index.html" width="100%" height="500px"></iframe>
                 </b-col>
             </b-row>
 
@@ -56,36 +55,6 @@ export default {
         }
     },
     methods: {
-        async triggerSave() {
-            try {
-                // Define the origin (usually the URL of your web application)
-
-                // Open the database with the specified origin
-                const indexedDB = window.indexedDB
-                const request = indexedDB.open("JupyterLite Storage")
-
-                const db = await new Promise((resolve, reject) => {
-                    request.onsuccess = (event) => resolve(event.target.result)
-                    request.onerror = (event) => reject(event.target.error)
-                })
-                console.log(db)
-                const transaction = db.transaction(["files"], "readonly")
-                const objectStore = transaction.objectStore("files")
-
-                const fileKey = "Untitled.ipynb"
-
-                const fileData = await new Promise((resolve, reject) => {
-                    const getRequest = objectStore.get(fileKey)
-                    getRequest.onsuccess = (event) => resolve(event.target.result)
-                    getRequest.onerror = (event) => reject(event.target.error)
-                })
-
-                console.log(fileData)
-            } catch (error) {
-                console.error("An error occurred:", error)
-            }
-        },
-
         async onSubmit(data) {
             try {
                 // call post api
