@@ -26,6 +26,7 @@ import AssignmentFileCard from "@/components/teacher-dashboard/wizard/cards/Assi
 import DueDateReviewEvaluationCard from "@/components/teacher-dashboard/wizard/cards/DueDateReviewEvaluationCard.vue"
 import StartDateReviewCard from "@/components/teacher-dashboard/wizard/cards/StartDateReviewCard.vue"
 import AssignmentForm from "@/components/teacher-dashboard/assignments/AssignmentForm.vue"
+import Cards from "@/mixins/cards"
 export default {
     name: "wizard",
     components: {
@@ -38,6 +39,7 @@ export default {
         AssignmentForm,
     },
     props: ["assignment"],
+    mixins: [Cards],
     data() {
         return {
             cardNames: [
@@ -91,16 +93,6 @@ export default {
                 reviewDueDate,
                 reviewEvaluationDueDate,
             })
-        },
-        constructDate(day, time) {
-            // construct the full date
-            const date = new Date()
-            date.setFullYear(day.getFullYear(), day.getMonth(), day.getDate())
-            date.setHours(time.split(":")[0])
-            date.setMinutes(time.split(":")[1])
-            date.setSeconds(0)
-            date.setMilliseconds(0)
-            return date
         },
     },
 }
