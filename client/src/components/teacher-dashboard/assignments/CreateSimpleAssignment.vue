@@ -57,7 +57,7 @@ export default {
                     this.assignment.description,
                     this.assignment.externalLink,
                     this.assignment.file,
-                    data.submissionExtensions,
+                    this.assignment.submissionExtensions,
                     this.assignment.blockFeedback,
                     this.assignment.lateSubmissions,
                     this.assignment.lateSubmissionReviews,

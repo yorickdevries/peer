@@ -8,7 +8,6 @@
             @switch-mode="switchMode"
             :is="cardNames[currCardIndex]"
         ></component>
-        <!--        <AssignmentForm v-else :assignment="assignment" @submitted="onSubmit" :edit="false" />-->
         <AssignmentForm
             v-else
             :assignment="assignment"
@@ -59,8 +58,6 @@ export default {
             if (this.currCardIndex < this.cardNames.length - 1) {
                 this.currCardIndex++
             } else {
-                // this.showSimpleModeButton = false
-                // this.switchMode()
                 this.onSubmit(this.assignment)
             }
         },
@@ -87,16 +84,12 @@ export default {
                     this.assignment.reviewEvaluationDueTime
                 )
             }
-            let submissionExtensions = this.assignment.submissionExtensions
-            let file = this.assignment.file
             this.$emit("submitted", {
                 publishDate,
                 dueDate,
                 reviewPublishDate,
                 reviewDueDate,
                 reviewEvaluationDueDate,
-                submissionExtensions,
-                file,
             })
         },
         constructDate(day, time) {
