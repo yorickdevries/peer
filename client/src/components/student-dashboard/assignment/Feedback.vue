@@ -34,6 +34,7 @@
                                 v-if="tab.aggregated"
                                 :submissionId="finalSubmission.id"
                                 :assignmentType="assignment.assignmentType"
+                                :file="finalSubmission.file"
                                 :readOnly="true"
                                 :reviewColors="reviewColors"
                             />
@@ -41,6 +42,7 @@
                                 v-else
                                 :reviewId="tab.id"
                                 :assignmentType="assignment.assignmentType"
+                                :file="finalSubmission.file"
                                 :readOnly="true"
                                 :reviewColors="reviewColors"
                             />

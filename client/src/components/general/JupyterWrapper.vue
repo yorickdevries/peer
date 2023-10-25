@@ -2,9 +2,9 @@
     <div>
         <button v-if="loading" class="btn btn-primary" type="button" disabled>
             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-            Loading...
+            Setting up Jupyter Environment...
         </button>
-
+        <dt v-if="!isMobile">Submitted file may take a few seconds to load after jupyter environment is set up</dt>
         <iframe src="http://localhost/jupyter/index.html" width="100%" height="500px"></iframe>
     </div>
 </template>
