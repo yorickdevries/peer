@@ -346,7 +346,7 @@ export default {
     methods: {
         async submitJupyterFile() {
             const childJupRef = this.$refs.childJupRef
-            this.file = await childJupRef.makeJupFile()
+            this.file = await childJupRef.makeJupFileAlt()
             await this.submitSubmission()
         },
         parseTransformedImage(canvas) {
