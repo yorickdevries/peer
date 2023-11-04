@@ -158,7 +158,6 @@ export default {
                 this.loading = false
                 return true
             } catch (error) {
-                console.error("An error occurred:", error)
                 return false
             }
         },

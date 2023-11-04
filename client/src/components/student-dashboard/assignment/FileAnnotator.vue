@@ -89,6 +89,11 @@ export default {
             return retVal
         },
         async makeJupFileAlt() {
+            // eslint-disable-next-line no-prototype-builtins
+            if (this.fileJson.hasOwnProperty("size")) {
+                console.log(await this.makeJupFile())
+                return await this.makeJupFile()
+            }
             console.log(this.fileJson)
             let jsonStr = `{
   "size": 75,
@@ -167,7 +172,7 @@ export default {
                 this.$refs.jupyterEditor.file = this.fileJson
 
                 const dbName = "JupyterLite Storage"
-                const vm = this
+                const vm = this.$refs.jupyterEditor
                 indexedDB.databases().then(async (databases) => {
                     const exists = databases.some((database) => database.name === dbName)
                     console.log(`Database ${dbName} exists: ${exists}`)
@@ -176,7 +181,7 @@ export default {
                         openRequest.onsuccess = async function () {
                             let intervalId = setInterval(async function () {
                                 console.log("Checking for objectStore")
-                                if (await vm.$refs.jupyterEditor.saveJupyterText()) {
+                                if (await vm.saveJupyterText()) {
                                     clearInterval(intervalId)
                                 }
                             }, 1000)
