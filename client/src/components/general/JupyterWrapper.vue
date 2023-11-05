@@ -233,7 +233,7 @@ export default {
                 const key = this.file.name
                 const value = this.file
                 console.log(this.file)
-                const addRequest = objectStore.add(value, key)
+                const addRequest = await objectStore.add(value, key)
 
                 addRequest.onsuccess = () => {
                     console.log("Key-value pair added successfully.")
@@ -243,7 +243,7 @@ export default {
                     console.error("Error adding key-value pair:", event.target.error)
                 }
 
-                db.close()
+                await db.close()
                 this.loading = false
                 return true
             } catch (error) {
@@ -251,36 +251,42 @@ export default {
                 return false
             }
         },
-    },
-    watch: {
-        file() {
-            let dbName = "JupyterLite Storage"
-            console.log("asdasdasdasdasdasd")
-            console.log(this.file)
-            indexedDB
-                .databases()
-                .then(async (databases) => {
-                    const exists = databases.some((database) => database.name === dbName)
-                    console.log(`Database ${dbName} exists: ${exists}`)
+        watch: {
+            file: {
+                immediate: true,
+                handler() {
+                    let dbName = "JupyterLite Storage"
+                    console.log("asdasdasdasdasdasd")
+                    console.log(this.file)
+                    indexedDB
+                        .databases()
+                        .then(async (databases) => {
+                            const exists = databases.some((database) => database.name === dbName)
+                            console.log(`Database ${dbName} exists: ${exists}`)
 
-                    if (exists) {
-                        const openRequest = indexedDB.open(dbName)
-                        openRequest.onsuccess = () => {
-                            let intervalId = setInterval(() => {
-                                console.log("Checking for objectStore")
-                                this.saveJupyterText().then((result) => {
-                                    if (result === true) {
-                                        clearInterval(intervalId)
-                                        console.log("finished")
-                                    }
-                                })
-                            }, 1000)
-                        }
-                    }
-                })
-                .catch((error) => {
-                    console.error(`An error occurred: ${error}`)
-                })
+                            if (exists) {
+                                const openRequest = indexedDB.open(dbName)
+                                openRequest.onsuccess = () => {
+                                    let intervalId = setInterval(async () => {
+                                        try {
+                                            console.log("Checking for objectStore")
+                                            const result = await this.saveJupyterText()
+                                            if (result === true) {
+                                                clearInterval(intervalId)
+                                                console.log("finished")
+                                            }
+                                        } catch (error) {
+                                            console.error(`An error occurred: ${error}`)
+                                        }
+                                    }, 1000)
+                                }
+                            }
+                        })
+                        .catch((error) => {
+                            console.error(`An error occurred: ${error}`)
+                        })
+                },
+            },
         },
     },
 }
