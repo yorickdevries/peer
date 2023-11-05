@@ -451,9 +451,12 @@ export default {
             }
             // Perform upload.
             try {
-                const childJupRef = this.$refs.childJupRef
-                this.file = await childJupRef.makeJupFileAlt()
                 await api.submissions.post(this.group.id, this.assignmentVersionId, this.file, config)
+                const childJupRef = this.$refs.childJupRef
+                await childJupRef.getJupFile()
+                await childJupRef.makeJupFileAlt()
+                // childJupRef.fileJson = this.file
+                // this.file = await childJupRef.makeJupFileAlt()
                 this.showSuccessMessage({ message: "Successfully submitted submission." })
             } catch (error) {
                 this.buttonDisabled = false

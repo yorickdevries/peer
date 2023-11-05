@@ -71,6 +71,7 @@ export default {
                             const fileContents = event.target.result
                             console.log(fileContents)
                             console.log(fileContents.length)
+                            this.fileJson = fileContents
                             resolve(fileContents)
                         }
                         fileReader.readAsText(blob)
@@ -81,18 +82,27 @@ export default {
                     })
             })
         },
-        async makeJupFile() {
-            let jupText = await this.$refs.jupyterEditor.getJupyterText()
-            console.log(jupText)
-            const blob = new Blob([JSON.stringify(jupText)], { type: "application/json" })
-            const retVal = new File([blob], "jupyterSubmission.ipynb", { type: "application/json" })
-            return retVal
-        },
+        // async makeJupFile() {
+        //     let jupText = await this.$refs.jupyterEditor.getJupyterText()
+        //     console.log(jupText)
+        //     const blob = new Blob([JSON.stringify(jupText)], { type: "application/json" })
+        //     const retVal = new File([blob], "jupyterSubmission.ipynb", { type: "application/json" })
+        //     return retVal
+        // },
         async makeJupFileAlt() {
+            // this.fileJson = await this.getJupFile()
+            // console.log(this.fileJson)
+            console.log(this.fileJson)
+            console.log("above")
             // eslint-disable-next-line no-prototype-builtins
             if (this.fileJson.hasOwnProperty("size")) {
-                console.log(await this.makeJupFile())
-                return await this.makeJupFile()
+                let jupText = this.fileJson
+                console.log(jupText)
+                const blob = new Blob([JSON.stringify(jupText)], { type: "application/json" })
+                const retVal = new File([blob], "jupyterSubmission.ipynb", { type: "application/json" })
+                this.$refs.jupyterEditor.file = jupText
+                console.log(this.$refs.jupyterEditor.file)
+                return retVal
             }
             console.log(this.fileJson)
             let jsonStr = `{
@@ -158,6 +168,8 @@ export default {
             console.log(jupText)
             const blob = new Blob([JSON.stringify(jupText)], { type: "application/json" })
             const retVal = new File([blob], "jupyterSubmission.ipynb", { type: "application/json" })
+            this.$refs.jupyterEditor.file = jupText
+            console.log(this.$refs.jupyterEditor.file)
             return retVal
         },
     },
