@@ -3,7 +3,7 @@
         <b-container>
             <!--Header with create button-->
             <BreadcrumbTitle :items="['Assignments']" class="mt-3">
-                <b-button variant="success" :to="{ name: 'teacher-dashboard.assignments.create' }"
+                <b-button variant="success" :to="{ name: 'teacher-dashboard.assignments.createSimple' }"
                     >Create assignment</b-button
                 >
             </BreadcrumbTitle>
