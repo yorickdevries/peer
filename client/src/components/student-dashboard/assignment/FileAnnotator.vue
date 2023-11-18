@@ -96,6 +96,7 @@ export default {
             console.log("above")
             // eslint-disable-next-line no-prototype-builtins
             if (this.fileJson.hasOwnProperty("size")) {
+                console.log("this is being run")
                 let jupText = this.fileJson
                 console.log(jupText)
                 const blob = new Blob([JSON.stringify(jupText)], { type: "application/json" })
@@ -103,74 +104,83 @@ export default {
                 this.$refs.jupyterEditor.file = jupText
                 console.log(this.$refs.jupyterEditor.file)
                 return retVal
+            } else {
+                console.log("this is not being run")
+                let jupText = await this.$refs.jupyterEditor.getJupyterText()
+                console.log(jupText)
+                const blob = new Blob([JSON.stringify(jupText)], { type: "application/json" })
+                const retVal = new File([blob], "jupyterSubmission.ipynb", { type: "application/json" })
+                this.$refs.jupyterEditor.file = jupText
+                console.log(this.$refs.jupyterEditor.file)
+                return retVal
             }
-            console.log(this.fileJson)
-            let jsonStr = `{
-  "size": 75,
-  "name": "firstSub.ipynb",
-  "path": "firstSub.ipynb",
-  "last_modified": "2023-10-15T08:38:08.743Z",
-  "created": "2023-10-15T08:37:50.586Z",
-  "format": "json",
-  "mimetype": "application/json",
-  "content": {
-    "metadata": {
-      "language_info": {
-        "codemirror_mode": {
-          "name": "python",
-          "version": 3
-        },
-        "file_extension": ".py",
-        "mimetype": "text/x-python",
-        "name": "python",
-        "nbconvert_exporter": "python",
-        "pygments_lexer": "ipython3",
-        "version": "3.8"
-      },
-      "kernelspec": {
-        "name": "python",
-        "display_name": "Python (Pyodide)",
-        "language": "python"
-      }
-    },
-    "nbformat_minor": 4,
-    "nbformat": 4,
-    "cells": [
-      {
-        "cell_type": "code",
-        "source": "print(\\"hello\\")",
-        "metadata": {
-          "trusted": true
-        },
-        "execution_count": 1,
-        "outputs": [
-          {
-            "name": "stdout",
-            "text": "hello\\n",
-            "output_type": "stream"
-          }
-        ]
-      },
-      {
-        "cell_type": "code",
-        "source": "",
-        "metadata": {},
-        "execution_count": null,
-        "outputs": []
-      }
-    ]
-  },
-  "writable": true,
-  "type": "notebook"
-}`
-            let jupText = JSON.parse(jsonStr)
-            jupText.content = this.fileJson
-            console.log(jupText)
-            const blob = new Blob([JSON.stringify(jupText)], { type: "application/json" })
-            const retVal = new File([blob], "jupyterSubmission.ipynb", { type: "application/json" })
-            this.$refs.jupyterEditor.file = jupText
-            console.log(this.$refs.jupyterEditor.file)
-            return retVal
+            //             console.log(this.fileJson)
+            //             let jsonStr = `{
+            //   "size": 75,
+            //   "name": "firstSub.ipynb",
+            //   "path": "firstSub.ipynb",
+            //   "last_modified": "2023-10-15T08:38:08.743Z",
+            //   "created": "2023-10-15T08:37:50.586Z",
+            //   "format": "json",
+            //   "mimetype": "application/json",
+            //   "content": {
+            //     "metadata": {
+            //       "language_info": {
+            //         "codemirror_mode": {
+            //           "name": "python",
+            //           "version": 3
+            //         },
+            //         "file_extension": ".py",
+            //         "mimetype": "text/x-python",
+            //         "name": "python",
+            //         "nbconvert_exporter": "python",
+            //         "pygments_lexer": "ipython3",
+            //         "version": "3.8"
+            //       },
+            //       "kernelspec": {
+            //         "name": "python",
+            //         "display_name": "Python (Pyodide)",
+            //         "language": "python"
+            //       }
+            //     },
+            //     "nbformat_minor": 4,
+            //     "nbformat": 4,
+            //     "cells": [
+            //       {
+            //         "cell_type": "code",
+            //         "source": "print(\\"hello\\")",
+            //         "metadata": {
+            //           "trusted": true
+            //         },
+            //         "execution_count": 1,
+            //         "outputs": [
+            //           {
+            //             "name": "stdout",
+            //             "text": "hello\\n",
+            //             "output_type": "stream"
+            //           }
+            //         ]
+            //       },
+            //       {
+            //         "cell_type": "code",
+            //         "source": "",
+            //         "metadata": {},
+            //         "execution_count": null,
+            //         "outputs": []
+            //       }
+            //     ]
+            //   },
+            //   "writable": true,
+            //   "type": "notebook"
+            // }`
+            //             let jupText = JSON.parse(jsonStr)
+            //             jupText.content = this.fileJson
+            //             console.log(jupText)
+            //             const blob = new Blob([JSON.stringify(jupText)], { type: "application/json" })
+            //             const retVal = new File([blob], "jupyterSubmission.ipynb", { type: "application/json" })
+            //             this.$refs.jupyterEditor.file = jupText
+            //             console.log(this.$refs.jupyterEditor.file)
+            //             return retVal
         },
     },
     async created() {
