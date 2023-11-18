@@ -346,7 +346,8 @@ export default {
     methods: {
         async submitJupyterFile() {
             const childJupRef = this.$refs.childJupRef
-            this.file = await childJupRef.makeJupFileAlt()
+            this.file = await childJupRef.makeJupFileAlt(true)
+            console.log(this.file)
             await this.submitSubmission()
         },
         parseTransformedImage(canvas) {
@@ -451,10 +452,11 @@ export default {
             }
             // Perform upload.
             try {
+                console.log(this.file)
                 await api.submissions.post(this.group.id, this.assignmentVersionId, this.file, config)
                 const childJupRef = this.$refs.childJupRef
                 await childJupRef.getJupFile()
-                await childJupRef.makeJupFileAlt()
+                await childJupRef.makeJupFileAlt(false)
                 // childJupRef.fileJson = this.file
                 // this.file = await childJupRef.makeJupFileAlt()
                 this.showSuccessMessage({ message: "Successfully submitted submission." })

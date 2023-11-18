@@ -89,24 +89,28 @@ export default {
         //     const retVal = new File([blob], "jupyterSubmission.ipynb", { type: "application/json" })
         //     return retVal
         // },
-        async makeJupFileAlt() {
+        async makeJupFileAlt(saveButton) {
             // this.fileJson = await this.getJupFile()
             // console.log(this.fileJson)
             console.log(this.fileJson)
             console.log("above")
-            // eslint-disable-next-line no-prototype-builtins
-            if (this.fileJson.hasOwnProperty("size")) {
-                console.log("this is being run")
-                let jupText = this.fileJson
+
+            //Save from editor
+            // eslint-disable-next-line no-constant-condition
+            if (saveButton) {
+                console.log("this is not being run")
+                let jupText = await this.$refs.jupyterEditor.getJupyterText()
                 console.log(jupText)
                 const blob = new Blob([JSON.stringify(jupText)], { type: "application/json" })
                 const retVal = new File([blob], "jupyterSubmission.ipynb", { type: "application/json" })
                 this.$refs.jupyterEditor.file = jupText
                 console.log(this.$refs.jupyterEditor.file)
                 return retVal
-            } else {
-                console.log("this is not being run")
-                let jupText = await this.$refs.jupyterEditor.getJupyterText()
+            } //Upload file
+            // eslint-disable-next-line no-prototype-builtins
+            else {
+                console.log("this is being run")
+                let jupText = this.fileJson
                 console.log(jupText)
                 const blob = new Blob([JSON.stringify(jupText)], { type: "application/json" })
                 const retVal = new File([blob], "jupyterSubmission.ipynb", { type: "application/json" })
