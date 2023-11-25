@@ -1,9 +1,17 @@
 <template>
     <div>
-        <button v-if="loading" class="btn btn-primary" type="button" disabled>
-            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-            Setting up Jupyter Environment...
-        </button>
+        <div v-if="loading" class="progress mb-3">
+            <div
+                class="progress-bar progress-bar-striped progress-bar-animated"
+                role="progressbar"
+                :style="{ width: progress + '%' }"
+                aria-valuenow="progress"
+                aria-valuemin="0"
+                aria-valuemax="100"
+            >
+                Setting up the Jupyter environment...
+            </div>
+        </div>
         <dt v-if="!isMobile">Submitted file may take a few seconds to load after jupyter environment is set up</dt>
         <iframe src="http://localhost/jupyter/index.html" width="100%" height="500px"></iframe>
     </div>
@@ -18,6 +26,8 @@ export default {
     data() {
         return {
             loading: true,
+            progress: 0,
+            timeToLoad: 60,
         }
     },
     async created() {
@@ -210,6 +220,31 @@ export default {
             // const retVal = new File([blob], "jupyterSubmission.ipynb", { type: "application/json" })
             return jupText
         },
+        startLoad() {
+            return new Promise((resolve) => {
+                const totalTimeInSeconds = this.timeToLoad
+                const steps = 100 // 100 steps for 100%
+
+                const intervalTime = (totalTimeInSeconds * 1000) / steps // convert sec to millisec
+
+                let currentStep = 0
+
+                if (this.loading) {
+                    let interval = setInterval(() => {
+                        if (this.progress < 100 && currentStep < steps) {
+                            this.progress += 100 / steps
+                            currentStep++
+                        } else {
+                            clearInterval(interval)
+                            this.loading = false
+                            resolve()
+                        }
+                    }, intervalTime)
+                } else {
+                    resolve()
+                }
+            })
+        },
         // puts the notebook (receieved from backend) into indexedDB
         // This method is used to store Jupyter notebook data in the IndexedDB. It opens the database, creates a
         // transaction, and then adds the Jupyter notebook content as a key-value pair in the "files" object store.
@@ -218,6 +253,7 @@ export default {
         // it returns false.
         async saveJupyterText() {
             try {
+                const loadingPromise = this.startLoad()
                 const indexedDB = window.indexedDB
                 const request = indexedDB.open("JupyterLite Storage")
 
@@ -242,9 +278,9 @@ export default {
                 addRequest.onerror = (event) => {
                     console.error("Error adding key-value pair:", event.target.error)
                 }
-
                 await db.close()
                 this.loading = false
+                await loadingPromise
                 return true
             } catch (error) {
                 console.error(error)
