@@ -460,11 +460,13 @@ export default {
                 // childJupRef.fileJson = this.file
                 // this.file = await childJupRef.makeJupFileAlt()
                 this.showSuccessMessage({ message: "Successfully submitted submission." })
+                this.$refs.uploadModal.hide()
             } catch (error) {
                 this.buttonDisabled = false
+                this.$refs.uploadModal.hide()
+                window.location.reload()
                 return
             }
-            this.$refs.uploadModal.hide()
 
             // Reset and fetch new submission.
             this.resetFile()
