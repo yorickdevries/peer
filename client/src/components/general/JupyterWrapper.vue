@@ -13,7 +13,7 @@
             </div>
         </div>
         <dt v-if="!isMobile">Submitted file may take a few seconds to load after jupyter environment is set up</dt>
-        <iframe src="http://localhost/jupyter/index.html" width="100%" height="500px"></iframe>
+        <iframe id="jupyter" src="http://localhost/jupyter/index.html" width="100%" height="500px"></iframe>
     </div>
 </template>
 
@@ -27,7 +27,7 @@ export default {
         return {
             loading: true,
             progress: 0,
-            timeToLoad: 60,
+            timeToLoad: 600,
         }
     },
     async created() {

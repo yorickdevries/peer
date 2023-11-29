@@ -231,6 +231,32 @@
                             >
                         </b-modal>
 
+                        <!-- Jupyter Save Warning Modal-->
+                        <b-modal
+                            :id="`jupyterSaveModal${assignmentVersion.id}`"
+                            ref="jupyterSaveModal"
+                            centered
+                            hide-footer
+                            title="Did you save everything in the Jupyter notebook viewer?"
+                        >
+                            <b-alert show variant="danger">
+                                If a file is unsaved, you can see a circle icon next to the file name
+                            </b-alert>
+
+                            <b-container class="d-flex justify-content-between">
+                                <b-button variant="primary" @click="handleJupConfirm" class="mr-2">
+                                    Yes, I have saved everything I want to submit
+                                </b-button>
+                                <b-button
+                                    variant="primary"
+                                    @click="$bvModal.hide(`jupyterSaveModal${assignmentVersion.id}`)"
+                                    class="ml-2"
+                                >
+                                    No, take me back
+                                </b-button>
+                            </b-container>
+                        </b-modal>
+
                         <!-- Upload Type Modal-->
                         <b-modal
                             :id="`uploadTypeModal${assignmentVersion.id}`"
@@ -275,8 +301,8 @@
                         />
                         <b-button
                             v-if="assignment.assignmentType === 'code' && assignment.submissionExtensions === '.ipynb'"
-                            @click="submitJupyterFile"
                             variant="primary"
+                            @click="$bvModal.show(`jupyterSaveModal${assignmentVersion.id}`)"
                             >Save submission</b-button
                         >
                     </div>
@@ -349,6 +375,10 @@ export default {
             this.file = await childJupRef.makeJupFileAlt(true)
             console.log(this.file)
             await this.submitSubmission()
+        },
+        async handleJupConfirm() {
+            this.$refs.jupyterSaveModal.hide()
+            await this.submitJupyterFile()
         },
         parseTransformedImage(canvas) {
             if (canvas.type === "error") {
