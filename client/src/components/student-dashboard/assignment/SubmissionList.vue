@@ -5,6 +5,7 @@
             <Submission
                 :assignmentVersion="assignment.versions[0]"
                 :assignmentVersionId="assignment.versions[0].id"
+                @shortcut-save="onChanged"
             ></Submission>
         </div>
         <div v-else>
@@ -28,7 +29,7 @@
                                 >
                             </div>
                         </template>
-                        <Submission :assignmentVersionId="assignmentVersion.id"></Submission>
+                        <Submission @shortcut-save="onChanged" :assignmentVersionId="assignmentVersion.id"></Submission>
                     </b-tab>
                 </b-tabs>
             </b-card>
@@ -47,11 +48,47 @@ export default {
     data() {
         return {
             assignment: null,
+            changed: false,
         }
     },
     async created() {
         const res = await api.assignments.get(this.$route.params.assignmentId)
         this.assignment = res.data
+        window.addEventListener("beforeunload", this.beforeWindowUnload)
+    },
+
+    beforeDestroy() {
+        window.removeEventListener("beforeunload", this.beforeWindowUnload)
+    },
+    methods: {
+        onChanged() {
+            this.changed = true
+        },
+        confirmLeave() {
+            return window.confirm("Do you really want to leave? You still have unsaved changes.")
+        },
+        isFormDirty() {
+            return this.changed
+        },
+        confirmStayInDirtyForm() {
+            return this.isFormDirty() && !this.confirmLeave()
+        },
+
+        beforeWindowUnload(e) {
+            if (this.confirmStayInDirtyForm()) {
+                // Cancel the event
+                e.preventDefault()
+                // Chrome requires returnValue to be set
+                e.returnValue = ""
+            }
+        },
+    },
+    beforeRouteLeave(to, from, next) {
+        if (this.confirmStayInDirtyForm()) {
+            next(false)
+        } else {
+            next()
+        }
     },
 }
 </script>

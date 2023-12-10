@@ -36,6 +36,7 @@ export default {
     emits: ["shortcut-save"],
     data() {
         return {
+            wordCount: 0,
             editorOptions: {
                 hideModeSwitch: true,
                 toolbarItems: [
@@ -49,13 +50,9 @@ export default {
             },
         }
     },
-    computed: {
-        wordCount() {
-            return !this.answerObject.answer ? 0 : this.getWordCount()
-        },
-    },
     methods: {
         getMarkdown() {
+            this.wordCount = this.getWordCount()
             this.answerObject.answer = this.$refs.toastuiEditor.invoke("getMarkdown")
             this.answerObject.changed = true
             this.$emit("shortcut-save")

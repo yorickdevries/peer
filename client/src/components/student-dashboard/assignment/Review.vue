@@ -71,6 +71,7 @@
                     :assignmentType="assignmentType"
                     :readOnly="reviewsAreReadOnly"
                     :file="fileMetadata"
+                    :editable="false"
                 />
             </b-col>
             <b-col :cols="columnWidthFileAndQuestionnaire">
