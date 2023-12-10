@@ -143,19 +143,12 @@ export default {
             }
         },
         async makeJupFileAlt() {
-            // this.fileJson = await this.getJupFile()
-            // console.log(this.fileJson)
-            console.log(this.file)
-            console.log("above")
             // eslint-disable-next-line no-prototype-builtins
             if (this.file.hasOwnProperty("size")) {
                 let jupText = this.file
                 console.log(jupText)
-                // const blob = new Blob([JSON.stringify(jupText)], { type: "application/json" })
-                // const retVal = new File([blob], "jupyterSubmission.ipynb", { type: "application/json" })
                 return jupText
             }
-            console.log(this.file)
             let jsonStr = `{
   "size": 75,
   "name": "firstSub.ipynb",
@@ -216,9 +209,6 @@ export default {
 }`
             let jupText = JSON.parse(jsonStr)
             jupText.content = this.file
-            console.log(jupText)
-            // const blob = new Blob([JSON.stringify(jupText)], { type: "application/json" })
-            // const retVal = new File([blob], "jupyterSubmission.ipynb", { type: "application/json" })
             return jupText
         },
         startLoad() {
@@ -268,7 +258,6 @@ export default {
                 this.file = await this.makeJupFileAlt()
                 const key = this.file.name
                 const value = this.file
-                console.log(this.file)
                 const addRequest = await objectStore.add(value, key)
 
                 addRequest.onsuccess = () => {
@@ -292,8 +281,6 @@ export default {
                 immediate: true,
                 handler() {
                     let dbName = "JupyterLite Storage"
-                    console.log("asdasdasdasdasdasd")
-                    console.log(this.file)
                     indexedDB
                         .databases()
                         .then(async (databases) => {
@@ -309,7 +296,6 @@ export default {
                                             const result = await this.saveJupyterText()
                                             if (result === true) {
                                                 clearInterval(intervalId)
-                                                console.log("finished")
                                             }
                                         } catch (error) {
                                             console.error(`An error occurred: ${error}`)
