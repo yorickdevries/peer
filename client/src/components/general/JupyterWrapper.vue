@@ -27,10 +27,11 @@ export default {
         return {
             loading: true,
             progress: 0,
-            timeToLoad: 600,
+            timeToLoad: 1000,
         }
     },
     async created() {
+        this.startLoad()
         const indexedDB = window.indexedDB
         const dbName = "JupyterLite Storage"
 
@@ -223,16 +224,16 @@ export default {
         startLoad() {
             return new Promise((resolve) => {
                 const totalTimeInSeconds = this.timeToLoad
-                const steps = 100 // 100 steps for 100%
+                const steps = 100
 
-                const intervalTime = (totalTimeInSeconds * 1000) / steps // convert sec to millisec
+                const intervalTime = (totalTimeInSeconds * 100) / steps
 
                 let currentStep = 0
 
                 if (this.loading) {
                     let interval = setInterval(() => {
                         if (this.progress < 100 && currentStep < steps) {
-                            this.progress += 100 / steps
+                            this.progress += (100 - this.progress) / 10
                             currentStep++
                         } else {
                             clearInterval(interval)
@@ -253,7 +254,6 @@ export default {
         // it returns false.
         async saveJupyterText() {
             try {
-                const loadingPromise = this.startLoad()
                 const indexedDB = window.indexedDB
                 const request = indexedDB.open("JupyterLite Storage")
 
@@ -280,7 +280,7 @@ export default {
                 }
                 await db.close()
                 this.loading = false
-                await loadingPromise
+                await this.startLoad()
                 return true
             } catch (error) {
                 console.error(error)
