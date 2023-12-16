@@ -306,8 +306,9 @@
                             v-if="assignment.assignmentType === 'code' && assignment.submissionExtensions === '.ipynb'"
                             variant="primary"
                             @click="$bvModal.show(`jupyterSaveModal${assignmentVersion.id}`)"
-                            >Save submission</b-button
-                        >
+                            >Save submission
+                            <b-spinner v-if="isLoading" small label="Loading..."></b-spinner>
+                        </b-button>
                         <!-- Modal Button -->
                         <b-button
                             v-if="assignment.assignmentType == 'text' && assignment.state == 'submission'"
@@ -337,6 +338,7 @@ export default {
     components: { FileAnnotator },
     data() {
         return {
+            isLoading: false,
             assignment: null,
             assignmentVersion: null,
             // new file to upload
@@ -390,7 +392,11 @@ export default {
         },
         async handleJupConfirm() {
             this.$refs.jupyterSaveModal.hide()
-            await this.submitJupyterFile()
+            this.isLoading = true
+            setTimeout(async () => {
+                await this.submitJupyterFile()
+                this.isLoading = false
+            }, 5000)
         },
         getChanged() {
             this.changed = true
