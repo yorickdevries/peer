@@ -70,7 +70,10 @@ export default {
         },
         isFormDirty() {
             for (let i = 0; i < this.feedbackReviews.length; i++) {
-                if (this.$refs[`review-${i}`][0].$refs["questions"].numberOfUnsavedQuestions() !== 0) {
+                const reviewRef = this.$refs[`review-${i}`]
+                const questionsRef = reviewRef && reviewRef[0] && reviewRef[0].$refs["questions"]
+
+                if (questionsRef && questionsRef.numberOfUnsavedQuestions() !== 0) {
                     return true
                 }
             }
