@@ -96,70 +96,76 @@ export default {
         //         //  It opens the database, creates a transaction, retrieves the first file (fileKey) in the object store,
         //         //  and returns the Jupyter notebook content in JSON format. The retrieved data is also set in the this.file
         //         //  data property.
-        //         async getJupyterText() {
-        //             let files = await this.getAllFiles()
-        //             try {
-        //                 const indexedDB = window.indexedDB
-        //                 const request = indexedDB.open("JupyterLite Storage")
-        //
-        //                 const db = await new Promise((resolve, reject) => {
-        //                     request.onsuccess = (event) => resolve(event.target.result)
-        //                     request.onerror = (event) => reject(event.target.error)
-        //                 })
-        //                 let transaction = db.transaction(["files"], "readonly")
-        //                 let objectStore = transaction.objectStore("files")
-        //
-        //                 // gets first file in indexedDB FOR NOW
-        //                 //TODO: Get all files added
-        //                 const fileKey = files[0]
-        //
-        //                 const fileData = await new Promise((resolve, reject) => {
-        //                     const getRequest = objectStore.get(fileKey)
-        //                     getRequest.onsuccess = (event) => resolve(event.target.result)
-        //                     getRequest.onerror = (event) => reject(event.target.error)
-        //                 })
-        //                 const jupJson = fileData
-        //                 this.file = jupJson
-        //                 return jupJson
-        //             } catch (error) {
-        //                 console.error("An error occurred:", error)
-        //             }
-        //         },
-        //         // This method retrieves all files in the IndexedDB database named "JupyterLite Storage."
-        //         async getAllFiles() {
-        //             try {
-        //                 const indexedDB = window.indexedDB
-        //                 const request = indexedDB.open("JupyterLite Storage")
-        //
-        //                 const db = await new Promise((resolve, reject) => {
-        //                     request.onsuccess = (event) => resolve(event.target.result)
-        //                     request.onerror = (event) => reject(event.target.error)
-        //                 })
-        //
-        //                 const transaction = db.transaction(["files"], "readonly")
-        //                 const objectStore = transaction.objectStore("files")
-        //
-        //                 const files = []
-        //
-        //                 const cursorRequest = objectStore.openCursor()
-        //
-        //                 cursorRequest.onsuccess = (event) => {
-        //                     const cursor = event.target.result
-        //                     if (cursor) {
-        //                         files.push(cursor.key)
-        //                         cursor.continue()
-        //                     } else {
-        //                         console.log("All files retrieved:", files)
-        //                     }
-        //                 }
-        //                 cursorRequest.onerror = (event) => {
-        //                     console.error("Cursor error:", event.target.error)
-        //                 }
-        //                 return files
-        //             } catch (error) {
-        //                 console.error("An error occurred:", error)
-        //             }
-        //         },
+        async getJupyterText() {
+            let files = await this.getAllFiles()
+            try {
+                const indexedDB = window.indexedDB
+                const request = indexedDB.open("JupyterLite Storage")
+
+                const db = await new Promise((resolve, reject) => {
+                    request.onsuccess = (event) => resolve(event.target.result)
+                    request.onerror = (event) => reject(event.target.error)
+                })
+                let transaction = db.transaction(["files"], "readonly")
+                let objectStore = transaction.objectStore("files")
+
+                // gets first file in indexedDB FOR NOW
+                //TODO: Get all files added
+                const fileKey = files[0]
+
+                const fileData = await new Promise((resolve, reject) => {
+                    const getRequest = objectStore.get(fileKey)
+                    getRequest.onsuccess = (event) => resolve(event.target.result)
+                    getRequest.onerror = (event) => reject(event.target.error)
+                })
+                const jupJson = fileData
+                this.file = jupJson
+                return jupJson
+            } catch (error) {
+                console.error("An error occurred:", error)
+            }
+        },
+        // This method retrieves all files in the IndexedDB database named "JupyterLite Storage."
+        async getAllFiles() {
+            try {
+                const indexedDB = window.indexedDB
+                const request = indexedDB.open("JupyterLite Storage")
+
+                const db = await new Promise((resolve, reject) => {
+                    request.onsuccess = (event) => resolve(event.target.result)
+                    request.onerror = (event) => reject(event.target.error)
+                })
+
+                try {
+                    const transaction = db.transaction(["files"], "readonly")
+                    const objectStore = transaction.objectStore("files")
+
+                    const files = []
+
+                    const cursorRequest = objectStore.openCursor()
+
+                    cursorRequest.onsuccess = (event) => {
+                        const cursor = event.target.result
+                        if (cursor) {
+                            files.push(cursor.key)
+                            cursor.continue()
+                        } else {
+                            console.log("All files retrieved:", files)
+                        }
+                    }
+                    cursorRequest.onerror = (event) => {
+                        console.error("Cursor error:", event.target.error)
+                    }
+                    return files
+                } catch (e) {
+                    console.error(e)
+                } finally {
+                    db.close()
+                }
+            } catch (error) {
+                console.error("An error occurred:", error)
+            }
+        },
         async makeJupFileAlt() {
             // eslint-disable-next-line no-prototype-builtins
             if (this.file.hasOwnProperty("size")) {
@@ -229,31 +235,31 @@ export default {
             jupText.content = this.file
             return jupText
         },
-        //         startLoad() {
-        //             return new Promise((resolve) => {
-        //                 const totalTimeInSeconds = this.timeToLoad
-        //                 const steps = 100
-        //
-        //                 const intervalTime = (totalTimeInSeconds * 100) / steps
-        //
-        //                 let currentStep = 0
-        //
-        //                 if (this.loading) {
-        //                     let interval = setInterval(() => {
-        //                         if (this.progress < 100 && currentStep < steps) {
-        //                             this.progress += (100 - this.progress) / 10
-        //                             currentStep++
-        //                         } else {
-        //                             clearInterval(interval)
-        //                             this.loading = false
-        //                             resolve()
-        //                         }
-        //                     }, intervalTime)
-        //                 } else {
-        //                     resolve()
-        //                 }
-        //             })
-        //         },
+        startLoad() {
+            return new Promise((resolve) => {
+                const totalTimeInSeconds = this.timeToLoad
+                const steps = 100
+
+                const intervalTime = (totalTimeInSeconds * 100) / steps
+
+                let currentStep = 0
+
+                if (this.loading) {
+                    let interval = setInterval(() => {
+                        if (this.progress < 100 && currentStep < steps) {
+                            this.progress += (100 - this.progress) / 10
+                            currentStep++
+                        } else {
+                            clearInterval(interval)
+                            this.loading = false
+                            resolve()
+                        }
+                    }, intervalTime)
+                } else {
+                    resolve()
+                }
+            })
+        },
         //         // puts the notebook (receieved from backend) into indexedDB
         //         // This method is used to store Jupyter notebook data in the IndexedDB. It opens the database, creates a
         //         // transaction, and then adds the Jupyter notebook content as a key-value pair in the "files" object store.
@@ -300,40 +306,43 @@ export default {
                 return false
             }
         },
-        //         watch: {
-        //             file: {
-        //                 immediate: true,
-        //                 handler() {
-        //                     let dbName = "JupyterLite Storage"
-        //                     indexedDB
-        //                         .databases()
-        //                         .then(async (databases) => {
-        //                             const exists = databases.some((database) => database.name === dbName)
-        //                             console.log(`Database ${dbName} exists: ${exists}`)
-        //
-        //                             if (exists) {
-        //                                 const openRequest = indexedDB.open(dbName)
-        //                                 openRequest.onsuccess = () => {
-        //                                     let intervalId = setInterval(async () => {
-        //                                         try {
-        //                                             console.log("Checking for objectStore")
-        //                                             const result = await this.saveJupyterText()
-        //                                             if (result === true) {
-        //                                                 clearInterval(intervalId)
-        //                                             }
-        //                                         } catch (error) {
-        //                                             console.error(`An error occurred: ${error}`)
-        //                                         }
-        //                                     }, 3000)
-        //                                 }
-        //                             }
-        //                         })
-        //                         .catch((error) => {
-        //                             console.error(`An error occurred: ${error}`)
-        //                         })
-        //                 },
-        //             },
-        //         },
+        watch: {
+            file: {
+                immediate: true,
+                handler() {
+                    let dbName = "JupyterLite Storage"
+                    // TODO: Don't use databases() to check if database exists, as it is not supported in Firefox
+                    // Instead use repreated checks to check if db exists (refactor into seperate method)
+                    indexedDB
+                        .databases()
+                        .then(async (databases) => {
+                            const exists = databases.some((database) => database.name === dbName)
+                            console.log(`Database ${dbName} exists: ${exists}`)
+
+                            if (exists) {
+                                //TODO: Not guarnateed to work, as the database might not be ready yet (should be done in while loop)
+                                const openRequest = indexedDB.open(dbName)
+                                openRequest.onsuccess = () => {
+                                    let intervalId = setInterval(async () => {
+                                        try {
+                                            console.log("Checking for objectStore")
+                                            const result = await this.saveJupyterText()
+                                            if (result === true) {
+                                                clearInterval(intervalId)
+                                            }
+                                        } catch (error) {
+                                            console.error(`An error occurred: ${error}`)
+                                        }
+                                    }, 3000)
+                                }
+                            }
+                        })
+                        .catch((error) => {
+                            console.error(`An error occurred: ${error}`)
+                        })
+                },
+            },
+        },
     },
 }
 </script>
