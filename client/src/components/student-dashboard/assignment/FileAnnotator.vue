@@ -160,6 +160,8 @@ export default {
                 indexedDB.databases().then(async (databases) => {
                     const exists = databases.some((database) => database.name === dbName)
                     console.log(`Database ${dbName} exists: ${exists}`)
+                    // TODO: Not guarnateed to work, as the database might not be ready yet (should be done in while loop)
+                    //repeat until database is ready
                     if (exists) {
                         const openRequest = indexedDB.open(dbName)
                         openRequest.onsuccess = async function () {
@@ -169,6 +171,11 @@ export default {
                                     clearInterval(intervalId)
                                 }
                             }, 1000)
+                            openRequest.result.close()
+                        }
+                        openRequest.onerror = function () {
+                            console.error("Error opening database")
+                            openRequest.result.close()
                         }
                     }
                 })
