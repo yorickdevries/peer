@@ -52,8 +52,8 @@ export default {
     },
     methods: {
         getMarkdown() {
-            this.wordCount = this.getWordCount()
             this.answerObject.answer = this.$refs.toastuiEditor.invoke("getMarkdown")
+            this.wordCount = this.getWordCount()
             this.answerObject.changed = true
             this.$emit("shortcut-save")
         },
