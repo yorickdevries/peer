@@ -89,6 +89,9 @@ export default {
         }
     },
     methods: {
+        async saveJupyterText() {
+            await this.$refs.jupyterEditor.saveJupyterText()
+        },
         async getJupFile() {
             return new Promise((resolve, reject) => {
                 fetch(this.filePath)

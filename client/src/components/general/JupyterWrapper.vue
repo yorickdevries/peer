@@ -31,93 +31,58 @@ export default {
         }
     },
     async created() {
-        // this.startLoad()
-        const indexedDB = window.indexedDB
-        const dbName = "JupyterLite Storage"
-
-        const request = indexedDB.open(dbName)
-
-        // eslint-disable-next-line no-unused-vars
-        request.onblocked = (event) => {
-            console.log("request blocked")
-            request.result.close()
-        }
-
-        // eslint-disable-next-line no-unused-vars
-        request.onerror = (event) => {
-            console.log("request failed")
-            request.result.close()
-        }
-
-        request.onsuccess = (event) => {
-            const db = event.target.result
-
-            try {
-                const transaction = db.transaction(["files"], "readwrite")
-                const objectStore = transaction.objectStore("files")
-
-                const clearRequest = objectStore.clear()
-
-                clearRequest.onsuccess = () => {
-                    console.log("Object store 'files' cleared successfully.")
-                }
-
-                clearRequest.onerror = (event) => {
-                    console.error("Error clearing object store 'files':", event.target.error)
-                }
-            } catch {
-                console.log("No files ot remove")
-            } finally {
-                request.result.close()
-            }
-        }
+        await this.openIndexedDB("JupyterLite Storage")
     },
     methods: {
-        //         async submitAnnotation(annotationText) {
-        //             // Update the current state
-        //             this.writing = false
-        //
-        //             try {
-        //                 // Send the annotation to the server
-        //                 const res = await api.codeannotations.postAnnotation(
-        //                     this.review.id,
-        //                     annotationText,
-        //                     this.startLineNumber,
-        //                     this.endLineNumber,
-        //                     this.highlightedFile
-        //                 )
-        //                 const annotation = res.data
-        //                 this.annotations.push(annotation)
-        //             } catch (error) {
-        //                 this.showErrorMessage({ message: "Unable to submit annotation" })
-        //             }
-        //         },
+        async openIndexedDB(dbName) {
+            const indexedDB = window.indexedDB
+            const request = indexedDB.open(dbName)
+
+            // eslint-disable-next-line no-unused-vars
+            request.onblocked = (event) => {
+                console.log("request blocked")
+                request.result.close()
+            }
+
+            // eslint-disable-next-line no-unused-vars
+            request.onerror = (event) => {
+                console.log("request failed")
+                request.result.close()
+            }
+
+            request.onsuccess = (event) => {
+                const db = event.target.result
+
+                try {
+                    const transaction = db.transaction(["files"], "readwrite")
+                    const objectStore = transaction.objectStore("files")
+
+                    const clearRequest = objectStore.clear()
+
+                    clearRequest.onsuccess = () => {
+                        console.log("Object store 'files' cleared successfully.")
+                    }
+
+                    clearRequest.onerror = (event) => {
+                        console.error("Error clearing object store 'files':", event.target.error)
+                    }
+                } catch {
+                    console.log("No files to remove")
+                } finally {
+                    request.result.close()
+                }
+            }
+        },
         //         //  This method retrieves Jupyter notebook data from an IndexedDB database named "JupyterLite Storage."
         //         //  It opens the database, creates a transaction, retrieves the first file (fileKey) in the object store,
         //         //  and returns the Jupyter notebook content in JSON format. The retrieved data is also set in the this.file
         //         //  data property.
         async getJupyterText() {
             let files = await this.getAllFiles()
+            console.log(files[0])
             try {
-                const indexedDB = window.indexedDB
-                const request = indexedDB.open("JupyterLite Storage")
-
-                const db = await new Promise((resolve, reject) => {
-                    request.onsuccess = (event) => resolve(event.target.result)
-                    request.onerror = (event) => reject(event.target.error)
-                })
-                let transaction = db.transaction(["files"], "readonly")
-                let objectStore = transaction.objectStore("files")
-
-                // gets first file in indexedDB FOR NOW
-                //TODO: Get all files added
-                const fileKey = files[0]
-
-                const fileData = await new Promise((resolve, reject) => {
-                    const getRequest = objectStore.get(fileKey)
-                    getRequest.onsuccess = (event) => resolve(event.target.result)
-                    getRequest.onerror = (event) => reject(event.target.error)
-                })
+                const fileData = files[0]
+                console.log(fileData)
                 const jupJson = fileData
                 this.file = jupJson
                 return jupJson
@@ -140,22 +105,25 @@ export default {
                     const transaction = db.transaction(["files"], "readonly")
                     const objectStore = transaction.objectStore("files")
 
-                    const files = []
+                    const files = await new Promise((resolve, reject) => {
+                        const cursorRequest = objectStore.openCursor()
+                        const files = []
 
-                    const cursorRequest = objectStore.openCursor()
-
-                    cursorRequest.onsuccess = (event) => {
-                        const cursor = event.target.result
-                        if (cursor) {
-                            files.push(cursor.key)
-                            cursor.continue()
-                        } else {
-                            console.log("All files retrieved:", files)
+                        cursorRequest.onsuccess = (event) => {
+                            const cursor = event.target.result
+                            if (cursor) {
+                                files.push(cursor.value)
+                                cursor.continue()
+                            } else {
+                                resolve(files)
+                            }
                         }
-                    }
-                    cursorRequest.onerror = (event) => {
-                        console.error("Cursor error:", event.target.error)
-                    }
+
+                        cursorRequest.onerror = (event) => {
+                            reject(event.target.error)
+                        }
+                    })
+
                     return files
                 } catch (e) {
                     console.error(e)
@@ -270,6 +238,7 @@ export default {
             const indexedDB = window.indexedDB
             const request = indexedDB.open("JupyterLite Storage")
             try {
+                console.log("got jup from backend")
                 const db = await new Promise((resolve, reject) => {
                     request.onsuccess = (event) => resolve(event.target.result)
                     request.onerror = (event) => reject(event.target.error)
