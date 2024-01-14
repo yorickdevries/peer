@@ -389,13 +389,14 @@ export default {
             this.file = await childJupRef.makeJupFileAlt(true)
             console.log(this.file)
             await this.submitSubmission()
+            await childJupRef.saveJupyterText()
         },
         async handleJupConfirm() {
             this.$refs.jupyterSaveModal.hide()
             this.isLoading = true
             setTimeout(async () => {
-                await this.submitJupyterFile()
                 this.isLoading = false
+                await this.submitJupyterFile()
             }, 5000)
         },
         getChanged() {
