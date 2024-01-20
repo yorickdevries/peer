@@ -85,14 +85,14 @@ export default {
         return {
             renderAs: "",
             fileJson: "",
-            text: "Loading...",
         }
     },
     methods: {
         async saveJupyterText() {
             await this.$refs.jupyterEditor.saveJupyterText()
         },
-        async getJupFile() {
+        // Returns the json contents of the jupyter file from the server
+        async fetchJupFile() {
             return new Promise((resolve, reject) => {
                 fetch(this.filePath)
                     .then((response) => response.blob())
@@ -111,19 +111,15 @@ export default {
                     })
             })
         },
-
-        async makeJupFileAlt(saveButton) {
-            //Save from editor
-            // eslint-disable-next-line no-constant-condition
+        async getFileFromJupEditor(saveButton) {
             if (saveButton) {
+                // Runs when the "save submission" button is pressed
                 let jupText = await this.$refs.jupyterEditor.getJupyterText()
                 const blob = new Blob([JSON.stringify(jupText)], { type: "application/json" })
                 const retVal = new File([blob], "jupyterSubmission.ipynb", { type: "application/json" })
-                this.$refs.jupyterEditor.file = jupText
                 return retVal
-            } //Upload file
-            // eslint-disable-next-line no-prototype-builtins
-            else {
+            } else {
+                // Runs when file is directly uploaded (not edited in editor)
                 let jupText = this.fileJson
                 const blob = new Blob([JSON.stringify(jupText)], { type: "application/json" })
                 const retVal = new File([blob], "jupyterSubmission.ipynb", { type: "application/json" })
@@ -154,34 +150,26 @@ export default {
             this.renderAs = this.assignmentType
             if (this.file.extension === ".ipynb") {
                 this.renderAs = "jupyter"
-                let tmp = await this.getJupFile()
+                let tmp = await this.fetchJupFile()
                 this.fileJson = JSON.parse(tmp)
                 this.$refs.jupyterEditor.file = this.fileJson
 
                 const dbName = "JupyterLite Storage"
                 const vm = this.$refs.jupyterEditor
-                indexedDB.databases().then(async (databases) => {
-                    const exists = databases.some((database) => database.name === dbName)
-                    console.log(`Database ${dbName} exists: ${exists}`)
-                    // TODO: Not guarnateed to work, as the database might not be ready yet (should be done in while loop)
-                    //repeat until database is ready
-                    if (exists) {
-                        const openRequest = indexedDB.open(dbName)
-                        openRequest.onsuccess = async function () {
-                            let intervalId = setInterval(async function () {
-                                console.log("Checking for objectStore")
-                                if (await vm.saveJupyterText()) {
-                                    clearInterval(intervalId)
-                                }
-                            }, 1000)
-                            openRequest.result.close()
+                const openRequest = indexedDB.open(dbName)
+                openRequest.onsuccess = async function () {
+                    let intervalId = setInterval(async function () {
+                        console.log("Checking for objectStore")
+                        if (await vm.saveJupyterText()) {
+                            clearInterval(intervalId)
                         }
-                        openRequest.onerror = function () {
-                            console.error("Error opening database")
-                            openRequest.result.close()
-                        }
-                    }
-                })
+                    }, 1000)
+                    openRequest.result.close()
+                }
+                openRequest.onerror = function () {
+                    console.error("Error opening database")
+                    openRequest.result.close()
+                }
             }
         } else {
             fetch(this.filePath)

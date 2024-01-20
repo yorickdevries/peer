@@ -73,10 +73,10 @@ export default {
                 }
             }
         },
-        //         //  This method retrieves Jupyter notebook data from an IndexedDB database named "JupyterLite Storage."
-        //         //  It opens the database, creates a transaction, retrieves the first file (fileKey) in the object store,
-        //         //  and returns the Jupyter notebook content in JSON format. The retrieved data is also set in the this.file
-        //         //  data property.
+        //  This method retrieves Jupyter notebook data from an IndexedDB database named "JupyterLite Storage."
+        //  It opens the database, creates a transaction, retrieves the first file (fileKey) in the object store,
+        //  and returns the Jupyter notebook content in JSON format. The retrieved data is also set in the this.file
+        //  data property.
         async getJupyterText() {
             let files = await this.getAllFiles()
             console.log(files[0])
@@ -134,7 +134,8 @@ export default {
                 console.error("An error occurred:", error)
             }
         },
-        async makeJupFileAlt() {
+        // Returns a json of the jupyter notebook in the expected format to display it in the jupyter lite editor
+        async getModifiedJupJson() {
             // eslint-disable-next-line no-prototype-builtins
             if (this.file.hasOwnProperty("size")) {
                 let jupText = this.file
@@ -228,12 +229,12 @@ export default {
                 }
             })
         },
-        //         // puts the notebook (receieved from backend) into indexedDB
-        //         // This method is used to store Jupyter notebook data in the IndexedDB. It opens the database, creates a
-        //         // transaction, and then adds the Jupyter notebook content as a key-value pair in the "files" object store.
-        //         // It sets the key as the file name (this.file.name) and the value as the Jupyter notebook content.
-        //         // If the addition is successful, it sets the loading property to false and returns true. If an error occurs,
-        //         // it returns false.
+        // puts the notebook (receieved from backend) into indexedDB
+        // This method is used to store Jupyter notebook data in the IndexedDB. It opens the database, creates a
+        // transaction, and then adds the Jupyter notebook content as a key-value pair in the "files" object store.
+        // It sets the key as the file name (this.file.name) and the value as the Jupyter notebook content.
+        // If the addition is successful, it sets the loading property to false and returns true. If an error occurs,
+        // it returns false.
         async saveJupyterText() {
             const indexedDB = window.indexedDB
             const request = indexedDB.open("JupyterLite Storage")
@@ -248,7 +249,7 @@ export default {
                     let objectStore = transaction.objectStore("files")
 
                     objectStore = db.transaction("files", "readwrite").objectStore("files")
-                    this.file = await this.makeJupFileAlt()
+                    this.file = await this.getModifiedJupJson()
                     const key = this.file.name
                     const value = this.file
                     const addRequest = await objectStore.add(value, key)
@@ -265,52 +266,14 @@ export default {
                     await this.startLoad()
                     return true
                 } catch (error) {
+                    await db.close()
                     console.error(error)
                     return false
-                } finally {
-                    db.close()
                 }
             } catch (error) {
                 console.error(error)
                 return false
             }
-        },
-        watch: {
-            file: {
-                immediate: true,
-                handler() {
-                    let dbName = "JupyterLite Storage"
-                    // TODO: Don't use databases() to check if database exists, as it is not supported in Firefox
-                    // Instead use repreated checks to check if db exists (refactor into seperate method)
-                    indexedDB
-                        .databases()
-                        .then(async (databases) => {
-                            const exists = databases.some((database) => database.name === dbName)
-                            console.log(`Database ${dbName} exists: ${exists}`)
-
-                            if (exists) {
-                                //TODO: Not guarnateed to work, as the database might not be ready yet (should be done in while loop)
-                                const openRequest = indexedDB.open(dbName)
-                                openRequest.onsuccess = () => {
-                                    let intervalId = setInterval(async () => {
-                                        try {
-                                            console.log("Checking for objectStore")
-                                            const result = await this.saveJupyterText()
-                                            if (result === true) {
-                                                clearInterval(intervalId)
-                                            }
-                                        } catch (error) {
-                                            console.error(`An error occurred: ${error}`)
-                                        }
-                                    }, 3000)
-                                }
-                            }
-                        })
-                        .catch((error) => {
-                            console.error(`An error occurred: ${error}`)
-                        })
-                },
-            },
         },
     },
 }

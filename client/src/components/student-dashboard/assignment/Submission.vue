@@ -386,7 +386,7 @@ export default {
     methods: {
         async submitJupyterFile() {
             const childJupRef = this.$refs.childRef
-            this.file = await childJupRef.makeJupFileAlt(true)
+            this.file = await childJupRef.getFileFromJupEditor(true)
             console.log(this.file)
             await this.submitSubmission()
             await childJupRef.saveJupyterText()
@@ -513,14 +513,10 @@ export default {
             try {
                 console.log(this.file)
                 await api.submissions.post(this.group.id, this.assignmentVersionId, this.file, config)
-                const childJupRef = this.$refs.childRef
-                await childJupRef.getJupFile()
-                await childJupRef.makeJupFileAlt(false)
-                // childJupRef.fileJson = this.file
-                // this.file = await childJupRef.makeJupFileAlt()
                 this.showSuccessMessage({ message: "Successfully submitted submission." })
                 this.$refs.uploadModal.hide()
             } catch (error) {
+                console.error(error)
                 this.buttonDisabled = false
                 this.$refs.uploadModal.hide()
                 window.location.reload()
