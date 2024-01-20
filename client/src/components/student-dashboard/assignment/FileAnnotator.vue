@@ -111,6 +111,7 @@ export default {
                     })
             })
         },
+        // Gets file from jupyter editor (or from upload modal) and sends to to submission component to be uploaded
         async getFileFromJupEditor(saveButton) {
             if (saveButton) {
                 // Runs when the "save submission" button is pressed

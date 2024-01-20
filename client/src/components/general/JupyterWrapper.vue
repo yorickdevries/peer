@@ -31,10 +31,10 @@ export default {
         }
     },
     async created() {
-        await this.openIndexedDB("JupyterLite Storage")
+        await this.clearExistingObjectStoreFiles("JupyterLite Storage")
     },
     methods: {
-        async openIndexedDB(dbName) {
+        async clearExistingObjectStoreFiles(dbName) {
             const indexedDB = window.indexedDB
             const request = indexedDB.open(dbName)
 
