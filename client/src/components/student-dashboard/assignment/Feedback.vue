@@ -153,6 +153,7 @@
                                             <div v-if="answer !== null">
                                                 <!-- OPEN QUESTION -->
                                                 <MarkdownEditorViewer
+                                                    :key="answer"
                                                     v-if="question.type === 'open'"
                                                     :answer-object="answer"
                                                     :displayeditor="false"
