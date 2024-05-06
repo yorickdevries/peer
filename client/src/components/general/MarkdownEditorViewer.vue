@@ -14,12 +14,11 @@
         </div>
         <div v-else>
             <viewer
-                v-if="answerObject.answer == null"
-                :initialValue="answerObject"
+                :key="answerObject.answer"
+                :initialValue="answerObject.answer == null ? answerObject : answerObject.answer"
                 :options="editorOptions"
                 height="500px"
             />
-            <viewer v-else :initialValue="answerObject.answer" :options="editorOptions" height="500px" />
         </div>
     </div>
 </template>
@@ -36,7 +35,6 @@ export default {
     emits: ["shortcut-save"],
     data() {
         return {
-            wordCount: 0,
             editorOptions: {
                 hideModeSwitch: true,
                 toolbarItems: [
@@ -50,9 +48,13 @@ export default {
             },
         }
     },
+    computed: {
+        wordCount() {
+            return !this.answerObject.answer ? 0 : this.getWordCount()
+        },
+    },
     methods: {
         getMarkdown() {
-            this.wordCount = this.getWordCount()
             this.answerObject.answer = this.$refs.toastuiEditor.invoke("getMarkdown")
             this.answerObject.changed = true
             this.$emit("shortcut-save")
