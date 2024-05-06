@@ -66,7 +66,12 @@
             <b-col :cols="columnWidthFileAndQuestionnaire" v-if="viewFile">
                 <br />
                 <br />
-                <FileAnnotator :reviewId="review.id" :assignmentType="assignmentType" :readOnly="reviewsAreReadOnly" />
+                <FileAnnotator
+                    :reviewId="review.id"
+                    :assignmentType="assignmentType"
+                    :readOnly="reviewsAreReadOnly"
+                    :editable="false"
+                />
             </b-col>
             <b-col :cols="columnWidthFileAndQuestionnaire">
                 <b-sidebar v-if="!popup" id="sidebar" title="Review Questionnaire" width="75%" right shadow backdrop>

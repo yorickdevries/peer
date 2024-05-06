@@ -2,6 +2,12 @@
     <b-row>
         <b-col>
             <b-card>
+                <div style="display: flex; justify-content: center">
+                    <b-button v-if="simpleModeButton" class="simpleMode" @click="switchMode"
+                        >Switch to simple mode</b-button
+                    >
+                </div>
+                <h1>Assignment Overview</h1>
                 <b-form @submit.prevent="onSubmit">
                     <!--Assignment name-->
                     <b-form-group label="Assignment name">
@@ -253,7 +259,7 @@
                         description="Add a file for the assignment (optional)."
                     >
                         <b-form-file
-                            placeholder="Choose a file..."
+                            :placeholder="assignment.file ? `${assignment.file.name}` : 'Add a file for the assignment'"
                             accept=".pdf,.zip,.doc,.docx"
                             :state="Boolean(assignment.file)"
                             v-model="assignment.file"
@@ -394,7 +400,7 @@ export default {
     components: {
         Datepicker,
     },
-    props: ["assignment", "edit"],
+    props: ["assignment", "edit", "simpleModeButton"],
     data() {
         return {
             // boolean which indicates whether the current file needs to be changed
@@ -403,6 +409,9 @@ export default {
             newFile: null,
             whitelistExtensions: null,
             extensionTypes: null,
+
+            extensionTypesText: [{ value: ".txt,.md", text: ".txt,.md" }],
+
             extensionTypesDocument: [
                 { value: ".pdf", text: ".pdf" },
                 { value: ".zip", text: ".zip" },
@@ -417,6 +426,7 @@ export default {
             assignmentTypes: [
                 { value: "document", text: "Document review" },
                 { value: "code", text: "Code review" },
+                { value: "text", text: "Text review" },
             ],
             buttonDisabled: false,
         }
@@ -549,6 +559,8 @@ export default {
                 this.assignment.submissionExtensions = ".pdf"
             } else if (this.assignment.assignmentType === "code") {
                 this.assignment.submissionExtensions = ".zip"
+            } else if (this.assignment.assignmentType === "text") {
+                this.assignment.submissionExtensions = ".txt,.md"
             }
             this.setExtensionTypes()
         },
@@ -565,6 +577,8 @@ export default {
                     this.whitelistExtensions = this.assignment.submissionExtensions
                     this.assignment.submissionExtensions = ".*"
                 }
+            } else if (this.assignment.assignmentType === "text") {
+                this.extensionTypes = this.extensionTypesText
             }
         },
         assignmentStateAfter(state) {
@@ -572,6 +586,9 @@ export default {
             const newIndex = assignmentStates.indexOf(state)
             if (newIndex < 0) throw new Error(`Illegal assignment state: ${state}`)
             return currentIndex > newIndex
+        },
+        switchMode() {
+            this.$emit("switch-mode")
         },
     },
     computed: {

@@ -1,7 +1,7 @@
 <template>
     <b-container fluid class="px-0">
         <b-tabs card>
-            <b-tab title="File Annotation Feedback">
+            <b-tab v-if="assignment.assignmentType !== 'text'" title="File Annotation Feedback">
                 <div v-if="finalSubmission == null">No final submission found.</div>
                 <div v-else-if="finalSubmission.file.extension !== '.pdf' && assignment.assignmentType === 'document'">
                     Your submission was not a .pdf file, so it was not annotated by reviewers.
@@ -153,6 +153,7 @@
                                             <div v-if="answer !== null">
                                                 <!-- OPEN QUESTION -->
                                                 <MarkdownEditorViewer
+                                                    :key="answer"
                                                     v-if="question.type === 'open'"
                                                     :answer-object="answer"
                                                     :displayeditor="false"

@@ -206,6 +206,7 @@ deploy-production:
 pages:
   image: python:3
   stage: deploy
+  needs: []
   before_script:
     - pip install mkdocs
     - pip install mkdocs-material
@@ -222,5 +223,6 @@ pages:
       when: never
     - if: $CI_COMMIT_BRANCH == "dev"
       when: manual
+      allow_failure: true
     - if: $CI_COMMIT_BRANCH == "master"
 

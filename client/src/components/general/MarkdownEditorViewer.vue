@@ -14,12 +14,11 @@
         </div>
         <div v-else>
             <viewer
-                v-if="answerObject.answer == null"
-                :initialValue="answerObject"
+                :key="answerObject.answer"
+                :initialValue="answerObject.answer == null ? answerObject : answerObject.answer"
                 :options="editorOptions"
                 height="500px"
             />
-            <viewer v-else :initialValue="answerObject.answer" :options="editorOptions" height="500px" />
         </div>
     </div>
 </template>

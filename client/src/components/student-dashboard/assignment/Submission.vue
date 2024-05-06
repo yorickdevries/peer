@@ -257,7 +257,7 @@
             </b-row>
             <b-row>
                 <b-col>
-                    <dt v-if="!isMobile">You can view your final submission here:</dt>
+                    <dt v-if="finalSubmission && !isMobile">You can view your final submission here:</dt>
                     <dt v-else>You can download your final submission by clicking on the filename above.</dt>
                     <div v-if="finalSubmission && !isMobile">
                         <b-alert v-if="finalSubmission.file.extension === '.pdf'" variant="secondary"
@@ -266,11 +266,22 @@
                             instead.</b-alert
                         >
                         <FileAnnotator
+                            ref="childRef"
                             :submissionId="finalSubmission.id"
                             :assignmentType="assignment.assignmentType"
                             :readOnly="true"
                             :ignoreAnnotations="true"
+                            :editable="assignment.state == 'submission'"
+                            @shortcut-save="getChanged"
                         />
+                        <!-- Modal Button -->
+                        <b-button
+                            v-if="assignment.assignmentType == 'text' && assignment.state == 'submission'"
+                            :disabled="!changed"
+                            @click="submitTextFile"
+                            variant="primary"
+                            >Save submission</b-button
+                        >
                     </div>
                 </b-col>
             </b-row>
@@ -312,6 +323,7 @@ export default {
             ],
             buttonDisabled: false,
             files: [],
+            changed: false,
         }
     },
     computed: {
@@ -335,6 +347,16 @@ export default {
         await this.fetchSubmissions()
     },
     methods: {
+        getChanged() {
+            this.changed = true
+            this.$emit("shortcut-save")
+        },
+        async submitTextFile() {
+            const childRef = this.$refs.childRef
+            this.file = await childRef.makeFile()
+            this.submitSubmission()
+            this.changed = false
+        },
         parseTransformedImage(canvas) {
             if (canvas.type === "error") {
                 this.showErrorMessage({ message: "There was an error parsing your image file." })

@@ -75,10 +75,10 @@ const templates = {
     assignmentName: string
   ) => {
     return {
-      subject: `Late review submitted in course: '${courseCode}'`,
+      subject: `You received a review after the deadline: '${courseCode}'`,
       text: `${studentName},
       
-      A review was submitted for the assignment: '${assignmentName}'
+      You received a review after the deadline: '${assignmentName}'
       
       This review was submitted after the deadline, and we wanted to make sure you didn't miss it
       
