@@ -59,7 +59,7 @@ build-server:
     paths:
     - server/dist
     - server/files
-    expire_in: 30 minutes
+    expire_in: 24 hours
   except:
   - schedule
 build-client:
