@@ -173,8 +173,9 @@ deploy-staging:
   environment:
     name: staging
     url: peer.eiptest.ewi.tudelft.nl
-  only:
-  - dev
+  rules:
+    - if: $CI_COMMIT_REF_NAME == 'dev'
+    - when: manual
 deploy-production:
   stage: deploy
   variables:
