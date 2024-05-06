@@ -223,5 +223,6 @@ pages:
       when: never
     - if: $CI_COMMIT_BRANCH == "dev"
       when: manual
+      allow_failure: true
     - if: $CI_COMMIT_BRANCH == "master"
 
