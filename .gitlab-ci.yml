@@ -59,7 +59,7 @@ build-server:
     paths:
     - server/dist
     - server/files
-    expire_in: 24 hours
+    expire_in: 30 minutes
   except:
   - schedule
 build-client:
@@ -206,6 +206,7 @@ deploy-production:
 pages:
   image: python:3
   stage: deploy
+  needs: []
   before_script:
     - pip install mkdocs
     - pip install mkdocs-material
