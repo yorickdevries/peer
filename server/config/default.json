@@ -5,7 +5,8 @@
         "port": 3306,
         "username": "peer",
         "password": "password",
-        "database": "peer"
+        "database": "peer",
+        "charset": "utf8mb4"
     },
     "session": {
         "secret": "add something random here",

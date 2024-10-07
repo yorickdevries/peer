@@ -11,6 +11,7 @@ const databaseConfig: {
   username: string;
   password: string;
   database: string;
+  charset: string;
   connectionUrl?: string;
 } = config.get("database");
 
@@ -68,6 +69,7 @@ switch (databaseConfig.type) {
         username: databaseConfig.username,
         password: databaseConfig.password,
         database: databaseConfig.database,
+        charset: databaseConfig.charset,
         extra: {
           connectionLimit: process.env.NODE_ENV === "production" ? 50 : 10,
         },
