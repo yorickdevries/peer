@@ -17,6 +17,8 @@
             :reviewColors="reviewColors || defaultReviewColor"
             :ignoreAnnotations="ignoreAnnotations"
         />
+        <JupyterWrapper v-else-if="renderAs === 'jupyter'" ref="jupyterEditor" :file="fileJson" />
+
         <MarkdownEditorViewer
             v-else-if="renderAs === 'text'"
             ref="editor"
@@ -28,6 +30,7 @@
                 }
             "
         />
+
         <div v-else>
             <b-alert show variant="secondary">
                 No file annotation is available, because the assignment type was not recognized.</b-alert
@@ -40,6 +43,9 @@
 import JSZip from "jszip"
 import CodeWrapper from "./../../general/CodeWrapper"
 import PDFAnnotator from "./PDFAnnotator"
+
+import JupyterWrapper from "./../../general/JupyterWrapper"
+
 import MarkdownEditorViewer from "@/components/general/MarkdownEditorViewer.vue"
 
 export default {
@@ -47,8 +53,19 @@ export default {
         MarkdownEditorViewer,
         CodeWrapper,
         PDFAnnotator,
+        JupyterWrapper,
     },
-    props: ["reviewId", "submissionId", "readOnly", "assignmentType", "reviewColors", "ignoreAnnotations", "editable"],
+
+    props: [
+        "reviewId",
+        "submissionId",
+        "readOnly",
+        "assignmentType",
+        "reviewColors",
+        "ignoreAnnotations",
+        "editable",
+        "file",
+    ],
 
     computed: {
         filePath() {
@@ -67,10 +84,50 @@ export default {
     data() {
         return {
             renderAs: "",
-            text: "Loading...",
+            fileJson: "",
         }
     },
     methods: {
+        async saveJupyterText() {
+            await this.$refs.jupyterEditor.saveJupyterText()
+        },
+        // Returns the json contents of the jupyter file from the server
+        async fetchJupFile() {
+            return new Promise((resolve, reject) => {
+                fetch(this.filePath)
+                    .then((response) => response.blob())
+                    .then((blob) => {
+                        const fileReader = new FileReader()
+                        fileReader.onload = function (event) {
+                            const fileContents = event.target.result
+                            this.fileJson = fileContents
+                            resolve(fileContents)
+                        }
+                        fileReader.readAsText(blob)
+                    })
+                    .catch((error) => {
+                        console.error(error)
+                        reject(error)
+                    })
+            })
+        },
+        // Gets file from jupyter editor (or from upload modal) and sends to to submission component to be uploaded
+        async getFileFromJupEditor(saveButton) {
+            if (saveButton) {
+                // Runs when the "save submission" button is pressed
+                let jupText = await this.$refs.jupyterEditor.getJupyterText()
+                const blob = new Blob([JSON.stringify(jupText)], { type: "application/json" })
+                const retVal = new File([blob], "jupyterSubmission.ipynb", { type: "application/json" })
+                return retVal
+            } else {
+                // Runs when file is directly uploaded (not edited in editor)
+                let jupText = this.fileJson
+                const blob = new Blob([JSON.stringify(jupText)], { type: "application/json" })
+                const retVal = new File([blob], "jupyterSubmission.ipynb", { type: "application/json" })
+                this.$refs.jupyterEditor.file = jupText
+                return retVal
+            }
+        },
         async fetchText() {
             await fetch(this.filePath)
                 .then((res) => res.text())
@@ -87,10 +144,34 @@ export default {
             return new File([blob], "textSubmission.txt", { type: "text/plain" })
         },
     },
+
     async created() {
         await this.fetchText()
         if (this.assignmentType) {
             this.renderAs = this.assignmentType
+            if (this.file.extension === ".ipynb") {
+                this.renderAs = "jupyter"
+                let tmp = await this.fetchJupFile()
+                this.fileJson = JSON.parse(tmp)
+                this.$refs.jupyterEditor.file = this.fileJson
+
+                const dbName = "JupyterLite Storage"
+                const vm = this.$refs.jupyterEditor
+                const openRequest = indexedDB.open(dbName)
+                openRequest.onsuccess = async function () {
+                    let intervalId = setInterval(async function () {
+                        console.log("Checking for objectStore")
+                        if (await vm.saveJupyterText()) {
+                            clearInterval(intervalId)
+                        }
+                    }, 1000)
+                    openRequest.result.close()
+                }
+                openRequest.onerror = function () {
+                    console.error("Error opening database")
+                    openRequest.result.close()
+                }
+            }
         } else {
             fetch(this.filePath)
                 .then((res) => res.blob())

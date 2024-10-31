@@ -231,6 +231,32 @@
                             >
                         </b-modal>
 
+                        <!-- Jupyter Save Warning Modal-->
+                        <b-modal
+                            :id="`jupyterSaveModal${assignmentVersion.id}`"
+                            ref="jupyterSaveModal"
+                            centered
+                            hide-footer
+                            title="Did you save everything in the Jupyter notebook viewer?"
+                        >
+                            <b-alert show variant="danger">
+                                If a file is unsaved, you can see a circle icon next to the file name
+                            </b-alert>
+
+                            <b-container class="d-flex justify-content-between">
+                                <b-button variant="primary" @click="handleJupConfirm" class="mr-2">
+                                    Yes, I have saved everything I want to submit
+                                </b-button>
+                                <b-button
+                                    variant="primary"
+                                    @click="$bvModal.hide(`jupyterSaveModal${assignmentVersion.id}`)"
+                                    class="ml-2"
+                                >
+                                    No, take me back
+                                </b-button>
+                            </b-container>
+                        </b-modal>
+
                         <!-- Upload Type Modal-->
                         <b-modal
                             :id="`uploadTypeModal${assignmentVersion.id}`"
@@ -269,11 +295,20 @@
                             ref="childRef"
                             :submissionId="finalSubmission.id"
                             :assignmentType="assignment.assignmentType"
+                            :file="finalSubmission.file"
                             :readOnly="true"
                             :ignoreAnnotations="true"
                             :editable="assignment.state == 'submission'"
                             @shortcut-save="getChanged"
                         />
+
+                        <b-button
+                            v-if="assignment.assignmentType === 'code' && assignment.submissionExtensions === '.ipynb'"
+                            variant="primary"
+                            @click="$bvModal.show(`jupyterSaveModal${assignmentVersion.id}`)"
+                            >Save submission
+                            <b-spinner v-if="isLoading" small label="Loading..."></b-spinner>
+                        </b-button>
                         <!-- Modal Button -->
                         <b-button
                             v-if="assignment.assignmentType == 'text' && assignment.state == 'submission'"
@@ -303,6 +338,7 @@ export default {
     components: { FileAnnotator },
     data() {
         return {
+            isLoading: false,
             assignment: null,
             assignmentVersion: null,
             // new file to upload
@@ -335,9 +371,10 @@ export default {
             )
         },
         finalSubmission() {
-            return _.find(this.submissions, (submission) => {
+            const retVal = _.find(this.submissions, (submission) => {
                 return submission.final
             })
+            return retVal
         },
     },
     async created() {
@@ -347,6 +384,21 @@ export default {
         await this.fetchSubmissions()
     },
     methods: {
+        async submitJupyterFile() {
+            const childJupRef = this.$refs.childRef
+            this.file = await childJupRef.getFileFromJupEditor(true)
+            console.log(this.file)
+            await this.submitSubmission()
+            await childJupRef.saveJupyterText()
+        },
+        async handleJupConfirm() {
+            this.$refs.jupyterSaveModal.hide()
+            this.isLoading = true
+            setTimeout(async () => {
+                this.isLoading = false
+                await this.submitJupyterFile()
+            }, 5000)
+        },
         getChanged() {
             this.changed = true
             this.$emit("shortcut-save")
@@ -441,6 +493,7 @@ export default {
             this.submissions = []
             const res = await api.assignmentversions.getSubmissions(this.assignmentVersion.id, this.group.id)
             this.submissions = res.data
+            console.log(this.submissions)
         },
         async submitSubmission() {
             this.buttonDisabled = true
@@ -458,13 +511,17 @@ export default {
             }
             // Perform upload.
             try {
+                console.log(this.file)
                 await api.submissions.post(this.group.id, this.assignmentVersionId, this.file, config)
                 this.showSuccessMessage({ message: "Successfully submitted submission." })
+                this.$refs.uploadModal.hide()
             } catch (error) {
+                console.error(error)
                 this.buttonDisabled = false
+                this.$refs.uploadModal.hide()
+                window.location.reload()
                 return
             }
-            this.$refs.uploadModal.hide()
 
             // Reset and fetch new submission.
             this.resetFile()

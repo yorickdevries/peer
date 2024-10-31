@@ -70,6 +70,7 @@
                     :reviewId="review.id"
                     :assignmentType="assignmentType"
                     :readOnly="reviewsAreReadOnly"
+                    :file="fileMetadata"
                     :editable="false"
                 />
             </b-col>

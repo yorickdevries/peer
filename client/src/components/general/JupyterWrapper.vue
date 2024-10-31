@@ -1,0 +1,282 @@
+<template>
+    <div>
+        <div v-if="loading" class="progress mb-3">
+            <div
+                class="progress-bar progress-bar-striped progress-bar-animated"
+                role="progressbar"
+                :style="{ width: progress + '%' }"
+                aria-valuenow="progress"
+                aria-valuemin="0"
+                aria-valuemax="100"
+            >
+                Setting up the Jupyter environment...
+            </div>
+        </div>
+        <dt>Submitted file may take a few seconds to load after jupyter environment is set up</dt>
+        <iframe id="jupyter" src="http://localhost/jupyter/index.html" width="100%" height="500px"></iframe>
+    </div>
+</template>
+
+<script>
+// import api from "@/api/api"
+
+export default {
+    name: "JupyterWrapper",
+    props: ["file"],
+    data() {
+        return {
+            loading: true,
+            progress: 0,
+            timeToLoad: 1000,
+        }
+    },
+    async created() {
+        await this.clearExistingObjectStoreFiles("JupyterLite Storage")
+    },
+    methods: {
+        async clearExistingObjectStoreFiles(dbName) {
+            const indexedDB = window.indexedDB
+            const request = indexedDB.open(dbName)
+
+            // eslint-disable-next-line no-unused-vars
+            request.onblocked = (event) => {
+                console.log("request blocked")
+                request.result.close()
+            }
+
+            // eslint-disable-next-line no-unused-vars
+            request.onerror = (event) => {
+                console.log("request failed")
+                request.result.close()
+            }
+
+            request.onsuccess = (event) => {
+                const db = event.target.result
+
+                try {
+                    const transaction = db.transaction(["files"], "readwrite")
+                    const objectStore = transaction.objectStore("files")
+
+                    const clearRequest = objectStore.clear()
+
+                    clearRequest.onsuccess = () => {
+                        console.log("Object store 'files' cleared successfully.")
+                    }
+
+                    clearRequest.onerror = (event) => {
+                        console.error("Error clearing object store 'files':", event.target.error)
+                    }
+                } catch {
+                    console.log("No files to remove")
+                } finally {
+                    request.result.close()
+                }
+            }
+        },
+        //  This method retrieves Jupyter notebook data from an IndexedDB database named "JupyterLite Storage."
+        //  It opens the database, creates a transaction, retrieves the first file (fileKey) in the object store,
+        //  and returns the Jupyter notebook content in JSON format. The retrieved data is also set in the this.file
+        //  data property.
+        async getJupyterText() {
+            let files = await this.getAllFiles()
+            console.log(files[0])
+            try {
+                const fileData = files[0]
+                console.log(fileData)
+                const jupJson = fileData
+                this.file = jupJson
+                return jupJson
+            } catch (error) {
+                console.error("An error occurred:", error)
+            }
+        },
+        // This method retrieves all files in the IndexedDB database named "JupyterLite Storage."
+        async getAllFiles() {
+            try {
+                const indexedDB = window.indexedDB
+                const request = indexedDB.open("JupyterLite Storage")
+
+                const db = await new Promise((resolve, reject) => {
+                    request.onsuccess = (event) => resolve(event.target.result)
+                    request.onerror = (event) => reject(event.target.error)
+                })
+
+                try {
+                    const transaction = db.transaction(["files"], "readonly")
+                    const objectStore = transaction.objectStore("files")
+
+                    const files = await new Promise((resolve, reject) => {
+                        const cursorRequest = objectStore.openCursor()
+                        const files = []
+
+                        cursorRequest.onsuccess = (event) => {
+                            const cursor = event.target.result
+                            if (cursor) {
+                                files.push(cursor.value)
+                                cursor.continue()
+                            } else {
+                                resolve(files)
+                            }
+                        }
+
+                        cursorRequest.onerror = (event) => {
+                            reject(event.target.error)
+                        }
+                    })
+
+                    return files
+                } catch (e) {
+                    console.error(e)
+                } finally {
+                    db.close()
+                }
+            } catch (error) {
+                console.error("An error occurred:", error)
+            }
+        },
+        // Returns a json of the jupyter notebook in the expected format to display it in the jupyter lite editor
+        async getModifiedJupJson() {
+            // eslint-disable-next-line no-prototype-builtins
+            if (this.file.hasOwnProperty("size")) {
+                let jupText = this.file
+                console.log(jupText)
+                return jupText
+            }
+            let jsonStr = `{
+          "size": 75,
+          "name": "firstSub.ipynb",
+          "path": "firstSub.ipynb",
+          "last_modified": "2023-10-15T08:38:08.743Z",
+          "created": "2023-10-15T08:37:50.586Z",
+          "format": "json",
+          "mimetype": "application/json",
+          "content": {
+            "metadata": {
+              "language_info": {
+                "codemirror_mode": {
+                  "name": "python",
+                  "version": 3
+                },
+                "file_extension": ".py",
+                "mimetype": "text/x-python",
+                "name": "python",
+                "nbconvert_exporter": "python",
+                "pygments_lexer": "ipython3",
+                "version": "3.8"
+              },
+              "kernelspec": {
+                "name": "python",
+                "display_name": "Python (Pyodide)",
+                "language": "python"
+              }
+            },
+            "nbformat_minor": 4,
+            "nbformat": 4,
+            "cells": [
+              {
+                "cell_type": "code",
+                "source": "print(\\"hello\\")",
+                "metadata": {
+                  "trusted": true
+                },
+                "execution_count": 1,
+                "outputs": [
+                  {
+                    "name": "stdout",
+                    "text": "hello\\n",
+                    "output_type": "stream"
+                  }
+                ]
+              },
+              {
+                "cell_type": "code",
+                "source": "",
+                "metadata": {},
+                "execution_count": null,
+                "outputs": []
+              }
+            ]
+          },
+          "writable": true,
+          "type": "notebook"
+        }`
+            let jupText = JSON.parse(jsonStr)
+            jupText.content = this.file
+            return jupText
+        },
+        startLoad() {
+            return new Promise((resolve) => {
+                const totalTimeInSeconds = this.timeToLoad
+                const steps = 100
+
+                const intervalTime = (totalTimeInSeconds * 100) / steps
+
+                let currentStep = 0
+
+                if (this.loading) {
+                    let interval = setInterval(() => {
+                        if (this.progress < 100 && currentStep < steps) {
+                            this.progress += (100 - this.progress) / 10
+                            currentStep++
+                        } else {
+                            clearInterval(interval)
+                            this.loading = false
+                            resolve()
+                        }
+                    }, intervalTime)
+                } else {
+                    resolve()
+                }
+            })
+        },
+        // puts the notebook (receieved from backend) into indexedDB
+        // This method is used to store Jupyter notebook data in the IndexedDB. It opens the database, creates a
+        // transaction, and then adds the Jupyter notebook content as a key-value pair in the "files" object store.
+        // It sets the key as the file name (this.file.name) and the value as the Jupyter notebook content.
+        // If the addition is successful, it sets the loading property to false and returns true. If an error occurs,
+        // it returns false.
+        async saveJupyterText() {
+            const indexedDB = window.indexedDB
+            const request = indexedDB.open("JupyterLite Storage")
+            try {
+                console.log("got jup from backend")
+                const db = await new Promise((resolve, reject) => {
+                    request.onsuccess = (event) => resolve(event.target.result)
+                    request.onerror = (event) => reject(event.target.error)
+                })
+                try {
+                    let transaction = db.transaction(["files"], "readonly")
+                    let objectStore = transaction.objectStore("files")
+
+                    objectStore = db.transaction("files", "readwrite").objectStore("files")
+                    this.file = await this.getModifiedJupJson()
+                    const key = this.file.name
+                    const value = this.file
+                    const addRequest = await objectStore.add(value, key)
+
+                    addRequest.onsuccess = () => {
+                        console.log("Key-value pair added successfully.")
+                    }
+
+                    addRequest.onerror = (event) => {
+                        console.error("Error adding key-value pair:", event.target.error)
+                    }
+                    await db.close()
+                    this.loading = false
+                    await this.startLoad()
+                    return true
+                } catch (error) {
+                    await db.close()
+                    console.error(error)
+                    return false
+                }
+            } catch (error) {
+                console.error(error)
+                return false
+            }
+        },
+    },
+}
+</script>
+
+<style scoped></style>

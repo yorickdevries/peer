@@ -3,6 +3,7 @@
 /server/dist/
 /server/files/
 /server/coverage/
+/server/_output/
 
 # local env files
 .env.local
@@ -39,3 +40,4 @@ pnpm-debug.log*
 
 # Ignore zip files generated
 *.zip
+/_output/
